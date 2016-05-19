@@ -33,3 +33,49 @@ assemble
 *.nav
 *.toc
 
+#ignor .d files
+*.d
+
+## Idea Gitignore
+
+# User-specific stuff:
+src/.idea/workspace.xml
+src/.idea/tasks.xml
+src/.idea/dictionaries
+src/.idea/vcs.xml
+src/.idea/jsLibraryMappings.xml
+
+# Sensitive or high-churn files:
+src/.idea/dataSources.ids
+src/.idea/dataSources.xml
+src/.idea/dataSources.local.xml
+src/.idea/sqlDataSources.xml
+src/.idea/dynamic.xml
+src/.idea/uiDesigner.xml
+
+# Gradle:
+src/.idea/gradle.xml
+src/.idea/libraries
+
+# Mongo Explorer plugin:
+src/.idea/mongoSettings.xml
+
+## File-based project format:
+src/*.iws
+
+## Plugin-specific files:
+
+# IntelliJ
+src/out/
+
+# mpeltonen/sbt-idea plugin
+src/.idea_modules/
+
+# JIRA plugin
+src/atlassian-ide-plugin.xml
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+src/com_crashlytics_export_strings.xml
+src/crashlytics.properties
+src/crashlytics-build.properties
+src/fabric.properties
