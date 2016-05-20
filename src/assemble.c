@@ -3,27 +3,10 @@
 #include <stdint.h>
 #include "instructions.h"
 
-struct symbol {
+struct sym {
 	char *label;
 	uint16_t address;
 };
-
-int numLines(FILE *file)
-{
-	char ch;
-	int num_of_lines = 0;
-
-	do {
-		ch = fgetc(file);
-		if (ch == '\n')
-			num_of_lines++;
-	} while (ch != EOF);
-
-	if (ch != '\n' && num_of_lines != 0)
-		num_of_lines++;
-
-	return num_of_lines;
-}
 
 int main(int argc, char **argv)
 {
@@ -31,8 +14,8 @@ int main(int argc, char **argv)
 	FILE *output;
 
 	/* Symbol Table ADT */
-	int symbol_table_size = 16;
-	struct symbol *symbol_table = malloc(symbol_table_size * sizeof(struct symbol));
+	int sym_table_size = 16;
+	struct sym *sym_table = calloc(sym_table_size, sizeof(struct sym));
 
 	/* Check if source and dest files are provided.	 */
 	if (argc < 3)
@@ -53,8 +36,8 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	
 
-	free(symbol_table);
+
+	free(sym_table);
 	return EXIT_SUCCESS;
 }
