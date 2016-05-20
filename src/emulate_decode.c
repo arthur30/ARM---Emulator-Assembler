@@ -5,25 +5,39 @@
 #include <stdbool.h>
 #include <errno.h>
 
+#define BIT_IMMEDIATE (1 << 25)
+
+#define DATA_PROC_MASK 0x0C000000
+#define DATA_PROC_BITP 0x00000000
+
+#define MULT_MASK      0x0FC000F0
+#define MULT_BITP      0x00000090
+
+#define TRANSFER_MASK  0x0C600000
+#define TRANSFER_BITP  0x04000000
+
+#define BRANCH_MASK    0x0F000000
+#define BRANCH_BITP    0x0A000000
+
 static bool instr_is_data_proc(uint32_t instr)
 {
-	return !(instr & (3 << 26)) &&
-		(instr & (1 << 25) || (instr & (9 << 4)) < (9 << 4));
+	return !(instr & DATA_PROC_MASK) &&
+		(instr & BIT_IMMEDIATE || (instr & MULT_BITP) < MULT_BITP);
 }
 
 static bool instr_is_mult(uint32_t instr)
 {
-	return !(instr & (63 << 22)) && (((instr >> 4) & 9) == 0x9);
+	return (instr & MULT_MASK) == MULT_BITP;
 }
 
 static bool instr_is_transfer(uint32_t instr)
 {
-	return ((instr >> 26) & 0x3) == 0x1 && !((instr >> 21) & 0x3);
+	return (instr & TRANSFER_MASK) == TRANSFER_BITP;
 }
 
 static bool instr_is_branch(uint32_t instr)
 {
-	return ((instr >> 24) & 0xF) == 0xA;
+	return (instr & BRANCH_MASK) == BRANCH_BITP;
 }
 
 static void set_instruction_type(struct pi_state *pstate, enum instr_type type)
