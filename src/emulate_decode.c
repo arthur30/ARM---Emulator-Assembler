@@ -28,25 +28,25 @@
 #define GETBITS(ic, p, n) (((ic) >> (p)) & ((1 << (n)) - 1))
 #define GETREG(ic, p) GETBITS(ic, p, 4)
 
-static bool instr_is_data_proc(uint32_t instr)
+static bool instr_is_data_proc(uint32_t ic)
 {
-	return !(instr & DATA_PROC_MASK) &&
-		(instr & BIT_IMM || (instr & MULT_BITP) < MULT_BITP);
+	return !(ic & DATA_PROC_MASK) &&
+		(ic & BIT_IMM || (ic & MULT_BITP) < MULT_BITP);
 }
 
-static bool instr_is_mult(uint32_t instr)
+static bool instr_is_mult(uint32_t ic)
 {
-	return (instr & MULT_MASK) == MULT_BITP;
+	return (ic & MULT_MASK) == MULT_BITP;
 }
 
-static bool instr_is_transfer(uint32_t instr)
+static bool instr_is_transfer(uint32_t ic)
 {
-	return (instr & TRANSFER_MASK) == TRANSFER_BITP;
+	return (ic & TRANSFER_MASK) == TRANSFER_BITP;
 }
 
-static bool instr_is_branch(uint32_t instr)
+static bool instr_is_branch(uint32_t ic)
 {
-	return (instr & BRANCH_MASK) == BRANCH_BITP;
+	return (ic & BRANCH_MASK) == BRANCH_BITP;
 }
 
 static void set_instruction_type(struct pi_state *pstate, enum instr_type type)
@@ -96,9 +96,8 @@ static int decode_offset(uint32_t ic, struct instr_offset *offset)
 	return 0;
 }
 
-static int decode_data_proc(struct pi_state *pstate)
+static int decode_data_proc(uint32_t ic, struct pi_state *pstate)
 {
-	uint32_t ic;
 	struct instr_data_proc *data_proc;
 
 	set_instruction_type(pstate, DATA_PROC);
@@ -112,9 +111,8 @@ static int decode_data_proc(struct pi_state *pstate)
 	return decode_op2(ic, &data_proc->op2);
 }
 
-static int decode_mult(struct pi_state *pstate)
+static int decode_mult(uint32_t ic, struct pi_state *pstate)
 {
-	uint32_t ic;
 	struct instr_mult *mult;
 
 	set_instruction_type(pstate, MULT);
@@ -131,9 +129,8 @@ static int decode_mult(struct pi_state *pstate)
 	return 0;
 }
 
-static int decode_transfer(struct pi_state *pstate)
+static int decode_transfer(uint32_t ic, struct pi_state *pstate)
 {
-	uint32_t ic;
 	struct instr_transfer *transfer;
 
 	set_instruction_type(pstate, TRANSFER);
@@ -148,9 +145,8 @@ static int decode_transfer(struct pi_state *pstate)
 	return decode_offset(ic, &transfer->offset);
 }
 
-static int decode_branch(struct pi_state *pstate)
+static int decode_branch(uint32_t ic, struct pi_state *pstate)
 {
-	uint32_t ic;
 	struct instr_branch *branch;
 	int32_t offset;
 
@@ -167,7 +163,7 @@ static int decode_branch(struct pi_state *pstate)
 
 int decode(struct pi_state *pstate)
 {
-	uint32_t instr_code;
+	uint32_t ic;
 	struct instr *instruction;
 
 	if (!pstate->pipeline.fetched)
@@ -176,21 +172,21 @@ int decode(struct pi_state *pstate)
 	pstate->pipeline.fetched = false;
 	pstate->pipeline.decoded = true;
 
-	instr_code = pstate->pipeline.instr_code;
+	ic = pstate->pipeline.instr_code;
 
 	instruction = &pstate->pipeline.instruction;
-	instruction->cond = GETBITS(instr_code, 28, 4);
+	instruction->cond = GETBITS(ic, 28, 4);
 
-	if (!instr_code)
+	if (!ic)
 		return decode_halt(pstate);
-	if (instr_is_data_proc(instr_code))
-		return decode_data_proc(pstate);
-	if (instr_is_mult(instr_code))
-		return decode_mult(pstate);
-	if (instr_is_transfer(instr_code))
-		return decode_transfer(pstate);
-	if (instr_is_branch(instr_code))
-		return decode_branch(pstate);
+	if (instr_is_data_proc(ic))
+		return decode_data_proc(ic, pstate);
+	if (instr_is_mult(ic))
+		return decode_mult(ic, pstate);
+	if (instr_is_transfer(ic))
+		return decode_transfer(ic, pstate);
+	if (instr_is_branch(ic))
+		return decode_branch(ic, pstate);
 
 	errno = EINVAL;
 	return -1;
