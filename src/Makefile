@@ -31,6 +31,6 @@ release:
 	make "BUILD=release"
 
 checksrc:
-	scripts/checkpatch.pl --no-tree -f $(wildcard *.c)
+	scripts/checkpatch.pl --quiet --no-tree -file $(wildcard *.c) $(wildcard *.h)
 
 -include $(wildcard *.d)
