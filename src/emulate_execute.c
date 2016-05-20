@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 
 static void set_cpsr_c(struct cpsrreg *cpsr, bool val)
@@ -365,11 +366,8 @@ static uint8_t *get_gpio(struct pi_state *pstate, size_t address)
 
 		for (size_t i = 0; i < GPIO_CONTROL_SIZE; i += 4) {
 			uint32_t addr = GPIO_CONTROL_ADDRESS + i;
-			uint8_t *mem = &pstate->gpio_control[i];
-			*mem++ =  addr        & 0xFF;
-			*mem++ = (addr >>  8) & 0xFF;
-			*mem++ = (addr >> 16) & 0xFF;
-			*mem++ = (addr >> 24) & 0xFF;
+
+			memcpy(&pstate->gpio_control[i], &addr, sizeof(addr));
 		}
 
 		fprintf(stdout, GPIO_PIN_ACCESS, low, high);
@@ -437,18 +435,10 @@ static int execute_transfer(struct pi_state *pstate)
 	if (!mem)
 		return -1;
 
-	if (transfer->load) {
-		*rd = 0;
-		*rd |= (uint32_t)(*mem++);
-		*rd |= (uint32_t)(*mem++) << 8;
-		*rd |= (uint32_t)(*mem++) << 16;
-		*rd |= (uint32_t)(*mem++) << 24;
-	} else {
-		*mem++ =  *rd        & 0xFF;
-		*mem++ = (*rd >>  8) & 0xFF;
-		*mem++ = (*rd >> 16) & 0xFF;
-		*mem++ = (*rd >> 24) & 0xFF;
-	}
+	if (transfer->load)
+		memcpy(rd, mem, 4);
+	else
+		memcpy(mem, rd, 4);
 
 	if (!transfer->preindexing) {
 		if (transfer->up)
