@@ -17,7 +17,7 @@ static void set_cpsr_zn(uint32_t res, struct cpsrreg *cpsr)
 {
 	if (cpsr) {
 		cpsr->z = !res;
-		cpsr->n = !!(res & (1 << 31));
+		cpsr->n = !!(res >> 31);
 	}
 }
 
@@ -64,11 +64,11 @@ op_eor(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 static int
 op_sub(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 {
-	uint32_t res;
-	bool carry = true;
+	uint64_t res;
+	bool carry;
 
-	if (__builtin_sub_overflow(rn, op2, &res))
-		carry = false;
+	res = (uint64_t)rn - (uint64_t)op2;
+	carry = !(res >> 32);
 	set_cpsr_c(cpsr, carry);
 	set_cpsr_zn(res, cpsr);
 	*rd = res;
@@ -78,11 +78,11 @@ op_sub(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 static int
 op_rsb(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 {
-	uint32_t res;
+	uint64_t res;
 	bool carry = true;
 
-	if (__builtin_sub_overflow(op2, rn, &res))
-		carry = false;
+	res = (uint64_t)op2 - (uint64_t)rn;
+	carry = !(res >> 32);
 	set_cpsr_c(cpsr, carry);
 	set_cpsr_zn(res, cpsr);
 	*rd = res;
@@ -92,14 +92,14 @@ op_rsb(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 static int
 op_add(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 {
-	uint32_t res;
-	bool carry = false;
+	uint64_t res;
+	bool carry;
 
-	if (__builtin_add_overflow(rn, op2, &res))
-		carry = true;
+	res = (uint64_t)rn + (uint64_t)op2;
+	carry = res & (1L << 33);
 	set_cpsr_c(cpsr, carry);
 	set_cpsr_zn(res, cpsr);
-	*rd = res;
+	*rd = (uint32_t)res;
 	return 0;
 }
 
@@ -127,11 +127,11 @@ static int
 op_cmp(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 {
 	(void)rd;
-	uint32_t res;
-	bool carry = true;
+	uint64_t res;
+	bool carry;
 
-	if (__builtin_sub_overflow(rn, op2, &res))
-		carry = false;
+	res = (uint64_t)rn - (uint64_t)op2;
+	carry = !(res >> 32);
 	set_cpsr_c(cpsr, carry);
 	set_cpsr_zn(res, cpsr);
 	return 0;
@@ -244,7 +244,7 @@ static int shift_ror(uint32_t *r, uint32_t val, uint32_t amount, bool *carry)
 	if (amount == 0)
 		return 0;
 
-	*carry = !!(val & (1 << ((amount * 31 + 3) % 32)));
+	*carry = !!((val >> (amount - 1)) & 0x1);
 	*r = (val >> amount) | (val << (32 - amount));
 
 	return 0;
