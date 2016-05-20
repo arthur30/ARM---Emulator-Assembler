@@ -187,13 +187,9 @@ static int shift_lsl(uint32_t *r, uint32_t val, uint32_t amount, bool *carry)
 		return -1;
 	}
 
-	*r = val;
-
-	if (amount == 0)
-		return 0;
-
-	*carry = !!((val << (amount - 1)) & (1 << 31));
-	*r <<= amount;
+	if (amount > 0)
+		*carry = !!((val << (amount - 1)) & (1 << 31));
+	*r = val << amount;
 
 	return 0;
 }
@@ -205,13 +201,9 @@ static int shift_lsr(uint32_t *r, uint32_t val, uint32_t amount, bool *carry)
 		return -1;
 	}
 
-	*r = val;
-
-	if (amount == 0)
-		return 0;
-
-	*carry = !!((val >> (amount - 1)) & 0x1);
-	*r >>= amount;
+	if (amount > 0)
+		*carry = !!((val >> (amount - 1)) & 0x1);
+	*r = val >> amount;
 
 	return 0;
 }
@@ -223,12 +215,8 @@ static int shift_asr(uint32_t *r, uint32_t val, uint32_t amount, bool *carry)
 		return -1;
 	}
 
-	*r = val;
-
-	if (amount == 0)
-		return 0;
-
-	*carry = !!((val >> (amount - 1)) & 0x1);
+	if (amount > 0)
+		*carry = !!((val >> (amount - 1)) & 0x1);
 	*r = ((signed)val) >> amount;
 
 	return 0;
@@ -241,12 +229,8 @@ static int shift_ror(uint32_t *r, uint32_t val, uint32_t amount, bool *carry)
 		return -1;
 	}
 
-	*r = val;
-
-	if (amount == 0)
-		return 0;
-
-	*carry = !!((val >> (amount - 1)) & 0x1);
+	if (amount > 0)
+		*carry = !!((val >> (amount - 1)) & 0x1);
 	*r = (val >> amount) | (val << (32 - amount));
 
 	return 0;
