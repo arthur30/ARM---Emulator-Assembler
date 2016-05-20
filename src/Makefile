@@ -22,7 +22,7 @@ all: checksrc $(BINARIES)
 
 assemble: assemble.o
 
-emulate: emulate.o
+emulate: emulate.o emulate_fetch.o emulate_decode.o emulate_execute.o
 
 clean:
 	$(RM) $(BINARIES) $(wildcard *.o) $(wildcard *.d)
