@@ -7,6 +7,8 @@
 #include <string.h>
 #include <errno.h>
 
+#define SHIFT_ROR 3
+
 static void set_cpsr_c(struct cpsrreg *cpsr, bool val)
 {
 	if (cpsr)
@@ -258,25 +260,39 @@ static int (*shift_table[4])
 	/* 11 */ shift_ror
 };
 
+static int get_shift_reg
+(struct pi_state *pstate, struct shift_reg *reg,
+uint8_t *type, uint32_t *val, uint32_t *amount)
+{
+	*type = reg->shift_type;
+	*val = pstate->registers[reg->rm];
+	int8_t rs = reg->amount.rs;
+
+	if (reg->constant)
+		*amount = reg->amount.integer;
+	else
+		*amount = pstate->registers[rs];
+
+	return 0;
+}
+
 static int get_op2
 (uint32_t *r, struct instr_op2 *op2, struct pi_state *pstate, bool *carry)
 {
 	uint8_t type;
 	uint32_t val;
 	uint32_t amount;
+	struct shift_reg *reg;
 
 	if (op2->immediate) {
-		type = 3;
+		type = SHIFT_ROR;
 		val = op2->offset.imm.imm;
 		amount = op2->offset.imm.rotate;
 		amount *= 2;
 	} else {
-		type = op2->offset.reg.shift_type;
-		val = pstate->registers[op2->offset.reg.rm];
-		if (op2->offset.reg.constant)
-			amount = op2->offset.reg.amount.integer;
-		else
-			amount = pstate->registers[op2->offset.reg.amount.rs];
+		reg = &op2->offset.reg;
+		if (get_shift_reg(pstate, reg, &type, &val, &amount))
+			return -1;
 
 	}
 
@@ -289,16 +305,12 @@ static int get_offset
 	uint8_t type;
 	uint32_t val;
 	uint32_t amount;
+	struct shift_reg *reg;
 
 	if (offset->immediate) {
-		type = offset->offset.reg.shift_type;
-		val = pstate->registers[offset->offset.reg.rm];
-		int8_t rs = offset->offset.reg.amount.rs;
-
-		if (offset->offset.reg.constant)
-			amount = offset->offset.reg.amount.integer;
-		else
-			amount = pstate->registers[rs];
+		reg = &offset->offset.reg;
+		if (get_shift_reg(pstate, reg, &type, &val, &amount))
+			return -1;
 	} else {
 		*r = offset->offset.imm;
 		return 0;
