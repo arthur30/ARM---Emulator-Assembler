@@ -354,8 +354,51 @@ static int execute_mult(struct pi_state *pstate)
 	return 0;
 }
 
+static uint8_t gpio_dummy[4];
+static uint8_t *get_gpio(struct pi_state *pstate, size_t address)
+{
+	if (address >= GPIO_CONTROL_ADDRESS &&
+	    address - GPIO_CONTROL_ADDRESS < GPIO_CONTROL_SIZE) {
+		int range = (address - GPIO_CONTROL_ADDRESS) / 4;
+		int low = range * 10;
+		int high = range * 10 + 9;
+
+		for (size_t i = 0; i < GPIO_CONTROL_SIZE; i += 4) {
+			uint32_t addr = GPIO_CONTROL_ADDRESS + i;
+			uint8_t *mem = &pstate->gpio_control[i];
+			*mem++ =  addr        & 0xFF;
+			*mem++ = (addr >>  8) & 0xFF;
+			*mem++ = (addr >> 16) & 0xFF;
+			*mem++ = (addr >> 24) & 0xFF;
+		}
+
+		fprintf(stdout, GPIO_PIN_ACCESS, low, high);
+		return &pstate->gpio_control[address - GPIO_CONTROL_ADDRESS];
+	}
+
+	if (address >= GPIO_CLEARING_ADDRESS &&
+	    address - GPIO_CLEARING_ADDRESS < GPIO_CONTROL_SIZE) {
+		fprintf(stdout, GPIO_PIN_OFF);
+		return gpio_dummy;
+	}
+
+	if (address >= GPIO_TURNON_ADDRESS &&
+	    address - GPIO_TURNON_ADDRESS < GPIO_TURNON_SIZE) {
+		fprintf(stdout, GPIO_PIN_ON);
+		return gpio_dummy;
+	}
+
+	return NULL;
+
+}
+
 static uint8_t *get_memory(struct pi_state *pstate, size_t address)
 {
+	uint8_t *gpio = get_gpio(pstate, address);
+
+	if (gpio)
+		return gpio;
+
 	if (address + 4 >= PI_MEMORY_SIZE) {
 		fprintf(stdout, OUT_OF_BOUNDS_MEM, address);
 		errno = EINVAL;
