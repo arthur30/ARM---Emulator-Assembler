@@ -8,6 +8,13 @@
 #define PI_REGISTER_COUNT 16
 #define R_PC 15
 
+#define GPIO_CONTROL_ADDRESS 0x20200000
+#define GPIO_CONTROL_SIZE 12
+#define GPIO_CLEARING_ADDRESS 0x20200028
+#define GPIO_CLEARING_SIZE 4
+#define GPIO_TURNON_ADDRESS 0x2020001C
+#define GPIO_TURNON_SIZE 4
+
 struct shift_reg {
 	bool constant;
 	uint8_t shift_type;
@@ -95,6 +102,7 @@ struct cpsrreg {
 
 struct pi_state {
 	uint8_t memory[PI_MEMORY_SIZE];
+	uint8_t gpio_control[GPIO_CONTROL_SIZE];
 	uint32_t registers[PI_REGISTER_COUNT];
 	struct cpsrreg cpsr;
 	struct pipeline {
