@@ -6,7 +6,7 @@ WARNINGS = -Wall -Wextra -Wformat=2 -pedantic \
 ERRORS   = -Werror -pedantic-errors
 DEFINES  = -D_DEFAULT_SOURCE -D_POSIX_SOURCE -D_BSD_SOURCE
 DEPSINFO = -MD -MP
-OPTIMIZE = -g -Og -ggdb -DDEBUG
+OPTIMIZE = -g -O0 -ggdb -DDEBUG
 ifeq ($(BUILD),release)
 OPTIMIZE = -O2 -D_FORTIFY_SOURCE=2 -pipe -fomit-frame-pointer
 endif
