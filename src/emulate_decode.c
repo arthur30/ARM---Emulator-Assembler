@@ -45,7 +45,7 @@ static void set_instruction_type(struct pi_state *pstate, enum instr_type type)
 	pstate->pipeline.instruction.type = type;
 }
 
-static int decode_data_halt(struct pi_state *pstate)
+static int decode_halt(struct pi_state *pstate)
 {
 	set_instruction_type(pstate, HALT);
 	return 0;
@@ -173,7 +173,7 @@ int decode(struct pi_state *pstate)
 	instruction->cond = instr_code >> 28;
 
 	if (!instr_code)
-		return decode_data_halt(pstate);
+		return decode_halt(pstate);
 	if (instr_is_data_proc(instr_code))
 		return decode_data_proc(pstate);
 	if (instr_is_mult(instr_code))
