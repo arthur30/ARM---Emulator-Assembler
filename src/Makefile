@@ -20,7 +20,7 @@ BINARIES = assemble emulate
 
 all: checksrc $(BINARIES)
 
-assemble: assemble.o
+assemble: assemble.o instructions.o
 
 emulate: emulate.o emulate_fetch.o emulate_decode.o emulate_execute.o
 
