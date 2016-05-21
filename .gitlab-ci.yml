@@ -1,6 +1,6 @@
 before_script:
   - cd src
 
-emulate:
+compile:
   script:
     - make
