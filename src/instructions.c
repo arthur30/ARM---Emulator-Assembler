@@ -70,9 +70,15 @@ uint32_t instr_dpi(void)
 	 */
 
 	/* int opcode = key_to_int(OPCODE_FROM_STRUCT, 1); */
-	int cond = 14 << 28;
+	uint32_t cond = 14 << 28;
+	uint32_t opcode;
+	uint32_t i;
+	uint32_t s;
+	uint32_t rn;
+	uint32_t rd;
+	uint32_t operand2;
 
-	return 0;
+	return cond + i + opcode + s + rn + rd + operand2;
 }
 
 uint32_t instr_multiply(void)
@@ -107,7 +113,16 @@ uint32_t instr_sdt(void)
 	 * U => Set if Offset is added to base reg.
 	 * P => Pre/Post indexing bit. See spec pg9.
 	 */
-	return 0;
+	uint32_t cond;
+	uint32_t i;
+	uint32_t p;
+	uint32_t u;
+	uint32_t l;
+	uint32_t rn;
+	uint32_t rd;
+	uint32_t offset;
+
+	return cond + (1 << 26) + i + p + u + l + rn + rd + offset;
 }
 
 uint32_t instr_branch(void)
@@ -117,5 +132,10 @@ uint32_t instr_branch(void)
 	 * COND 1010 Offset
 	 * COND => See from the spec.
 	 */
-	return 0;
+
+	/* int cond = key_to_int(LABEL_FROM_STRUCT, 0) << 28; */
+	uint32_t cond;
+	uint32_t offset;
+
+	return cond + (10 << 24) + offset;
 }
