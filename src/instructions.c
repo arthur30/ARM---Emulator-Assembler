@@ -39,17 +39,19 @@ struct mnemonic dict_branch[] = {
 int key_to_int(char *key, int dpi)
 {
 	int i = 0;
-	struct mnemonic *dict;
-	dict = dict_branch;
-	if (dpi) {
+	struct mnemonic *dict = dict_branch;
+
+	if (dpi)
 		dict = dict_dpi;
-	}
+
 	char *cand = dict[i].str;
+
 	while (cand) {
 		if (strcmp(cand, key) == 0)
 			return dict[i].n;
-		cand = dict[++i].str;	
+		cand = dict[++i].str;
 	}
+
 	return -1;
 }
 
@@ -69,6 +71,7 @@ uint32_t instr_dpi(void)
 
 	/* int opcode = key_to_int(OPCODE_FROM_STRUCT, 1); */
 	int cond = 14 << 28;
+
 	return 0;
 }
 
