@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "instructions.h"
+#include "assemble_instructions.h"
 
 struct sym {
 	char *label;
