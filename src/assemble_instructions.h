@@ -1,5 +1,5 @@
-#ifndef INSTRUCTIONS_H
-#define INSTRUCTIONS_H
+#ifndef ASSEMBLE_INSTRUCTIONS_H
+#define ASSEMBLE_INSTRUCTIONS_H
 
 #include <stdint.h>
 

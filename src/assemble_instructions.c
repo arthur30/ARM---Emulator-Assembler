@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "instructions.h"
+#include "assemble_instructions.h"
 
 struct mnemonic {
 	const char *str;
