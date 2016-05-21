@@ -55,6 +55,26 @@ int key_to_int(char *key, int dpi)
 	return -1;
 }
 
+/* Variables to build the instructions. */
+
+uint32_t cond;      /* for COND */
+
+uint32_t opcode;    /* for OPCODE */
+uint32_t operand2;  /* for OPERAND2 */
+uint32_t offset;    /* for OFFSET */
+
+uint32_t i;         /* for IMMEDIATE OFFSET */
+uint32_t s;         /* for SET CONDITION BIT */
+uint32_t a;         /* for ACCUMULATE BIT */
+uint32_t p;         /* for PRE/POST INDEXING BIT */
+uint32_t u;         /* for UP BIT*/
+uint32_t l;         /* for LOAD/STORE BIT */
+
+uint32_t rn;        /* for REGISTER Rn */
+uint32_t rd;        /* for REGISTER Rd */
+uint32_t rs;        /* for REGISTER Rd */
+uint32_t rm;        /* for REGISTER Rm */
+
 /* All functions return a 32bit integer. */
 
 uint32_t instr_dpi(void)
@@ -70,13 +90,7 @@ uint32_t instr_dpi(void)
 	 */
 
 	/* int opcode = key_to_int(OPCODE_FROM_STRUCT, 1); */
-	uint32_t cond = 14 << 28;
-	uint32_t opcode;
-	uint32_t i;
-	uint32_t s;
-	uint32_t rn;
-	uint32_t rd;
-	uint32_t operand2;
+	cond = 14 << 28;
 
 	return cond + i + opcode + s + rn + rd + operand2;
 }
@@ -92,13 +106,9 @@ uint32_t instr_multiply(void)
 	 * mla r1, r2, r3, r4 => r1 = (r2 x r3) + r4
 	 * mul r1, r2, r3 => r1 = r2 x r3
 	 */
-	uint32_t cond = 14 << 28;
-	uint32_t a = 1 << 21;
-	uint32_t s = 0;
-	uint32_t rd;
-	uint32_t rn;
-	uint32_t rs;
-	uint32_t rm;
+	cond = 14 << 28;
+	a = 1 << 21;
+	s = 0;
 
 	return cond + a + s + rd + rn + rs + 144 + rm;
 }
@@ -113,14 +123,6 @@ uint32_t instr_sdt(void)
 	 * U => Set if Offset is added to base reg.
 	 * P => Pre/Post indexing bit. See spec pg9.
 	 */
-	uint32_t cond;
-	uint32_t i;
-	uint32_t p;
-	uint32_t u;
-	uint32_t l;
-	uint32_t rn;
-	uint32_t rd;
-	uint32_t offset;
 
 	return cond + (1 << 26) + i + p + u + l + rn + rd + offset;
 }
@@ -134,8 +136,6 @@ uint32_t instr_branch(void)
 	 */
 
 	/* int cond = key_to_int(LABEL_FROM_STRUCT, 0) << 28; */
-	uint32_t cond;
-	uint32_t offset;
 
 	return cond + (10 << 24) + offset;
 }
