@@ -20,9 +20,9 @@ BINARIES = assemble emulate
 
 all: checksrc $(BINARIES)
 
-assemble: assemble.o
+assemble: $(patsubst %.c,%.o,$(wildcard assemble*.c))
 
-emulate: emulate.o emulate_fetch.o emulate_decode.o emulate_execute.o
+emulate: $(patsubst %.c,%.o,$(wildcard emulate*.c))
 
 clean:
 	$(RM) $(BINARIES) $(wildcard *.o) $(wildcard *.d)
