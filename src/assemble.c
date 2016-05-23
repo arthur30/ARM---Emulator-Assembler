@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "assemble_instructions.h"
+#include "assemble_tokenizer.h"
 
 struct sym {
 	char *label;
@@ -36,6 +37,10 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+	char str[] = "label mla r0,r2,r3,r4";
+	char *ptr = str;
+
+	tokenize(ptr);
 	free(sym_table);
 	return EXIT_SUCCESS;
 }

@@ -7,13 +7,21 @@
 struct instruction tokenize(char *instr)
 {
 	char *save;
-	char *p;
-	const char *delim = ":";
+	char *token;
+	int has_label = 0;
 
-	for (p = strtok_r(instr, delim, &save);
-	     p;
-	     p = strtok_r(NULL, delim, &save))
-		printf("chunk=%s\n", p);
+	token = strtok_r(instr, ":", &save);
+	if (instr != NULL)
+		has_label = 1;
+
+	printf("chunk=%s\n", token);
+
+	if (has_label) {
+		for (token = strtok_r(NULL, " ,", &save);
+			token;
+			token = strtok_r(NULL, " ,", &save))
+			printf("chunk=%s\n", token);
+	}
 
 	return tokens;
 }
