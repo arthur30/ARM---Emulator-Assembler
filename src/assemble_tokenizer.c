@@ -4,23 +4,27 @@
 #include <string.h>
 #include "assemble_tokenizer.h"
 
+#define NO_LABEL "NO LABEL SUPPLIED"
+
 struct instruction tokenize(char *instr)
 {
 	int i = 0;
+	char nolabel[] = NO_LABEL;
 	char *save;
 	char *replace = NULL;
 	char *token;
 
 	token = strtok_r(instr, ":", &save);
-	if (strlen(save) == 0)
+	if (strlen(save) == 0) {
 		replace = token;
-	else
+		tokens.label = nolabel;
+	} else
 		tokens.label = token;
 
 	for (token = strtok_r(replace, " ,", &save), i = 0;
 		token;
 		token = strtok_r(NULL, " ,", &save), i++) {
-		/* printf("chunk=%s\n", token); */
+
 		switch (i) {
 		case 0:
 			tokens.mnemonic = token;
@@ -39,6 +43,8 @@ struct instruction tokenize(char *instr)
 			break;
 		}
 	}
+
+	/* NOTE: We still have to check for extra operands. */
 
 	return tokens;
 }

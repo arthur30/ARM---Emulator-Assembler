@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	char *ptr = str;
 	char *ptr2 = str2;
 
-	struct instruction tokens = tokenize(ptr);
+	struct instruction tokens = tokenize(ptr2);
 
 	printf("%s\n", tokens.label);
 	printf("%s\n", tokens.mnemonic);
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 	printf("%s\n", tokens.op2);
 	printf("%s\n", tokens.op3);
 	printf("%s\n", tokens.op4);
-	tokenize(ptr2);
+	tokenize(ptr);
 	free(sym_table);
 	return EXIT_SUCCESS;
 }
