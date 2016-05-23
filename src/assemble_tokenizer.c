@@ -6,21 +6,38 @@
 
 struct instruction tokenize(char *instr)
 {
+	int i = 0;
 	char *save;
+	char *replace = NULL;
 	char *token;
-	int has_label = 0;
 
 	token = strtok_r(instr, ":", &save);
-	if (instr != NULL)
-		has_label = 1;
+	if (strlen(save) == 0)
+		replace = token;
+	else
+		tokens.label = token;
 
-	printf("chunk=%s\n", token);
-
-	if (has_label) {
-		for (token = strtok_r(NULL, " ,", &save);
-			token;
-			token = strtok_r(NULL, " ,", &save))
-			printf("chunk=%s\n", token);
+	for (token = strtok_r(replace, " ,", &save), i = 0;
+		token;
+		token = strtok_r(NULL, " ,", &save), i++) {
+		/* printf("chunk=%s\n", token); */
+		switch (i) {
+		case 0:
+			tokens.mnemonic = token;
+			break;
+		case 1:
+			tokens.op1 = token;
+			break;
+		case 2:
+			tokens.op2 = token;
+			break;
+		case 3:
+			tokens.op3 = token;
+			break;
+		case 4:
+			tokens.op4 = token;
+			break;
+		}
 	}
 
 	return tokens;
