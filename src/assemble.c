@@ -5,7 +5,7 @@
 
 struct sym {
 	char *label;
-	uint16_t address;
+	uint16_t *address;
 };
 
 int main(int argc, char **argv)
@@ -27,12 +27,12 @@ int main(int argc, char **argv)
 
 	/* Handle errors if files don't exist */
 	if (input == NULL) {
-		perror("Error opening the input file");
+		printf("Error opening the input file");
 		return EXIT_FAILURE;
 	}
 
 	if (output == NULL) {
-		perror("Error opening the output file");
+		printf("Error opening the output file");
 		return EXIT_FAILURE;
 	}
 
