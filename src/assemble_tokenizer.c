@@ -41,6 +41,10 @@ struct instruction tokenize(char *instr)
 		case 4:
 			tokens.op4 = token;
 			break;
+		default:
+			printf("ERROR: Instruction not well defined.");
+			exit(EXIT_FAILURE);
+			break;
 		}
 	}
 

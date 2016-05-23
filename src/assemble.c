@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	}
 
 	char str[] = "label: mla r0,r2,r3,r4";
-	char str2[] = "label mla r0,r2,r3,r4";
+	char str2[] = "mla r0,r2,r3,r4";
 	char *ptr = str;
 	char *ptr2 = str2;
 
