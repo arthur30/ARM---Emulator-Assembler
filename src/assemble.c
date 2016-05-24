@@ -37,20 +37,6 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	char str[] = "label: mla r0,r2,r3,r4";
-	char str2[] = "mla r0,r2,r3,r4";
-	char *ptr = str;
-	char *ptr2 = str2;
-
-	struct instruction tokens = tokenize(ptr2);
-
-	printf("%s\n", tokens.label);
-	printf("%s\n", tokens.mnemonic);
-	printf("%s\n", tokens.op1);
-	printf("%s\n", tokens.op2);
-	printf("%s\n", tokens.op3);
-	printf("%s\n", tokens.op4);
-	tokenize(ptr);
 	free(sym_table);
 	return EXIT_SUCCESS;
 }
