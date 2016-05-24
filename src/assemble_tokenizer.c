@@ -48,7 +48,5 @@ struct instruction tokenize(char *instr)
 		}
 	}
 
-	/* NOTE: We still have to check for extra operands. */
-
 	return tokens;
 }

@@ -77,7 +77,7 @@ uint32_t rm;        /* for REGISTER Rm           */
 
 /* All functions return a 32bit integer. */
 
-uint32_t instr_dpi(void)
+uint32_t instr_dpi(struct instruction instr)
 {
 	/*
 	 * Instruction Result:
@@ -92,10 +92,12 @@ uint32_t instr_dpi(void)
 	/* int opcode = key_to_int(OPCODE_FROM_STRUCT, 1); */
 	cond = 14 << 28;
 
+	(void) instr;
+
 	return cond + i + opcode + s + rn + rd + operand2;
 }
 
-uint32_t instr_multiply(void)
+uint32_t instr_multiply(struct instruction instr)
 {
 	/*
 	 * Instruction Result:
@@ -110,10 +112,12 @@ uint32_t instr_multiply(void)
 	a = 1 << 21;
 	s = 0;
 
+	(void) instr;
+
 	return cond + a + s + rd + rn + rs + 144 + rm;
 }
 
-uint32_t instr_sdt(void)
+uint32_t instr_sdt(struct instruction instr)
 {
 	/*
 	 * Instruction Result:
@@ -124,10 +128,12 @@ uint32_t instr_sdt(void)
 	 * P => Pre/Post indexing bit. See spec pg9.
 	 */
 
+	(void) instr;
+
 	return cond + (1 << 26) + i + p + u + l + rn + rd + offset;
 }
 
-uint32_t instr_branch(void)
+uint32_t instr_branch(struct instruction instr)
 {
 	/*
 	 * Instruction Result:
@@ -136,6 +142,8 @@ uint32_t instr_branch(void)
 	 */
 
 	/* int cond = key_to_int(LABEL_FROM_STRUCT, 0) << 28; */
+
+	(void) instr;
 
 	return cond + (10 << 24) + offset;
 }

@@ -2,15 +2,16 @@
 #define ASSEMBLE_INSTRUCTIONS_H
 
 #include <stdint.h>
+#include "assemble_tokenizer.h"
 
 uint32_t key_to_int(char *key, int dpi);
 
-uint32_t instr_dpi(void);
+uint32_t instr_dpi(struct instruction instr);
 
-uint32_t instr_multiply(void);
+uint32_t instr_multiply(struct instruction instr);
 
-uint32_t instr_sdt(void);
+uint32_t instr_sdt(struct instruction instr);
 
-uint32_t instr_branch(void);
+uint32_t instr_branch(struct instruction instr);
 
 #endif
