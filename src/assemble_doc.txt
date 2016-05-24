@@ -1,0 +1,39 @@
+This is the simple documentation I maintain for the assembler.
+
+1. Tokenizer
+
+func tokenize:
+	INPUT: A line having the literals.
+	OUTPUT: All the tokens in form of a struct INSTRUCTION.
+
+struct instruction:
+	label: label to the line, if any.
+	mnemonic: operation to be performed.
+	op1: First operand.
+	op2: Second operand.
+	op3: Third operand.
+	op4: Fourth operand.
+
+2. Instructions
+
+func key_to_int:
+	INPUT: Enter the string and the dictionary number.
+	OUTPUT: Returns the int associated with the string in the dictionary.
+
+func instr_dpi:
+	INPUT: struct instruction.
+	OUTPUT: Machine code for Data Processing Instruction.
+
+func instr_multiply:
+	INPUT: struct instruction.
+	OUTPUT: Machine code for Multiply Instruction.
+
+func instr_sdt:
+	INPUT: struct instruction.
+	OUTPUT: Machine code for Simple Data Transfer Instruction.
+
+func instr_branch:
+	INPUT: struct instruction.
+	OUTPUT: Machine code for the Branch Instruction.
+
+
