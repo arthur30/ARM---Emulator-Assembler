@@ -4,10 +4,26 @@
 #include "assemble_instructions.h"
 #include "assemble_tokenizer.h"
 
+
 struct sym {
 	char *label;
 	uint16_t *address;
 };
+
+
+static int print_bits(uint32_t x)
+{
+	int i;
+	uint32_t mask = 1 << 31;
+
+	for (i = 0; i < 32; i++) {
+		printf("%i", (x & mask) != 0);
+		x <<= 1;
+	}
+	printf("\n");
+
+	return 1;
+}
 
 int main(int argc, char **argv)
 {
@@ -37,6 +53,11 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+	char str[] = "mla r0,r1,r2,r3";
+	char *ptr = str;
+
+	print_bits(instr_multiply(tokenize(ptr)));
 	free(sym_table);
 	return EXIT_SUCCESS;
 }
+

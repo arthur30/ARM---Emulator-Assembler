@@ -1,8 +1,11 @@
+#include "assemble_instructions.h"
+#include "assemble_parser.h"
+#include "emulate_pi_state.h"
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "assemble_instructions.h"
-#include "assemble_parser.h"
+#include <stdbool.h>
 
 /* Variables to build the instructions. */
 
@@ -38,9 +41,23 @@ uint32_t instr_dpi(struct instruction instr)
 	 * Operand2 => <#expression> || Rm{,<shift>}
 	 */
 
-	(void) instr;
+	struct instr_data_proc parsed = parse_dpi(instr);
 
 	cond = 14 << 28;
+
+	if (parsed.op2.immediate)
+		i = 1 << 24;
+	else
+		i = 0;
+
+	if (parsed.setcond)
+		s = 1 << 19;
+	else
+		s = 0;
+
+	rn = parsed.rn << 15;
+	rd = parsed.rd << 11;
+	operand2 = parsed.op2.offset.imm.imm;
 
 	return cond + i + opcode + s + rn + rd + operand2;
 }
@@ -56,11 +73,22 @@ uint32_t instr_multiply(struct instruction instr)
 	 * mla r1, r2, r3, r4 => r1 = (r2 x r3) + r4
 	 * mul r1, r2, r3 => r1 = r2 x r3
 	 */
-	cond = 14 << 28;
-	a = 1 << 21;
-	s = 0;
 
-	(void) instr;
+	struct instr_mult parsed = parse_mult(instr);
+
+	cond = 14 << 28;
+	s = 0;
+	rs = parsed.rs << 8;
+	rm = parsed.rm;
+	rd = parsed.rd << 16;
+
+	if (parsed.accumulate) {
+		a = 1 << 21;
+		rn = parsed.rn << 12;
+	} else {
+		a = 0;
+		rn = 0;
+	}
 
 	return cond + a + s + rd + rn + rs + 144 + rm;
 }

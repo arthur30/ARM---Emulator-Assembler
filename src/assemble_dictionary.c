@@ -19,6 +19,8 @@ struct map dict_dpi[] = {
 	{"tst", 8},
 	{"teq", 9},
 	{"cmp", 10},
+	{"mul", 20},
+	{"mla", 21},
 	{0, 0}
 };
 
