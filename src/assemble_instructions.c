@@ -2,58 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "assemble_instructions.h"
-
-struct mnemonic {
-	const char *str;
-	int n;
-};
-
-struct mnemonic dict_dpi[] = {
-	{"and", 0},
-	{"eor", 1},
-	{"sub", 2},
-	{"rsb", 3},
-	{"add", 4},
-	{"orr", 12},
-	{"mov", 13},
-	{"tst", 8},
-	{"teq", 9},
-	{"cmp", 10},
-	{0, 0}
-};
-
-struct mnemonic dict_branch[] = {
-	{"beq", 0},
-	{"bne", 1},
-	{"bge", 10},
-	{"blt", 11},
-	{"bgt", 12},
-	{"ble", 13},
-	{"b", 14},
-	{"bal", 14},
-	{0, 0}
-};
-
-/* dpi > 0 to search for DPI keys */
-
-uint32_t key_to_int(char *key, int dpi)
-{
-	int i = 0;
-	struct mnemonic *dict = dict_branch;
-
-	if (dpi)
-		dict = dict_dpi;
-
-	const char *cand = dict[i].str;
-
-	while (cand) {
-		if (strcmp(cand, key) == 0)
-			return dict[i].n;
-		cand = dict[++i].str;
-	}
-
-	return -1;
-}
+#include "assemble_parser.h"
 
 /* Variables to build the instructions. */
 
@@ -89,10 +38,9 @@ uint32_t instr_dpi(struct instruction instr)
 	 * Operand2 => <#expression> || Rm{,<shift>}
 	 */
 
-	/* int opcode = key_to_int(OPCODE_FROM_STRUCT, 1); */
-	cond = 14 << 28;
-
 	(void) instr;
+
+	cond = 14 << 28;
 
 	return cond + i + opcode + s + rn + rd + operand2;
 }
@@ -130,6 +78,11 @@ uint32_t instr_sdt(struct instruction instr)
 
 	(void) instr;
 
+	if (l == 0)
+		l = 1;
+	else
+		l = 0;
+
 	return cond + (1 << 26) + i + p + u + l + rn + rd + offset;
 }
 
@@ -140,8 +93,6 @@ uint32_t instr_branch(struct instruction instr)
 	 * COND 1010 Offset
 	 * COND => See from the spec.
 	 */
-
-	/* int cond = key_to_int(LABEL_FROM_STRUCT, 0) << 28; */
 
 	(void) instr;
 
