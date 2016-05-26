@@ -4,27 +4,101 @@
 
 \begin{document}
 
-\title{ARM Checkpoint... }
-\author{TODO}
+\title{ARM Checkpoint}
+\author{
+  Szilveszter Szekely,
+  Abhinav Mishra,
+  Arthur-Mihai Niculae,
+  Tom Bellingham
+}
 
 \maketitle
 
 \section{Group Organisation}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+Our idea was to split up the parts of the task among the different members of
+the group, first focusing on the emulator and the assembler and then the
+remaining GPIO LED flasher and extension parts.
+
+The emulator was assigned to Szilveszter Szekely and Arthur-Mihai Niculae.
+The assamble was assigned to Abhinav Mishra and Tom Bellingham.
+
+At this point we have yet to decide on the specifics of the work allocation of
+GPIO LED program and the extension.
+
+\section{Group Dynamics}
+
+Our group is host to a wide range of abilities and expertise, which has provided
+a unique opportunity to query and learn from those who have considerable skill
+in particular areas.
+
+For some of us, the C lectures have been our first exposure to the language,
+thus studying the language independently in order to contribute to the group
+more effectively later on has been a hindrance to working as a team in the early
+stages.
+
+Partitioning the group into halves, with each pair tackling one of the first two
+tasks, has so far been an effective strategy. However, given the discrepancy in
+knowledge and ability between group members, some members were able to
+contribute disproportionally to the end result.
+
+In these situations we have peer-reviewed each other's code to discuss and
+ensure that we understand the design and implementation decisions that were
+made.
+
+In future we need to ensure that we communicate more systematically and
+regularly about progress with specific tasks, and strategize not only about
+immediate objectives but also upcoming tasks and the long-term life of the
+project.
 
 \section{Implementation Strategies}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+The emulator was split into four main parts.
+
+There are the data structures for the storing the state of the emulator and the
+decoded instructions. The state includes the current values of registers, the
+current values in memory, whether there is a fetched instructions and the
+fetched instruction, whether there is a decoded instruction and the decoded
+instruction itself.
+
+The decoded instructions are stored in a single structure that has a flag
+indicating the kind of the instruction and the specific parts to their their
+respective instructions. The are stored in an union in order to save on memory.
+
+The remaining four parts are split based on the parts of the execution pipeline,
+therefore fetch, decode, execute.
+
+Fetch is relatively simple, as it only needs to fetch from memory and copy four
+bytes into a 32 bit instruction value and set the instruction fetched flag.
+
+Decoding the instructions consist of two steps. First, the kind of the
+instruction is identified using bit patterns that we have found to uniquely
+specify them. Then the specifics of each instruction kind are parsed into the
+instruction structure.
+
+Execution the instruction happens by having conditions on which parts of the
+structure are filled in. First the condition is checked then if it needs to be
+the stored instruction is executed, doing the necessary processing on them like
+doing the value rotations, extensions and the like.
+
+Finally the PC register is incremented.
+
+If any of these operations fail or a halt instruction is encountered then
+execution is halted and the state of the emulator dumped.
+
+To simplify code paths, we use arrays of function pointers and index into them
+with relevant parts of the instruction, for example the opcode of the data
+processing instruction.
+
+The data structures of the emulator are to be reused in the assembler.
+
+TODO Assembler structure, maybe.
+
+\section{Implementation Challenges}
+
+TODO A discussion on implementation tasks that you think you will find difficult
+/ challenging later on, and how you are working to mitigate these.
+
+TODO What to write here?...
 
 \end{document}
