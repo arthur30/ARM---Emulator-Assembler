@@ -4,47 +4,58 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 
 #define MAX_LINE_LENGTH 512
+#define SYM_TABLE_CAPACITY 16
 
 struct sym {
 	char *label;
 	uint16_t address;
 };
 
+struct labels {
+	int size;
+	int capacity;
+	struct sym *table;
+} sym_table;
 
-/*static int print_bits(uint32_t x)
-*{
-*	int i;
-*	uint32_t mask = 1 << 31;
-*
-*	for (i = 0; i < 32; i++) {
-*		printf("%i", (x & mask) != 0);
-*		x <<= 1;
-*	}
-*	printf("\n");
-*
-*	return 1;
-*}
-*/
+static void initiate_labels(void)
+{
+	sym_table.size = 0;
+	sym_table.capacity = SYM_TABLE_CAPACITY;
+	sym_table.table = calloc(SYM_TABLE_CAPACITY, sizeof(struct sym));
+
+	if (!sym_table.table) {
+		fprintf(stderr, "Couldn't allocate memory for labels.");
+		exit(EXIT_FAILURE);
+	}
+}
+
+static void extend_labels(void)
+{
+	if (sym_table.size == sym_table.capacity) {
+		sym_table.capacity = 2 * sym_table.capacity;
+		sym_table.table = realloc(sym_table.table, sym_table.capacity);
+
+		if (!sym_table.table)
+			fprintf(stderr, "Coudln't extend memory for labels");
+	}
+}
+
+static void destroy_labels(void)
+{
+	free(sym_table.table);
+}
 
 int main(int argc, char **argv)
 {
 	FILE *input;
 	FILE *output;
 
-	/* Symbol Table ADT */
-	int sym_table_size = 16;
-	struct sym *sym_table = calloc(sym_table_size, sizeof(struct sym));
-
-	if (!sym_table) {
-		fprintf(stderr, "Couldn't allocate space to sym table.");
-		exit(EXIT_FAILURE);
-	}
-
 	/* Check if source and dest files are provided.	 */
-	if (argc < 3)
+	if (argc != 3)
 		return EXIT_FAILURE;
 
 	/* Open the input and output files */
@@ -62,14 +73,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	/* char str[] = "bal a";
-	 * char *ptr = str;
-	 *
-	 * struct instruction instr = tokenize(ptr);
-	 *
-	 * if (instr.label == NULL)
-	 *	print_bits(instr_branch(instr, -16));
-	 */
+	initiate_labels();
 
 	char *line = malloc(MAX_LINE_LENGTH);
 	int instr_num = 0;
@@ -82,32 +86,37 @@ int main(int argc, char **argv)
 	/* FIRST PASS */
 	while (fgets(line, MAX_LINE_LENGTH, input)) {
 
-		printf("%s", line);
+		extend_labels();
 
-		/*		if (instr_num % 16 == 0)
-		 *	sym_table = realloc(sym_table,
-		 *			2*instr_num*sizeof(struct sym));
-		 */
-		struct instruction instr = tokenize(line);
+		struct instruction *instr = malloc(sizeof(struct instruction));
 
-		if (instr.label && instr.mnemonic) {
-			sym_table[instr_num].label = instr.label;
-			sym_table[instr_num].address =  4*instr_num;
-			instr_num++;
-		} else if (instr.label) {
-			sym_table[instr_num].label = instr.label;
-			sym_table[instr_num].address =  4*(instr_num + 1);
-		} else if (instr.mnemonic) {
-			instr_num++;
+		tokenize(line, instr);
+
+
+		if (instr->label) {
+			sym_table.table[sym_table.size].label = instr->label;
+			sym_table.table[sym_table.size].address = 4 * instr_num;
+			sym_table.size++;
 		}
+
+		if (strlen(instr->mnemonic) > 1)
+			instr_num++;
+
+		free(instr);
 
 	}
 
+	int i = 0;
+
+	for (i = 0; i < sym_table.size; i++) {
+		printf("%s\t%i\n", sym_table.table[i].label,
+				sym_table.table[i].address);
+	}
 
 	free(line);
 	fclose(input);
 	fclose(output);
-	free(sym_table);
+	destroy_labels();
 	return EXIT_SUCCESS;
 }
 

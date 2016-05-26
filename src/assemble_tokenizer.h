@@ -10,8 +10,6 @@ struct instruction {
 	char *op4;
 };
 
-struct instruction tokens;
-
-struct instruction tokenize(char *instr);
+void tokenize(char *instr, struct instruction *tokens);
 
 #endif
