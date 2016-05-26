@@ -47,33 +47,36 @@ static void print_state(struct pi_state *pstate)
 				pstate->memory[address + 2],
 				pstate->memory[address + 3]);
 	}
-
 }
 
 int main(int argc, char **argv)
 {
 	FILE *input;
-
-	struct pi_state *pstate = calloc(1, sizeof(struct pi_state));
-
-	if (!pstate) {
-		fprintf(stderr, "Not enough memory for Pi state\n");
-		exit(1);
-	}
+	struct pi_state *pstate;
 
 	if (argc != 2) {
-		fprintf(stderr, "Provide an input binary as an argument\n");
-		exit(1);
+		fprintf(stderr, NOT_ENOUGH_ARGS);
+		goto fail;
 	}
 
+	pstate = calloc(1, sizeof(struct pi_state));
+	if (!pstate)
+		goto fail;
+
 	input = fopen(argv[1], "rb");
-
 	if (!input)
-		fprintf(stderr, "Could not open input file\n");
+		goto fail;
 
-	fread(&pstate->memory, PI_MEMORY_SIZE, 1, input);
+	if (!fread(&pstate->memory, 1, PI_MEMORY_SIZE, input))
+		goto fail;
+	if (ferror(input))
+		goto fail;
+	if (!feof(input)) {
+		fprintf(stderr, BINARY_TOO_LARGE);
+		goto fail;
+	}
 
-	while (true) {
+	for (;;) {
 		if (pstate->pipeline.decoded)
 			if (execute(pstate) && !errno)
 				break;
@@ -88,4 +91,9 @@ int main(int argc, char **argv)
 	print_state(pstate);
 
 	return EXIT_SUCCESS;
+
+fail:
+	if (errno)
+		fprintf(stderr, "%s (errno: %d)\n", strerror(errno), errno);
+	return EXIT_FAILURE;
 }
