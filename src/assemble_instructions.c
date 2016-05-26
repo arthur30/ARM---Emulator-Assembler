@@ -108,6 +108,7 @@ uint32_t instr_sdt(struct instruction instr)
 	 */
 
 	(void) instr;
+	cond = 14 << 28;
 
 	if (l == 0)
 		l = 1;
@@ -117,7 +118,7 @@ uint32_t instr_sdt(struct instruction instr)
 	return cond + (1 << 26) + i + p + u + l + rn + rd + offset;
 }
 
-uint32_t instr_branch(struct instruction instr)
+uint32_t instr_branch(struct instruction instr, int off)
 {
 	/*
 	 * Instruction Result:
@@ -125,7 +126,8 @@ uint32_t instr_branch(struct instruction instr)
 	 * COND => See from the spec.
 	 */
 
-	(void) instr;
+	cond = branch_to_cond(instr.mnemonic) << 28;
+	offset = (off >> 2) & ((1 << 24) - 1);
 
 	return cond + (10 << 24) + offset;
 }

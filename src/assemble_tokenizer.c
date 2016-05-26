@@ -9,7 +9,6 @@
 struct instruction tokenize(char *instr)
 {
 	int i = 0;
-	char nolabel[] = NO_LABEL;
 	char *save;
 	char *replace = NULL;
 	char *token;
@@ -17,12 +16,12 @@ struct instruction tokenize(char *instr)
 	token = strtok_r(instr, ":", &save);
 	if (strlen(save) == 0) {
 		replace = token;
-		tokens.label = nolabel;
+		tokens.label = NULL;
 	} else
 		tokens.label = token;
 
 	for (token = strtok_r(replace, " ,", &save), i = 0;
-		token;
+		i < 4;
 		token = strtok_r(NULL, " ,", &save), i++) {
 
 		switch (i) {

@@ -36,13 +36,49 @@ struct map dict_branch[] = {
 	{0, 0}
 };
 
+struct map dict_mult[] = {
+	{"mul", 0},
+	{"mla", 1},
+	{0, 0}
+};
 
+struct map dict_sdt[] = {
+	{"ldr", 0},
+	{"sdr", 1},
+	{0, 0}
+};
 
-uint32_t dpi_to_opcode(char *key)
+struct map dict_all[] = {
+	{"and", 0},
+	{"eor", 0},
+	{"sub", 0},
+	{"rsb", 0},
+	{"add", 0},
+	{"orr", 0},
+	{"mov", 0},
+	{"tst", 0},
+	{"teq", 0},
+	{"cmp", 0},
+	{"mul", 0},
+	{"mla", 0},
+	{"mul", 1},
+	{"mla", 1},
+	{"ldr", 2},
+	{"sdr", 2},
+	{"beq", 3},
+	{"bne", 3},
+	{"bge", 3},
+	{"blt", 3},
+	{"bgt", 3},
+	{"ble", 3},
+	{"b", 3},
+	{"bal", 3},
+	{0, 0}
+};
+
+static uint32_t key_to_int(struct map *dict, char *key)
 {
 	int i = 0;
-	struct map *dict = dict_dpi;
-
 	const char *cand = dict[i].str;
 
 	while (cand) {
@@ -52,20 +88,30 @@ uint32_t dpi_to_opcode(char *key)
 	}
 
 	return -1;
+}
+
+uint32_t dpi_to_opcode(char *key)
+{
+	return key_to_int(dict_dpi, key);
 }
 
 uint32_t branch_to_cond(char *key)
 {
-	int i = 0;
-	struct map *dict = dict_branch;
-
-	const char *cand = dict[i].str;
-
-	while (cand) {
-		if (strcmp(cand, key) == 0)
-			return dict[i].n;
-		cand = dict[++i].str;
-	}
-
-	return -1;
+	return key_to_int(dict_branch, key);
 }
+
+uint32_t mult_select(char *key)
+{
+	return key_to_int(dict_mult, key);
+}
+
+uint32_t sdt_select(char *key)
+{
+	return key_to_int(dict_sdt, key);
+}
+
+uint32_t classify_instr(char *key)
+{
+	return key_to_int(dict_all, key);
+}
+

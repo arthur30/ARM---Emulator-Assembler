@@ -10,6 +10,6 @@ struct instr_mult parse_mult(struct instruction instr);
 
 struct instr_transfer parse_sdt(struct instruction instr);
 
-struct instr_branch parse_branch(struct instruction instr);
+struct instr_branch parse_branch(struct instruction instr, int off);
 
 #endif

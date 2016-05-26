@@ -12,6 +12,6 @@ uint32_t instr_multiply(struct instruction instr);
 
 uint32_t instr_sdt(struct instruction instr);
 
-uint32_t instr_branch(struct instruction instr);
+uint32_t instr_branch(struct instruction instr, int off);
 
 #endif
