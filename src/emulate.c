@@ -2,37 +2,39 @@
 #include "emulate_fetch.h"
 #include "emulate_decode.h"
 #include "emulate_execute.h"
+#include "emulate_errors.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include <errno.h>
 
 static void print_state(struct pi_state *pstate)
 {
-	fprintf(stdout, "Registers:\n");
-	for (int i = 0; i < 13; i++) {
-		uint32_t val = pstate->registers[i];
+	int i;
+	uint32_t val, pc, cpsr;
+	uint8_t *mem;
+	size_t address;
 
+	fprintf(stdout, "Registers:\n");
+	for (i = 0; i < 13; i++) {
+		val = pstate->registers[i];
 		fprintf(stdout, "$%-2d : %10d (0x%08x)\n", i, val, val);
 	}
 
-	uint32_t pc = pstate->registers[R_PC];
-
+	pc = pstate->registers[R_PC];
 	fprintf(stdout, "PC  : %10d (0x%08x)\n", pc, pc);
 
-	uint32_t cpsr = (pstate->cpsr.n << 31) |
-			(pstate->cpsr.z << 30) |
-			(pstate->cpsr.c << 29) |
-			(pstate->cpsr.v << 28);
-
+	cpsr = (pstate->cpsr.n << 31) |
+		(pstate->cpsr.z << 30) |
+		(pstate->cpsr.c << 29) |
+		(pstate->cpsr.v << 28);
 	fprintf(stdout, "CPSR: %10d (0x%08x)\n", cpsr, cpsr);
 
 	fprintf(stdout, "Non-zero memory:\n");
-
-	uint8_t *mem = pstate->memory;
-	size_t address = 0;
-
+	mem = pstate->memory;
+	address = 0;
 	for (address = 0; address < PI_MEMORY_SIZE; address += 4) {
 		if (mem[address] |
 		    mem[address + 1] |

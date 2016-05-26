@@ -248,9 +248,11 @@ static int get_shift_reg
 (struct pi_state *pstate, struct shift_reg *reg,
 uint8_t *type, uint32_t *val, uint32_t *amount)
 {
+	int8_t rs;
+
 	*type = reg->shift_type;
 	*val = pstate->registers[reg->rm];
-	int8_t rs = reg->amount.rs;
+	rs = reg->amount.rs;
 
 	if (reg->constant)
 		*amount = reg->amount.integer;
@@ -335,7 +337,6 @@ static int execute_mult(struct pi_state *pstate)
 	uint32_t rn;
 	uint32_t rm;
 	uint32_t rs;
-
 	struct instr_mult *mult;
 
 	mult = &pstate->pipeline.instruction.instr_bits.mult;
@@ -354,15 +355,18 @@ static int execute_mult(struct pi_state *pstate)
 static uint8_t gpio_dummy[4];
 static uint8_t *get_gpio(struct pi_state *pstate, size_t address)
 {
+	int range, low, high;
+	size_t i;
+	uint32_t addr;
+
 	if (address >= GPIO_CONTROL_ADDRESS &&
 	    address - GPIO_CONTROL_ADDRESS < GPIO_CONTROL_SIZE) {
-		int range = (address - GPIO_CONTROL_ADDRESS) / 4;
-		int low = range * 10;
-		int high = range * 10 + 9;
+		range = (address - GPIO_CONTROL_ADDRESS) / 4;
+		low = range * 10;
+		high = range * 10 + 9;
 
-		for (size_t i = 0; i < GPIO_CONTROL_SIZE; i += 4) {
-			uint32_t addr = GPIO_CONTROL_ADDRESS + i;
-
+		for (i = 0; i < GPIO_CONTROL_SIZE; i += 4) {
+			addr = GPIO_CONTROL_ADDRESS + i;
 			memcpy(&pstate->gpio_control[i], &addr, sizeof(addr));
 		}
 
@@ -410,6 +414,7 @@ static int execute_transfer(struct pi_state *pstate)
 	uint32_t rn;
 	uint32_t offsetval;
 	bool carry;
+	uint8_t *mem;
 
 	transfer = &pstate->pipeline.instruction.instr_bits.transfer;
 	offset = &transfer->offset;
@@ -426,8 +431,7 @@ static int execute_transfer(struct pi_state *pstate)
 			rn -= offsetval;
 	}
 
-	uint8_t *mem = get_memory(pstate, rn);
-
+	mem = get_memory(pstate, rn);
 	if (!mem)
 		return -1;
 
@@ -535,14 +539,14 @@ static int check_cond(struct pi_state *pstate)
 int execute(struct pi_state *pstate)
 {
 	enum instr_type type;
-	int cond_check_res = check_cond(pstate);
+	int cond_check_res;
 
-	pstate->pipeline.decoded = false;
-
-	type = pstate->pipeline.instruction.type;
-
+	cond_check_res = check_cond(pstate);
 	if (cond_check_res == -1)
 		return -1;
+
+	pstate->pipeline.decoded = false;
+	type = pstate->pipeline.instruction.type;
 
 	if (cond_check_res || type == HALT)
 		return instr_type_table[type](pstate);
