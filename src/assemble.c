@@ -10,6 +10,9 @@
 #define MAX_LINE_LENGTH 512
 #define SYM_TABLE_CAPACITY 16
 
+static FILE *input;
+static FILE *output;
+
 struct sym {
 	char *label;
 	uint16_t address;
@@ -49,32 +52,24 @@ static void destroy_labels(void)
 	free(sym_table.table);
 }
 
-int main(int argc, char **argv)
+static void load_io_files(char *inp, char *out)
 {
-	FILE *input;
-	FILE *output;
+	input = fopen(inp, "r");
+	output = fopen(out, "wb");
 
-	/* Check if source and dest files are provided.	 */
-	if (argc != 3)
-		return EXIT_FAILURE;
-
-	/* Open the input and output files */
-	input = fopen(argv[1], "r");
-	output = fopen(argv[2], "wb");
-
-	/* Handle errors if files don't exist */
 	if (input == NULL) {
 		printf("Error opening the input file");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
 	if (output == NULL) {
 		printf("Error opening the output file");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
+}
 
-	initiate_labels();
-
+static void first_pass(void)
+{
 	char *line = malloc(MAX_LINE_LENGTH);
 	int instr_num = 0;
 
@@ -83,13 +78,11 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	/* FIRST PASS */
 	while (fgets(line, MAX_LINE_LENGTH, input)) {
-
-		extend_labels();
 
 		struct instruction *instr = malloc(sizeof(struct instruction));
 
+		extend_labels();
 		tokenize(line, instr);
 
 
@@ -103,17 +96,26 @@ int main(int argc, char **argv)
 			instr_num++;
 
 		free(instr);
-
-	}
-
-	int i = 0;
-
-	for (i = 0; i < sym_table.size; i++) {
-		printf("%s\t%i\n", sym_table.table[i].label,
-				sym_table.table[i].address);
 	}
 
 	free(line);
+}
+
+static void second_pass(void)
+{
+
+}
+
+int main(int argc, char **argv)
+{
+	if (argc != 3)
+		return EXIT_FAILURE;
+
+	load_io_files(argv[1], argv[2]);
+	initiate_labels();
+	first_pass();
+	second_pass();
+
 	fclose(input);
 	fclose(output);
 	destroy_labels();
