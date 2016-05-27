@@ -1,6 +1,7 @@
 \documentclass[11pt]{article}
 
 \usepackage{fullpage}
+\usepackage{enumitem}
 
 \begin{document}
 
@@ -71,7 +72,7 @@ instruction itself.
 The remaining four parts are split based on the parts of the execution pipeline,
 therefore fetch, decode, execute.
 
-\begin{itemize}
+\begin{itemize}[noitemsep,topsep=0pt]
     \item Fetch: relatively simple, fetches 4 bytes from memory, packs them
     \item Decode: tests for specific bit patterns to identify instruction type
       then unpacks it
@@ -98,7 +99,7 @@ binary mode.
 
 Talking about how the assembler generates this binary encoding. The assembler
 has been divided into 4 main parts:
-\begin{itemize}
+\begin{itemize}[noitemsep,topsep=0pt]
 \item A tokenizer(to tokenize the instruction),
 \item A parser(to parse the tokenized instruction),
 \item A dictionary(to look for the mnemonics and their respective values),
