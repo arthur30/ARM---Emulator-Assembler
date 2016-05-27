@@ -4,14 +4,12 @@
 #include <stdint.h>
 #include "assemble_tokenizer.h"
 
-uint32_t key_to_int(char *key, int dpi);
+uint32_t instr_dpi(struct instruction *instr);
 
-uint32_t instr_dpi(struct instruction instr);
+uint32_t instr_multiply(struct instruction *instr);
 
-uint32_t instr_multiply(struct instruction instr);
+uint32_t instr_sdt(struct instruction *instr);
 
-uint32_t instr_sdt(struct instruction instr);
-
-uint32_t instr_branch(struct instruction instr, int off);
+uint32_t instr_branch(struct instruction *instr, int off);
 
 #endif

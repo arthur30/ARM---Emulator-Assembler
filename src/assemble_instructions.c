@@ -30,7 +30,7 @@ uint32_t rm;        /* for REGISTER Rm           */
 
 /* All functions return a 32bit integer. */
 
-uint32_t instr_dpi(struct instruction instr)
+uint32_t instr_dpi(struct instruction *instr)
 {
 	/*
 	 * Instruction Result:
@@ -45,7 +45,7 @@ uint32_t instr_dpi(struct instruction instr)
 	struct instr_data_proc parsed = parse_dpi(instr);
 
 	cond = 14 << 28;
-	opcode = dpi_to_opcode(instr.mnemonic) << 21;
+	opcode = dpi_to_opcode(instr->mnemonic) << 21;
 	rd = parsed.rd << 12;
 	rn = parsed.rn << 16;
 
@@ -65,7 +65,7 @@ uint32_t instr_dpi(struct instruction instr)
 	return cond + i + opcode + s + rn + rd + operand2;
 }
 
-uint32_t instr_multiply(struct instruction instr)
+uint32_t instr_multiply(struct instruction *instr)
 {
 	/*
 	 * Instruction Result:
@@ -96,7 +96,7 @@ uint32_t instr_multiply(struct instruction instr)
 	return cond + a + s + rd + rn + rs + 144 + rm;
 }
 
-uint32_t instr_sdt(struct instruction instr)
+uint32_t instr_sdt(struct instruction *instr)
 {
 	/*
 	 * Instruction Result:
@@ -118,7 +118,7 @@ uint32_t instr_sdt(struct instruction instr)
 	return cond + (1 << 26) + i + p + u + l + rn + rd + offset;
 }
 
-uint32_t instr_branch(struct instruction instr, int off)
+uint32_t instr_branch(struct instruction *instr, int off)
 {
 	/*
 	 * Instruction Result:
@@ -126,7 +126,7 @@ uint32_t instr_branch(struct instruction instr, int off)
 	 * COND => See from the spec.
 	 */
 
-	cond = branch_to_cond(instr.mnemonic) << 28;
+	cond = branch_to_cond(instr->mnemonic) << 28;
 	offset = (off >> 2) & ((1 << 24) - 1);
 
 	return cond + (10 << 24) + offset;

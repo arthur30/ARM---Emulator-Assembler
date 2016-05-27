@@ -103,6 +103,50 @@ static void first_pass(void)
 
 static void second_pass(void)
 {
+	char *line = malloc(MAX_LINE_LENGTH);
+	int instr_num = 0;
+
+	if (!line) {
+		fprintf(stderr, "Couldn't allocate memory for the line.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	rewind(input);
+
+	while (fgets(line, MAX_LINE_LENGTH, input)) {
+		struct instruction *instr = malloc(sizeof(struct instruction));
+		int instr_type;
+		uint32_t instr_binary;
+
+		tokenize(line, instr);
+
+		if (strlen(instr->mnemonic) > 1) {
+			instr_type = classify_instr(instr->mnemonic);
+
+			switch (instr_type) {
+			case 0:
+				instr_binary = instr_dpi(instr);
+				break;
+			case 1:
+				instr_binary = instr_multiply(instr);
+				break;
+			case 2:
+				instr_binary = instr_sdt(instr);
+				break;
+			case 3:
+				instr_binary = instr_branch(instr, 0);
+				break;
+			default:
+				fprintf(stderr, "Error: Invalid Instruction");
+				exit(EXIT_FAILURE);
+			}
+
+			fwrite(&instr_binary, sizeof(instr_binary), 1, output);
+			instr_num++;
+		}
+
+		free(instr);
+	}
 
 }
 
