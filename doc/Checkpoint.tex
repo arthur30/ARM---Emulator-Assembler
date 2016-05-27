@@ -62,7 +62,7 @@ spot and correct them easily. \\ \\
 
 The \textbf{emulator} was split into four main parts.
 
-There are the data structures for the storing the state of the emulator and the
+There are data structures for storing the state of the emulator and the
 decoded instructions. The state includes the current values of registers, the
 current values in memory, whether there is a fetched instructions and the
 fetched instruction, whether there is a decoded instruction and the decoded
@@ -73,9 +73,9 @@ therefore fetch, decode, execute.
 
 \begin{itemize}
     \item Fetch: relatively simple, fetches 4 bytes from memory, packs them
-    \item Decoding: tests for specific bit patterns to identify instruction type
+    \item Decode: tests for specific bit patterns to identify instruction type
       then unpacks it
-    \item Execution: check the flags on the decoded instruction and calls their
+    \item Execute: check the flags on the decoded instruction and calls their
       respective functions by indexing into an array
     \item PC: finally PC is incremented
 \end{itemize}
