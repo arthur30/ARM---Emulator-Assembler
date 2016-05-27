@@ -90,12 +90,9 @@ processing instruction. To save space the instructions are stored in unions.
 
 The data structures of the emulator are to be reused in the assembler. \\
 
-For the \textbf{assembler} we are using the two pass strategy mentioned in the spec
-file. In the first pass over the file we collect all the labels with their
-addresses and store them for future use. In the second pass over the file
-we tokenize and parse all the instructions. Finally we generate the
-corresponding binary encoding and write it to the output file opened in
-binary mode.
+For the \textbf{assembler} we are using the two pass strategy mentioned in the
+spec file. In the first pass we read the labels and in the second pass we write
+the binary encoded instruction.
 
 Talking about how the assembler generates this binary encoding. The assembler
 has been divided into 4 main parts:
