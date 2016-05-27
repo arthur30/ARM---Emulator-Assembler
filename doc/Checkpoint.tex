@@ -21,7 +21,7 @@ the group, first focusing on the emulator and the assembler and then the
 remaining GPIO LED flasher and extension parts.
 
 The emulator was assigned to Szilveszter Szekely and Arthur-Mihai Niculae.
-The assamble was assigned to Abhinav Mishra and Tom Bellingham.
+The assembler was assigned to Abhinav Mishra and Tom Bellingham.
 
 At this point we have yet to decide on the specifics of the work allocation of
 GPIO LED program and the extension.
@@ -69,7 +69,7 @@ fetched instruction, whether there is a decoded instruction and the decoded
 instruction itself.
 
 The decoded instructions are stored in a single structure that has a flag
-indicating the kind of the instruction and the specific parts to their their
+indicating the kind of instruction and the specific parts to their their
 respective instructions. The are stored in an union in order to save on memory.
 
 The remaining four parts are split based on the parts of the execution pipeline,
@@ -98,8 +98,32 @@ with relevant parts of the instruction, for example the opcode of the data
 processing instruction.
 
 The data structures of the emulator are to be reused in the assembler.
+\\ \\
+For the assembler we are using the two pass strategy mentioned in the spec
+file. In the first pass over the file we collect all the labels with their
+addresses and store them for future use. In the second pass over the file
+we tokenize and parse all the instructions. Finally we generate the
+corresponding binary encoding and write it to the output file opened in
+binary mode.
 
-TODO Assembler structure, maybe.
+Talking about how the assembler generates this binary encoding. The assembler
+has been divided into 4 main parts:
+\begin{itemize}
+\item A tokenizer(to tokenize the instruction),
+\item A parser(to parse the tokenized instruction),
+\item A dictionary(to look for the mnemonics and their respective values),
+\item An instruction generator(to generate the final binary encoding)
+\end{itemize}
+
+We also reuse some of the data structures used in the emulator in order to 
+avoid duplicates and redundant code.(Ex: 
+\textbf{instr\_data\_proc}, \textbf{instr\_mult}, \textbf{instr\_transfer} \& \textbf{instr\_branch}
+)
+
+We would also like to mention that there is some work to be done on the
+assembler to pass all the test cases. Also we are thinking of reducing the
+number of components underlying the assembler and making the tokenizer more
+efficient and complete.
 
 \section{Implementation Challenges}
 
