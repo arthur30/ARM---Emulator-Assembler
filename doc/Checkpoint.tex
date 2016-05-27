@@ -85,7 +85,7 @@ execution is halted and the state of the emulator dumped.
 
 To simplify code paths, we use arrays of function pointers and index into them
 with relevant parts of the instruction, for example the opcode of the data
-processing instruction.
+processing instruction. To save space the instructions are stored in unions.
 
 The data structures of the emulator are to be reused in the assembler.
 \\ \\
