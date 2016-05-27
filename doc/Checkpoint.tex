@@ -68,27 +68,17 @@ current values in memory, whether there is a fetched instructions and the
 fetched instruction, whether there is a decoded instruction and the decoded
 instruction itself.
 
-The decoded instructions are stored in a single structure that has a flag
-indicating the kind of instruction and the specific parts to their respective
-instructions. The are stored in an union in order to save on memory.
-
 The remaining four parts are split based on the parts of the execution pipeline,
 therefore fetch, decode, execute.
 
-Fetch is relatively simple, as it only needs to fetch from memory and copy four
-bytes into a 32 bit instruction value and set the instruction fetched flag.
-
-Decoding the instructions consist of two steps. First, the kind of the
-instruction is identified using bit patterns that we have found to uniquely
-specify them. Then the specifics of each instruction kind are parsed into the
-instruction structure.
-
-Execution the instruction happens by having conditions on which parts of the
-structure are filled in. First the condition is checked then if it needs to be
-the stored instruction is executed, doing the necessary processing on them like
-doing the value rotations, extensions and the like.
-
-Finally the PC register is incremented.
+\begin{itemize}
+    \item Fetch: relatively simple, fetches 4 bytes from memory, packs them
+    \item Decoding: tests for specific bit patterns to identify instruction type
+      then unpacks it
+    \item Execution: check the flags on the decoded instruction and calls their
+      respective functions by indexing into an array
+    \item PC: finally PC is incremented
+\end{itemize}
 
 If any of these operations fail or a halt instruction is encountered then
 execution is halted and the state of the emulator dumped.
