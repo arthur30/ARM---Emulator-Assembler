@@ -53,6 +53,13 @@ project.
 
 \section{Implementation Strategies}
 
+We wanted a consistent style for our code and one that also filters out most of
+the possible errors that we can make. Therefore we decided to include the Linux
+kernel checkpatch.pl tool to check our for style consistency. We also turned on
+more warnings in our Makefile to spot more problems. We made any style error and
+warning along with compiler errors into errors that stop the build, so we can
+spot and correct them easily.
+
 The emulator was split into four main parts.
 
 There are the data structures for the storing the state of the emulator and the
