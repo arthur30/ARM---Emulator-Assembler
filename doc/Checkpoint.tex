@@ -73,11 +73,12 @@ The remaining four parts are split based on the parts of the execution pipeline,
 therefore fetch, decode, execute.
 
 \begin{itemize}[noitemsep,topsep=0pt]
-    \item \textbf{Fetch}: relatively simple, fetches 4 bytes from memory, packs them
-    \item \textbf{Decode}: tests for specific bit patterns to identify instruction type
-      then unpacks it
-    \item \textbf{Execute}: check the flags on the decoded instruction and calls their
-      respective functions by indexing into an array
+    \item \textbf{Fetch}: relatively simple, fetches 4 bytes from memory,
+      packs them
+    \item \textbf{Decode}: tests for specific bit patterns to identify
+      instruction type then unpacks it
+    \item \textbf{Execute}: check the flags on the decoded instruction and calls
+      their respective functions by indexing into an array
     \item \textbf{PC}: incremented
 \end{itemize}
 
@@ -109,7 +110,10 @@ has been divided into 4 main parts:
 
 We also reuse some of the data structures used in the emulator in order to
 avoid duplicates and redundant code.(Ex:
-\textbf{instr\_data\_proc}, \textbf{instr\_mult}, \textbf{instr\_transfer} \& \textbf{instr\_branch}
+\textbf{instr\_data\_proc},
+\textbf{instr\_mult},
+\textbf{instr\_transfer} \&
+\textbf{instr\_branch}
 )
 
 We would also like to mention that there is some work to be done on the
