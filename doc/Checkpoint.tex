@@ -73,12 +73,12 @@ The remaining four parts are split based on the parts of the execution pipeline,
 therefore fetch, decode, execute.
 
 \begin{itemize}[noitemsep,topsep=0pt]
-    \item Fetch: relatively simple, fetches 4 bytes from memory, packs them
-    \item Decode: tests for specific bit patterns to identify instruction type
+    \item \textbf{Fetch}: relatively simple, fetches 4 bytes from memory, packs them
+    \item \textbf{Decode}: tests for specific bit patterns to identify instruction type
       then unpacks it
-    \item Execute: check the flags on the decoded instruction and calls their
+    \item \textbf{Execute}: check the flags on the decoded instruction and calls their
       respective functions by indexing into an array
-    \item PC: incremented
+    \item \textbf{PC}: incremented
 \end{itemize}
 
 If any of these operations fail or a halt instruction is encountered then
@@ -97,10 +97,14 @@ the binary encoded instruction.
 Talking about how the assembler generates this binary encoding. The assembler
 has been divided into 4 main parts:
 \begin{itemize}[noitemsep,topsep=0pt]
-\item A tokenizer(to tokenize the instruction),
-\item A parser(to parse the tokenized instruction),
-\item A dictionary(to look for the mnemonics and their respective values),
-\item An instruction generator(to generate the final binary encoding)
+	\item \textbf{Tokenizer}:
+		to tokenize the instruction.
+	\item \textbf{Parser}:
+		to parse the tokenized instruction.
+	\item \textbf{Dictionary}:
+		to look for the mnemonics and their respective values.
+	\item \textbf{Instruction Generator}:
+		to generate the final binary encoding.
 \end{itemize}
 
 We also reuse some of the data structures used in the emulator in order to
