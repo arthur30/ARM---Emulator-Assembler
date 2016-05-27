@@ -69,8 +69,8 @@ fetched instruction, whether there is a decoded instruction and the decoded
 instruction itself.
 
 The decoded instructions are stored in a single structure that has a flag
-indicating the kind of instruction and the specific parts to their their
-respective instructions. The are stored in an union in order to save on memory.
+indicating the kind of instruction and the specific parts to their respective
+instructions. The are stored in an union in order to save on memory.
 
 The remaining four parts are split based on the parts of the execution pipeline,
 therefore fetch, decode, execute.
@@ -115,8 +115,8 @@ has been divided into 4 main parts:
 \item An instruction generator(to generate the final binary encoding)
 \end{itemize}
 
-We also reuse some of the data structures used in the emulator in order to 
-avoid duplicates and redundant code.(Ex: 
+We also reuse some of the data structures used in the emulator in order to
+avoid duplicates and redundant code.(Ex:
 \textbf{instr\_data\_proc}, \textbf{instr\_mult}, \textbf{instr\_transfer} \& \textbf{instr\_branch}
 )
 
