@@ -68,6 +68,20 @@ static void load_io_files(char *inp, char *out)
 	}
 }
 
+static int lookout_symbol(char *key)
+{
+	int i = 0;
+	const char *cand = sym_table.table[i].label;
+
+	while (cand) {
+		if (strcmp(cand, key) == 0)
+			return sym_table.table[i].address;
+		cand = sym_table.table[++i].label;
+	}
+
+	return -1;
+}
+
 static void first_pass(void)
 {
 	char *line = malloc(MAX_LINE_LENGTH);
@@ -87,7 +101,8 @@ static void first_pass(void)
 
 
 		if (instr->label) {
-			sym_table.table[sym_table.size].label = instr->label;
+			sym_table.table[sym_table.size].label =
+						strcat(instr->label, "\n");
 			sym_table.table[sym_table.size].address = 4 * instr_num;
 			sym_table.size++;
 		}
@@ -116,6 +131,9 @@ static void second_pass(void)
 	while (fgets(line, MAX_LINE_LENGTH, input)) {
 		struct instruction *instr = malloc(sizeof(struct instruction));
 		int instr_type;
+		int jump_to;
+		int current;
+		int offset;
 		uint32_t instr_binary;
 
 		tokenize(line, instr);
@@ -134,7 +152,14 @@ static void second_pass(void)
 				instr_binary = instr_sdt(instr);
 				break;
 			case 3:
-				instr_binary = instr_branch(instr, 0);
+				jump_to = lookout_symbol(instr->op1);
+				current = 4*(instr_num + 1);
+				offset = lookout_symbol(instr->op1) -
+						(4*(instr_num + 1) + 8);
+
+				printf("%i\t%i\t%i\n", jump_to, current,
+									offset);
+				instr_binary = instr_branch(instr, offset);
 				break;
 			default:
 				fprintf(stderr, "Error: Invalid Instruction");
@@ -150,19 +175,24 @@ static void second_pass(void)
 
 }
 
+
+
 int main(int argc, char **argv)
 {
 	if (argc != 3)
 		return EXIT_FAILURE;
 
 	load_io_files(argv[1], argv[2]);
+
 	initiate_labels();
+
 	first_pass();
 	second_pass();
 
+	destroy_labels();
 	fclose(input);
 	fclose(output);
-	destroy_labels();
+
 	return EXIT_SUCCESS;
 }
 

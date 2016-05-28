@@ -19,8 +19,6 @@ struct map dict_dpi[] = {
 	{"tst", 8},
 	{"teq", 9},
 	{"cmp", 10},
-	{"mul", 20},
-	{"mla", 21},
 	{0, 0}
 };
 
@@ -59,8 +57,6 @@ struct map dict_all[] = {
 	{"tst", 0},
 	{"teq", 0},
 	{"cmp", 0},
-	{"mul", 0},
-	{"mla", 0},
 	{"mul", 1},
 	{"mla", 1},
 	{"ldr", 2},
