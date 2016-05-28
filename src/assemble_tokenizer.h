@@ -1,13 +1,19 @@
 #ifndef ASSEMBLE_TOKENIZER_H
 #define ASSEMBLE_TOKENIZER_H
 
+#include "emulate_pi_state.h"
+
 struct instruction {
 	char *label;
-	char *mnemonic;
-	char *op1;
-	char *op2;
-	char *op3;
-	char *op4;
+	bool mnemonic;
+	uint8_t type;
+	uint8_t code;
+	union {
+		struct instr_data_proc dpi;
+		struct instr_mult mult;
+		struct instr_transfer sdt;
+		struct instr_branch branch;
+	} instr;
 };
 
 void tokenize(char *instr, struct instruction *tokens);

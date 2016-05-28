@@ -1,5 +1,4 @@
 #include "assemble_instructions.h"
-#include "assemble_parser.h"
 #include "assemble_dictionary.h"
 #include "emulate_pi_state.h"
 
@@ -43,25 +42,29 @@ uint32_t instr_dpi(struct instruction *instr)
 	 * Operand2 => <#expression> || Rm{,<shift>}
 	 */
 
-	struct instr_data_proc parsed = parse_dpi(instr);
 
 	cond = 14 << 28;
-	opcode = dpi_to_opcode(instr->mnemonic) << 21;
-	rd = parsed.rd << 12;
-	rn = parsed.rn << 16;
+	opcode = (instr->code) << 21;
+	rd = instr->instr.dpi.rd << 12;
+	rn = instr->instr.dpi.rn << 16;
 
-	if (parsed.op2.immediate) {
+	if (instr->instr.dpi.op2.immediate) {
 		i = 1 << 25;
-		operand2 = parsed.op2.offset.imm.imm;
+		operand2 = instr->instr.dpi.op2.offset.imm.imm;
 	} else {
 		i = 0;
-		operand2 = parsed.op2.offset.reg.rm;
+		operand2 = instr->instr.dpi.op2.offset.reg.rm;
 	}
 
-	if (parsed.setcond)
+	if (instr->instr.dpi.setcond)
 		s = 1 << 20;
 	else
 		s = 0;
+
+	printf("%i\t", instr->code);
+	printf("%i\t", instr->instr.dpi.rn);
+	printf("%i\t", instr->instr.dpi.rd);
+	printf("%i\n", instr->instr.dpi.op2.offset.imm.imm);
 
 	return cond + i + opcode + s + rn + rd + operand2;
 }
@@ -78,17 +81,16 @@ uint32_t instr_multiply(struct instruction *instr)
 	 * mul r1, r2, r3 => r1 = r2 x r3
 	 */
 
-	struct instr_mult parsed = parse_mult(instr);
 
 	cond = 14 << 28;
 	s = 0;
-	rs = parsed.rs << 8;
-	rm = parsed.rm;
-	rd = parsed.rd << 16;
+	rs = instr->instr.mult.rs << 8;
+	rm = instr->instr.mult.rm;
+	rd = instr->instr.mult.rd << 16;
 
-	if (parsed.accumulate) {
+	if (instr->instr.mult.accumulate) {
 		a = 1 << 21;
-		rn = parsed.rn << 12;
+		rn = instr->instr.mult.rn << 12;
 	} else {
 		a = 0;
 		rn = 0;
@@ -127,7 +129,7 @@ uint32_t instr_branch(struct instruction *instr, int off)
 	 * COND => See from the spec.
 	 */
 
-	cond = branch_to_cond(instr->mnemonic) << 28;
+	cond = instr->code << 28;
 	offset = (off >> 2) & ((1 << 24) - 1);
 
 	return cond + (10 << 24) + offset;

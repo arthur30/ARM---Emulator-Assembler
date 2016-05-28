@@ -107,7 +107,7 @@ static void first_pass(void)
 			sym_table.size++;
 		}
 
-		if (strlen(instr->mnemonic) > 1)
+		if (instr->mnemonic)
 			instr_num++;
 
 		free(instr);
@@ -138,8 +138,9 @@ static void second_pass(void)
 
 		tokenize(line, instr);
 
-		if (strlen(instr->mnemonic) > 1) {
-			instr_type = classify_instr(instr->mnemonic);
+
+		if (instr->mnemonic) {
+			instr_type = instr->type;
 
 			switch (instr_type) {
 			case 0:
@@ -152,10 +153,9 @@ static void second_pass(void)
 				instr_binary = instr_sdt(instr);
 				break;
 			case 3:
-				jump_to = lookout_symbol(instr->op1);
+				jump_to = lookout_symbol(instr->label);
 				current = 4*(instr_num + 1);
-				offset = lookout_symbol(instr->op1) -
-						(4*(instr_num + 1) + 8);
+				offset = jump_to - (current + 8);
 
 				printf("%i\t%i\t%i\n", jump_to, current,
 									offset);
@@ -168,7 +168,7 @@ static void second_pass(void)
 
 			fwrite(&instr_binary, sizeof(instr_binary), 1, output);
 			instr_num++;
-		}
+		 }
 
 		free(instr);
 	}

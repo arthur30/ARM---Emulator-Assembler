@@ -1,49 +1,123 @@
+#include "assemble_tokenizer.h"
+#include "assemble_dictionary.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "assemble_tokenizer.h"
+#include <stdbool.h>
 
-#define NO_LABEL "NO LABEL SUPPLIED"
-
-void tokenize(char *instr, struct instruction *tokens)
+static void init_dpi(struct instruction *tokens)
 {
-	int i = 0;
-	char *save;
-	char *replace = NULL;
+	int j = 0;
 	char *token;
 
-	token = strtok_r(instr, ":", &save);
-	tokens->label = strdup(token);
+	tokens->instr.dpi.opcode = tokens->code;
+	tokens->instr.dpi.setcond = false;
 
-	if (strlen(save) == 0) {
-		replace = token;
-		tokens->label = NULL;
+	switch (tokens->code) {
+	case 8:
+	case 9:
+	case 10:
+		tokens->instr.dpi.setcond = true;
+		tokens->instr.dpi.rd = 0;
+		tokens->instr.dpi.rn = atoi(strtok(NULL, " ,") + 1);
+		token = strtok(NULL, " ,");
+		tokens->instr.dpi.op2.immediate = token[0] == '#';
+		j = atoi(token + 1);
+
+		if (tokens->instr.dpi.op2.immediate)
+			tokens->instr.dpi.op2.offset.imm.imm = j;
+		else
+			tokens->instr.dpi.op2.offset.reg.rm = j;
+		break;
+	case 13:
+		tokens->instr.dpi.rn = 0;
+		tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
+		token = strtok(NULL, " ,");
+		printf("%s\n", token);
+		tokens->instr.dpi.op2.immediate = token[0] == '#';
+		j = atoi(token + 1);
+
+		if (tokens->instr.dpi.op2.immediate)
+			tokens->instr.dpi.op2.offset.imm.imm = j;
+		else
+			tokens->instr.dpi.op2.offset.reg.rm = j;
+		break;
+	default:
+		tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
+		tokens->instr.dpi.rn = atoi(strtok(NULL, " ,") + 1);
+		token = strtok(NULL, " ,");
+		tokens->instr.dpi.op2.immediate = token[0] == '#';
+		j = atoi(token + 1);
+
+		if (tokens->instr.dpi.op2.immediate)
+			tokens->instr.dpi.op2.offset.imm.imm = j;
+		else
+			tokens->instr.dpi.op2.offset.reg.rm = j;
+		break;
 	}
 
-	for (token = strtok_r(replace, " ,", &save), i = 0;
-		token;
-		token = strtok_r(NULL, " ,", &save), i++) {
+}
 
-		switch (i) {
+static void init_mult(struct instruction *tokens)
+{
+	tokens->instr.mult.accumulate = tokens->code;
+	tokens->instr.mult.setcond = false;
+	tokens->instr.mult.rd = atoi(strtok(NULL, " ,") + 1);
+	tokens->instr.mult.rm = atoi(strtok(NULL, " ,") + 1);
+	tokens->instr.mult.rs = atoi(strtok(NULL, " ,") + 1);
+
+	if (tokens->code)
+		tokens->instr.mult.rn = atoi(strtok(NULL, " ,") + 1);
+}
+
+static void init_sdt(struct instruction *tokens)
+{
+	(void) tokens;
+}
+
+static void init_branch(struct instruction *tokens)
+{
+	(void) tokens;
+}
+
+void tokenize(char *orig_instr, struct instruction *tokens)
+{
+	char *token;
+	char *instr = strdup(orig_instr);
+
+	token = strtok(instr, ":");
+	tokens->label = token;
+
+	if (!strcmp(token, orig_instr))
+		tokens->label = NULL;
+
+
+	if (tokens->label)
+		token = strtok(NULL, " ");
+	else
+		token = strtok(instr, " ");
+
+	if (token) {
+		tokens->mnemonic = true;
+		tokens->type = classify_instr(token);
+		printf("%i\t", tokens->type);
+		tokens->code = instr_code(token, tokens->type);
+		printf("%i\t", tokens->code);
+
+		switch (tokens->type) {
 		case 0:
-			tokens->mnemonic = strdup(token);
+			init_dpi(tokens);
 			break;
 		case 1:
-			tokens->op1 = strdup(token);
+			init_mult(tokens);
 			break;
 		case 2:
-			tokens->op2 = strdup(token);
+			init_sdt(tokens);
 			break;
 		case 3:
-			tokens->op3 = strdup(token);
-			break;
-		case 4:
-			tokens->op4 = strdup(token);
-			break;
-		default:
-			printf("ERROR: Instruction not well defined.");
-			exit(EXIT_FAILURE);
+			init_branch(tokens);
 			break;
 		}
 	}

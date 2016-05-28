@@ -86,24 +86,20 @@ static uint32_t key_to_int(struct map *dict, char *key)
 	return -1;
 }
 
-uint32_t dpi_to_opcode(char *key)
+uint32_t instr_code(char *key, int type)
 {
-	return key_to_int(dict_dpi, key);
-}
-
-uint32_t branch_to_cond(char *key)
-{
-	return key_to_int(dict_branch, key);
-}
-
-uint32_t mult_select(char *key)
-{
-	return key_to_int(dict_mult, key);
-}
-
-uint32_t sdt_select(char *key)
-{
-	return key_to_int(dict_sdt, key);
+	switch (type) {
+	case 0:
+		return key_to_int(dict_dpi, key);
+	case 1:
+		return key_to_int(dict_mult, key);
+	case 2:
+		return key_to_int(dict_sdt, key);
+	case 3:
+		return key_to_int(dict_branch, key);
+	default:
+		return -1;
+	}
 }
 
 uint32_t classify_instr(char *key)
