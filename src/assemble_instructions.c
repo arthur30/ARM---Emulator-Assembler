@@ -32,17 +32,6 @@ uint32_t rm;        /* for REGISTER Rm           */
 
 uint32_t instr_dpi(struct instruction *instr)
 {
-	/*
-	 * Instruction Result:
-	 * COND 00 I OpCode S -Rn- -Rd- Operand2
-	 * COND => 1110
-	 * OpCode => See from Spec.
-	 * S => (tst, teq, cmp -> 1) || (rest -> 0)
-	 * I => Set if Operand2 is an immediate const.
-	 * Operand2 => <#expression> || Rm{,<shift>}
-	 */
-
-
 	cond = 14 << 28;
 	opcode = (instr->code) << 21;
 	rd = instr->instr.dpi.rd << 12;
@@ -61,27 +50,11 @@ uint32_t instr_dpi(struct instruction *instr)
 	else
 		s = 0;
 
-	printf("%i\t", instr->code);
-	printf("%i\t", instr->instr.dpi.rn);
-	printf("%i\t", instr->instr.dpi.rd);
-	printf("%i\n", instr->instr.dpi.op2.offset.imm.imm);
-
 	return cond + i + opcode + s + rn + rd + operand2;
 }
 
 uint32_t instr_multiply(struct instruction *instr)
 {
-	/*
-	 * Instruction Result:
-	 * COND 0000 00AS -Rd- -Rn- -Rs- 1001 -Rm-
-	 * COND => 1110
-	 * A => (mul -> 0) || (mla -> 1)
-	 * S => 0
-	 * mla r1, r2, r3, r4 => r1 = (r2 x r3) + r4
-	 * mul r1, r2, r3 => r1 = r2 x r3
-	 */
-
-
 	cond = 14 << 28;
 	s = 0;
 	rs = instr->instr.mult.rs << 8;
@@ -112,25 +85,30 @@ uint32_t instr_sdt(struct instruction *instr)
 
 	(void) instr;
 	cond = 14 << 28;
+	l = 0;
+	p = 0;
+	u = 1 << 23;
+	i = 0;
+	rn = instr->instr.sdt.rn << 16;
+	rd = instr->instr.sdt.rd << 12;
+	offset = instr->instr.sdt.offset.offset.imm;
 
-	if (l == 0)
-		l = 1;
-	else
-		l = 0;
+	if (instr->instr.sdt.load)
+		l = 1 << 20;
+
+	if (instr->instr.sdt.preindexing)
+		p = 1 << 24;
+
+	if (instr->instr.sdt.offset.immediate)
+		i = 1 << 24;
 
 	return cond + (1 << 26) + i + p + u + l + rn + rd + offset;
 }
 
-uint32_t instr_branch(struct instruction *instr, int off)
+uint32_t instr_branch(struct instruction *instr)
 {
-	/*
-	 * Instruction Result:
-	 * COND 1010 Offset
-	 * COND => See from the spec.
-	 */
-
 	cond = instr->code << 28;
-	offset = (off >> 2) & ((1 << 24) - 1);
+	offset = (instr->instr.branch.offset >> 2) & ((1 << 24) - 1);
 
 	return cond + (10 << 24) + offset;
 }

@@ -42,7 +42,7 @@ struct map dict_mult[] = {
 
 struct map dict_sdt[] = {
 	{"ldr", 0},
-	{"sdr", 1},
+	{"str", 1},
 	{0, 0}
 };
 
@@ -60,7 +60,7 @@ struct map dict_all[] = {
 	{"mul", 1},
 	{"mla", 1},
 	{"ldr", 2},
-	{"sdr", 2},
+	{"str", 2},
 	{"beq", 3},
 	{"bne", 3},
 	{"bge", 3},

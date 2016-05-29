@@ -130,7 +130,6 @@ static void second_pass(void)
 
 	while (fgets(line, MAX_LINE_LENGTH, input)) {
 		struct instruction *instr = malloc(sizeof(struct instruction));
-		int instr_type;
 		int jump_to;
 		int current;
 		int offset;
@@ -140,9 +139,8 @@ static void second_pass(void)
 
 
 		if (instr->mnemonic) {
-			instr_type = instr->type;
 
-			switch (instr_type) {
+			switch (instr->type) {
 			case 0:
 				instr_binary = instr_dpi(instr);
 				break;
@@ -150,16 +148,22 @@ static void second_pass(void)
 				instr_binary = instr_multiply(instr);
 				break;
 			case 2:
+				/* Handle the variable placement. */
 				instr_binary = instr_sdt(instr);
 				break;
 			case 3:
-				jump_to = lookout_symbol(instr->label);
-				current = 4*(instr_num + 1);
-				offset = jump_to - (current + 8);
+				jump_to = lookout_symbol(instr->jump);
 
-				printf("%i\t%i\t%i\n", jump_to, current,
-									offset);
-				instr_binary = instr_branch(instr, offset);
+				if (jump_to == -1) {
+					fprintf(stderr, "Invlid label jump.");
+					exit(EXIT_FAILURE);
+				}
+
+				current = 4*(instr_num);
+				offset = jump_to - (current + 8);
+				instr->instr.branch.offset = offset;
+
+				instr_binary = instr_branch(instr);
 				break;
 			default:
 				fprintf(stderr, "Error: Invalid Instruction");

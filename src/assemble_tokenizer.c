@@ -5,11 +5,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 static void init_dpi(struct instruction *tokens)
 {
-	int j = 0;
+	long int j = 0;
 	char *token;
 
 	tokens->instr.dpi.opcode = tokens->code;
@@ -24,7 +25,7 @@ static void init_dpi(struct instruction *tokens)
 		tokens->instr.dpi.rn = atoi(strtok(NULL, " ,") + 1);
 		token = strtok(NULL, " ,");
 		tokens->instr.dpi.op2.immediate = token[0] == '#';
-		j = atoi(token + 1);
+		j = strtol(token + 1, NULL, 0);
 
 		if (tokens->instr.dpi.op2.immediate)
 			tokens->instr.dpi.op2.offset.imm.imm = j;
@@ -35,9 +36,8 @@ static void init_dpi(struct instruction *tokens)
 		tokens->instr.dpi.rn = 0;
 		tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
 		token = strtok(NULL, " ,");
-		printf("%s\n", token);
 		tokens->instr.dpi.op2.immediate = token[0] == '#';
-		j = atoi(token + 1);
+		j = strtol(token + 1, NULL, 0);
 
 		if (tokens->instr.dpi.op2.immediate)
 			tokens->instr.dpi.op2.offset.imm.imm = j;
@@ -49,7 +49,7 @@ static void init_dpi(struct instruction *tokens)
 		tokens->instr.dpi.rn = atoi(strtok(NULL, " ,") + 1);
 		token = strtok(NULL, " ,");
 		tokens->instr.dpi.op2.immediate = token[0] == '#';
-		j = atoi(token + 1);
+		j = strtol(token + 1, NULL, 0);
 
 		if (tokens->instr.dpi.op2.immediate)
 			tokens->instr.dpi.op2.offset.imm.imm = j;
@@ -57,7 +57,6 @@ static void init_dpi(struct instruction *tokens)
 			tokens->instr.dpi.op2.offset.reg.rm = j;
 		break;
 	}
-
 }
 
 static void init_mult(struct instruction *tokens)
@@ -74,12 +73,55 @@ static void init_mult(struct instruction *tokens)
 
 static void init_sdt(struct instruction *tokens)
 {
-	(void) tokens;
+	char *token;
+	uint32_t add;
+	int d;
+
+	tokens->instr.sdt.load = !tokens->code;
+	tokens->instr.sdt.up = true;
+	d = atoi(strtok(NULL, " ,") + 1);
+	tokens->instr.sdt.rd = d;
+	tokens->instr.sdt.preindexing = true;
+	tokens->sdt_offset = 0;
+
+	token = strtok(NULL, "");
+
+	if (token[0] == '=') {
+		add = strtol(token + 1, NULL, 0);
+
+		if (add >> 12) {
+			tokens->type = 0;
+			tokens->code = 13;
+			tokens->instr.dpi.rn = 0;
+			tokens->instr.dpi.rd = d;
+			tokens->instr.dpi.op2.immediate = true;
+			tokens->instr.dpi.op2.offset.imm.imm = add;
+		} else
+			tokens->sdt_offset = add;
+
+	} else if (token[3] == ']') {
+		tokens->instr.sdt.rn = atoi(strtok(token, "[]") + 1);
+		token = strtok(NULL, "# ,");
+
+		if (token) {
+			tokens->instr.sdt.preindexing = false;
+			tokens->instr.sdt.offset.immediate = true;
+			add = atoi(token + 1);
+			tokens->instr.sdt.offset.offset.imm = add;
+		} else
+			tokens->instr.sdt.offset.immediate = false;
+
+	} else {
+		tokens->instr.sdt.rn = atoi(strtok(token, "[,") + 1);
+		tokens->instr.sdt.offset.immediate = true;
+		add = atoi(strtok(NULL, "# ]"));
+		tokens->instr.sdt.offset.offset.imm = add;
+	}
 }
 
 static void init_branch(struct instruction *tokens)
 {
-	(void) tokens;
+	tokens->jump = strtok(NULL, " ");
 }
 
 void tokenize(char *orig_instr, struct instruction *tokens)
@@ -99,12 +141,12 @@ void tokenize(char *orig_instr, struct instruction *tokens)
 	else
 		token = strtok(instr, " ");
 
-	if (token) {
+	tokens->mnemonic = false;
+
+	if (strlen(token) > 1) {
 		tokens->mnemonic = true;
 		tokens->type = classify_instr(token);
-		printf("%i\t", tokens->type);
 		tokens->code = instr_code(token, tokens->type);
-		printf("%i\t", tokens->code);
 
 		switch (tokens->type) {
 		case 0:
