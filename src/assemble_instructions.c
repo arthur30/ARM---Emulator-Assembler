@@ -38,20 +38,22 @@ uint32_t instr_dpi(struct instruction *instr)
 	opcode = (instr->code) << 21;
 	rd = instr->instr.dpi.rd << 12;
 	rn = instr->instr.dpi.rn << 16;
+	i = 0;
+	s = 0;
+	imm = 0;
+	shift = 0;
+	operand2 = 0;
 
 	if (instr->instr.dpi.op2.immediate) {
 		i = 1 << 25;
 		imm = instr->instr.dpi.op2.offset.imm.imm;
 		shift = instr->instr.dpi.op2.offset.imm.rotate;
 	} else {
-		i = 0;
 		operand2 = instr->instr.dpi.op2.offset.reg.rm;
 	}
 
 	if (instr->instr.dpi.setcond)
 		s = 1 << 20;
-	else
-		s = 0;
 
 	return cond + i + opcode + s + rn + rd + (shift << 8) + imm + operand2;
 }
