@@ -14,6 +14,8 @@ uint32_t cond;      /* for COND                  */
 
 uint32_t opcode;    /* for OPCODE                */
 uint32_t operand2;  /* for OPERAND2              */
+uint32_t imm;  /* for OPERAND2              */
+uint32_t shift;  /* for OPERAND2              */
 uint32_t offset;    /* for OFFSET                */
 
 uint32_t i;         /* for IMMEDIATE OFFSET      */
@@ -39,7 +41,8 @@ uint32_t instr_dpi(struct instruction *instr)
 
 	if (instr->instr.dpi.op2.immediate) {
 		i = 1 << 25;
-		operand2 = instr->instr.dpi.op2.offset.imm.imm;
+		imm = instr->instr.dpi.op2.offset.imm.imm;
+		shift = instr->instr.dpi.op2.offset.imm.rotate;
 	} else {
 		i = 0;
 		operand2 = instr->instr.dpi.op2.offset.reg.rm;
@@ -50,7 +53,7 @@ uint32_t instr_dpi(struct instruction *instr)
 	else
 		s = 0;
 
-	return cond + i + opcode + s + rn + rd + operand2;
+	return cond + i + opcode + s + rn + rd + (shift << 8) + imm;
 }
 
 uint32_t instr_multiply(struct instruction *instr)

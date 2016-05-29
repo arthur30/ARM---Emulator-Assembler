@@ -8,10 +8,36 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+static void generate_op2(long int op2, uint8_t *imm, int *shift)
+{
+	long int temp = op2;
+	int s;
+
+	if (op2 <= 255) {
+		*imm = op2;
+		*shift = 0;
+	} else {
+		while (!(temp & 1)) {
+			temp >>= 1;
+			s++;
+		}
+
+		if (temp > 255) {
+			fprintf(stderr, "Operand2 value doesn't fit.");
+			exit(EXIT_FAILURE);
+		}
+
+		*imm = temp;
+		*shift = (31 - s)/2;
+	}
+}
+
 static void init_dpi(struct instruction *tokens)
 {
 	long int j = 0;
 	char *token;
+	uint8_t imm;
+	int shift;
 
 	tokens->instr.dpi.opcode = tokens->code;
 	tokens->instr.dpi.setcond = false;
@@ -23,40 +49,27 @@ static void init_dpi(struct instruction *tokens)
 		tokens->instr.dpi.setcond = true;
 		tokens->instr.dpi.rd = 0;
 		tokens->instr.dpi.rn = atoi(strtok(NULL, " ,") + 1);
-		token = strtok(NULL, " ,");
-		tokens->instr.dpi.op2.immediate = token[0] == '#';
-		j = strtol(token + 1, NULL, 0);
-
-		if (tokens->instr.dpi.op2.immediate)
-			tokens->instr.dpi.op2.offset.imm.imm = j;
-		else
-			tokens->instr.dpi.op2.offset.reg.rm = j;
 		break;
 	case 13:
 		tokens->instr.dpi.rn = 0;
 		tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
-		token = strtok(NULL, " ,");
-		tokens->instr.dpi.op2.immediate = token[0] == '#';
-		j = strtol(token + 1, NULL, 0);
-
-		if (tokens->instr.dpi.op2.immediate)
-			tokens->instr.dpi.op2.offset.imm.imm = j;
-		else
-			tokens->instr.dpi.op2.offset.reg.rm = j;
 		break;
 	default:
 		tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
 		tokens->instr.dpi.rn = atoi(strtok(NULL, " ,") + 1);
-		token = strtok(NULL, " ,");
-		tokens->instr.dpi.op2.immediate = token[0] == '#';
-		j = strtol(token + 1, NULL, 0);
-
-		if (tokens->instr.dpi.op2.immediate)
-			tokens->instr.dpi.op2.offset.imm.imm = j;
-		else
-			tokens->instr.dpi.op2.offset.reg.rm = j;
 		break;
 	}
+
+	token = strtok(NULL, " ,");
+	tokens->instr.dpi.op2.immediate = token[0] == '#';
+	j = strtol(token + 1, NULL, 0);
+	generate_op2(j, &imm, &shift);
+
+	if (tokens->instr.dpi.op2.immediate) {
+		tokens->instr.dpi.op2.offset.imm.imm = imm;
+		tokens->instr.dpi.op2.offset.imm.rotate = shift;
+	} else
+		tokens->instr.dpi.op2.offset.reg.rm = j;
 }
 
 static void init_mult(struct instruction *tokens)
