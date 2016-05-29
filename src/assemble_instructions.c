@@ -38,9 +38,9 @@ uint32_t instr_dpi(struct instruction *instr)
 	uint8_t amount = 0;
 
 	cond = 14 << 28;
-	opcode = (instr->code) << 21;
-	rd = instr->instr.dpi.rd << 12;
-	rn = instr->instr.dpi.rn << 16;
+	opcode = (uint32_t)(instr->code) << 21;
+	rd = (uint32_t)instr->instr.dpi.rd << 12;
+	rn = (uint32_t)instr->instr.dpi.rn << 16;
 	rm = 0;
 	i = 0;
 	s = 0;
@@ -56,13 +56,18 @@ uint32_t instr_dpi(struct instruction *instr)
 		rm = instr->instr.dpi.op2.offset.reg.rm;
 		constant = instr->instr.dpi.op2.offset.reg.constant;
 		shift_type = instr->instr.dpi.op2.offset.reg.shift_type;
+
+		if (!constant) {
+			amount = instr->instr.dpi.op2.offset.reg.amount.integer;
+			operand2 = ((uint32_t)amount << 7) |
+				((uint32_t)shift_type << 5) |
+				((uint32_t)constant << 4) |
+				rm;
+		} else {
+			operand2 = rm;
+		}
 	}
 
-	if (constant) {
-		amount = instr->instr.dpi.op2.offset.reg.amount.integer;
-		operand2 = (amount << 7) + (shift_type << 5)
-						+ (constant << 4) + rm;
-	}
 
 	if (instr->instr.dpi.setcond)
 		s = 1 << 20;
