@@ -53,7 +53,7 @@ uint32_t instr_dpi(struct instruction *instr)
 	else
 		s = 0;
 
-	return cond + i + opcode + s + rn + rd + (shift << 8) + imm;
+	return cond + i + opcode + s + rn + rd + (shift << 8) + imm + operand2;
 }
 
 uint32_t instr_multiply(struct instruction *instr)
