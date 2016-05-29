@@ -193,6 +193,9 @@ void tokenize(char *orig_instr, struct instruction *tokens)
 		case 4:
 			init_lsl(tokens);
 			break;
+		case 5:
+			tokens->type = 0;
+			break;
 		}
 	}
 }

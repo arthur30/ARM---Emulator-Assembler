@@ -48,6 +48,9 @@ uint32_t instr_dpi(struct instruction *instr)
 	shift = 0;
 	operand2 = 0;
 
+	if (instr->code == 5)
+		return 0;
+
 	if (instr->instr.dpi.op2.immediate) {
 		i = 1 << 25;
 		imm = instr->instr.dpi.op2.offset.imm.imm;

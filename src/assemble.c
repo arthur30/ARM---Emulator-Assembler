@@ -128,14 +128,15 @@ static void second_pass(void)
 
 	rewind(input);
 
+	struct instruction *instr = calloc(1, sizeof(struct instruction));
+
 	while (fgets(line, MAX_LINE_LENGTH, input)) {
-		struct instruction *instr =
-			calloc(1, sizeof(struct instruction));
 		int jump_to;
 		int current;
 		int offset;
 		uint32_t instr_binary;
 
+		memset(instr, 0, sizeof(struct instruction));
 		tokenize(line, instr);
 
 
@@ -175,8 +176,9 @@ static void second_pass(void)
 			instr_num++;
 		 }
 
-		free(instr);
 	}
+
+	free(instr);
 
 }
 
