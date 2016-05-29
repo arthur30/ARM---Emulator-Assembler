@@ -69,6 +69,7 @@ struct map dict_all[] = {
 	{"ble", 3},
 	{"b", 3},
 	{"bal", 3},
+	{"lsl", 4},
 	{0, 0}
 };
 

@@ -10,25 +10,25 @@
 
 /* Variables to build the instructions. */
 
-static uint32_t cond;      /* for COND                  */
+uint32_t cond;      /* for COND                  */
 
-static uint32_t opcode;    /* for OPCODE                */
-static uint32_t operand2;  /* for OPERAND2              */
-static uint32_t imm;       /* for OPERAND2              */
-static uint32_t shift;     /* for OPERAND2              */
-static uint32_t offset;    /* for OFFSET                */
+uint32_t opcode;    /* for OPCODE                */
+uint32_t operand2;  /* for OPERAND2              */
+uint32_t imm;  /* for OPERAND2              */
+uint32_t shift;  /* for OPERAND2              */
+uint32_t offset;    /* for OFFSET                */
 
-static uint32_t i;         /* for IMMEDIATE OFFSET      */
-static uint32_t s;         /* for SET CONDITION BIT     */
-static uint32_t a;         /* for ACCUMULATE BIT        */
-static uint32_t p;         /* for PRE/POST INDEXING BIT */
-static uint32_t u;         /* for UP BIT                */
-static uint32_t l;         /* for LOAD/STORE BIT        */
+uint32_t i;         /* for IMMEDIATE OFFSET      */
+uint32_t s;         /* for SET CONDITION BIT     */
+uint32_t a;         /* for ACCUMULATE BIT        */
+uint32_t p;         /* for PRE/POST INDEXING BIT */
+uint32_t u;         /* for UP BIT                */
+uint32_t l;         /* for LOAD/STORE BIT        */
 
-static uint32_t rn;        /* for REGISTER Rn           */
-static uint32_t rd;        /* for REGISTER Rd           */
-static uint32_t rs;        /* for REGISTER Rd           */
-static uint32_t rm;        /* for REGISTER Rm           */
+uint32_t rn;        /* for REGISTER Rn           */
+uint32_t rd;        /* for REGISTER Rd           */
+uint32_t rs;        /* for REGISTER Rd           */
+uint32_t rm;        /* for REGISTER Rm           */
 
 /* All functions return a 32bit integer. */
 
@@ -38,24 +38,23 @@ uint32_t instr_dpi(struct instruction *instr)
 	opcode = (instr->code) << 21;
 	rd = instr->instr.dpi.rd << 12;
 	rn = instr->instr.dpi.rn << 16;
-	i = 0;
-	s = 0;
-	imm = 0;
-	shift = 0;
-	operand2 = 0;
+	rm = 0;
 
 	if (instr->instr.dpi.op2.immediate) {
 		i = 1 << 25;
 		imm = instr->instr.dpi.op2.offset.imm.imm;
-		shift = instr->instr.dpi.op2.offset.imm.rotate;
+		shift = instr->instr.dpi.op2.offset.imm.rotate << 8;
 	} else {
-		operand2 = instr->instr.dpi.op2.offset.reg.rm;
+		i = 0;
+		rm = instr->instr.dpi.op2.offset.reg.rm;
 	}
 
 	if (instr->instr.dpi.setcond)
 		s = 1 << 20;
+	else
+		s = 0;
 
-	return cond + i + opcode + s + rn + rd + (shift << 8) + imm + operand2;
+	return cond + i + opcode + s + rn + rd + shift + imm + operand2;
 }
 
 uint32_t instr_multiply(struct instruction *instr)

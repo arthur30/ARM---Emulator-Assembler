@@ -8,31 +8,36 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define SHIFT_BIT_SIZE (1 << 4)
-#define IMM_BIT_SIZE (1 << 8)
-
-static int generate_op2(uint32_t op2, uint8_t *imm, uint8_t *shift)
+static void generate_op2(long int op2, uint8_t *imm, int *shift)
 {
-	int i;
+	long int temp = op2;
+	int s;
 
-	for (i = 0; i < SHIFT_BIT_SIZE; i++) {
-		if (op2 < IMM_BIT_SIZE) {
-			*imm = (uint8_t)op2;
-			*shift = i;
-			return 0;
+	if (op2 <= 255) {
+		*imm = op2;
+		*shift = 0;
+	} else {
+		while (!(temp & 1)) {
+			temp >>= 1;
+			s++;
 		}
-		op2 = (op2 << 2) | (op2 >> 30);
-	}
 
-	return -1;
+		if (temp > 255) {
+			fprintf(stderr, "Operand2 value doesn't fit.");
+			exit(EXIT_FAILURE);
+		}
+
+		*imm = temp;
+		*shift = (31 - s)/2;
+	}
 }
 
 static void init_dpi(struct instruction *tokens)
 {
-	uint32_t j = 0;
+	long int j = 0;
 	char *token;
 	uint8_t imm;
-	uint8_t shift;
+	int shift;
 
 	tokens->instr.dpi.opcode = tokens->code;
 	tokens->instr.dpi.setcond = false;
@@ -57,12 +62,8 @@ static void init_dpi(struct instruction *tokens)
 
 	token = strtok(NULL, " ,");
 	tokens->instr.dpi.op2.immediate = token[0] == '#';
-	j = (uint32_t)strtol(token + 1, NULL, 0);
-	if (generate_op2(j, &imm, &shift)) {
-		fprintf(stderr, "Operand2 value doesn't fit.");
-		exit(EXIT_FAILURE);
-
-	}
+	j = strtol(token + 1, NULL, 0);
+	generate_op2(j, &imm, &shift);
 
 	if (tokens->instr.dpi.op2.immediate) {
 		tokens->instr.dpi.op2.offset.imm.imm = imm;
@@ -106,6 +107,7 @@ static void init_sdt(struct instruction *tokens)
 			tokens->code = 13;
 			tokens->instr.dpi.rn = 0;
 			tokens->instr.dpi.rd = d;
+			/* TODO: Rotation should be implemented here.*/
 			tokens->instr.dpi.op2.immediate = true;
 			tokens->instr.dpi.op2.offset.imm.imm = add;
 		} else
@@ -134,6 +136,23 @@ static void init_sdt(struct instruction *tokens)
 static void init_branch(struct instruction *tokens)
 {
 	tokens->jump = strtok(NULL, " ");
+}
+
+static void init_lsl(struct instruction *tokens)
+{
+	char *token;
+	int j = 0;
+
+	tokens->type = 0;
+	tokens->code = 13;
+	tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
+	tokens->instr.dpi.op2.immediate = false;
+	tokens->instr.dpi.op2.offset.reg.rm = tokens->instr.dpi.rd;
+	tokens->instr.dpi.op2.offset.reg.shift_type = 0;
+	tokens->instr.dpi.op2.offset.reg.constant = 0;
+	token = strtok(NULL, " ,#");
+	j = strtol(token, NULL, 0);
+	tokens->instr.dpi.op2.offset.reg.amount.integer = j;
 }
 
 void tokenize(char *orig_instr, struct instruction *tokens)
@@ -172,6 +191,9 @@ void tokenize(char *orig_instr, struct instruction *tokens)
 			break;
 		case 3:
 			init_branch(tokens);
+			break;
+		case 4:
+			init_lsl(tokens);
 			break;
 		}
 	}
