@@ -10,6 +10,7 @@ struct map {
 
 struct map dict_dpi[] = {
 	{"and", 0},
+	{"andeq", 5},
 	{"eor", 1},
 	{"sub", 2},
 	{"rsb", 3},
@@ -70,6 +71,7 @@ struct map dict_all[] = {
 	{"b", 3},
 	{"bal", 3},
 	{"lsl", 4},
+	{"andeq", 5},
 	{0, 0}
 };
 
@@ -98,6 +100,8 @@ uint32_t instr_code(char *key, int type)
 		return key_to_int(dict_sdt, key);
 	case 3:
 		return key_to_int(dict_branch, key);
+	case 5:
+		return key_to_int(dict_dpi, key);
 	default:
 		return -1;
 	}
