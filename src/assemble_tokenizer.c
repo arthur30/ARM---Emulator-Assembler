@@ -7,37 +7,31 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#define SHIFT_BIT_SIZE (1 << 4)
+#define IMM_BIT_SIZE (1 << 8)
 
-static void generate_op2(long int op2, uint8_t *imm, int *shift)
+static int generate_op2(uint32_t op2, uint8_t *imm, uint8_t *shift)
 {
-	long int temp = op2;
-	int s;
+	int i;
 
-	if (op2 <= 255) {
-		*imm = op2;
-		*shift = 0;
-	} else {
-		while (!(temp & 1)) {
-			temp >>= 1;
-			s++;
+	for (i = 0; i < SHIFT_BIT_SIZE; i++) {
+		if (op2 < IMM_BIT_SIZE) {
+			*imm = (uint8_t)op2;
+			*shift = i;
+			return 0;
 		}
-
-		if (temp > 255) {
-			fprintf(stderr, "Operand2 value doesn't fit.");
-			exit(EXIT_FAILURE);
-		}
-
-		*imm = temp;
-		*shift = (31 - s)/2;
+		op2 = (op2 << 2) | (op2 >> 30);
 	}
+
+	return -1;
 }
 
 static void init_dpi(struct instruction *tokens)
 {
-	long int j = 0;
+	uint32_t j = 0;
 	char *token;
 	uint8_t imm;
-	int shift;
+	uint8_t shift;
 
 	tokens->instr.dpi.opcode = tokens->code;
 	tokens->instr.dpi.setcond = false;
@@ -62,8 +56,12 @@ static void init_dpi(struct instruction *tokens)
 
 	token = strtok(NULL, " ,");
 	tokens->instr.dpi.op2.immediate = token[0] == '#';
-	j = strtol(token + 1, NULL, 0);
-	generate_op2(j, &imm, &shift);
+	j = (uint32_t)strtol(token + 1, NULL, 0);
+	if (generate_op2(j, &imm, &shift)) {
+		fprintf(stderr, "Operand2 value doesn't fit.");
+		exit(EXIT_FAILURE);
+
+	}
 
 	if (tokens->instr.dpi.op2.immediate) {
 		tokens->instr.dpi.op2.offset.imm.imm = imm;
