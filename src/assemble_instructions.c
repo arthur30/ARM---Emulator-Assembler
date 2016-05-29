@@ -10,25 +10,25 @@
 
 /* Variables to build the instructions. */
 
-uint32_t cond;      /* for COND                  */
+static uint32_t cond;      /* for COND                  */
 
-uint32_t opcode;    /* for OPCODE                */
-uint32_t operand2;  /* for OPERAND2              */
-uint32_t imm;  /* for OPERAND2              */
-uint32_t shift;  /* for OPERAND2              */
-uint32_t offset;    /* for OFFSET                */
+static uint32_t opcode;    /* for OPCODE                */
+static uint32_t operand2;  /* for OPERAND2              */
+static uint32_t imm;       /* for OPERAND2              */
+static uint32_t shift;     /* for OPERAND2              */
+static uint32_t offset;    /* for OFFSET                */
 
-uint32_t i;         /* for IMMEDIATE OFFSET      */
-uint32_t s;         /* for SET CONDITION BIT     */
-uint32_t a;         /* for ACCUMULATE BIT        */
-uint32_t p;         /* for PRE/POST INDEXING BIT */
-uint32_t u;         /* for UP BIT                */
-uint32_t l;         /* for LOAD/STORE BIT        */
+static uint32_t i;         /* for IMMEDIATE OFFSET      */
+static uint32_t s;         /* for SET CONDITION BIT     */
+static uint32_t a;         /* for ACCUMULATE BIT        */
+static uint32_t p;         /* for PRE/POST INDEXING BIT */
+static uint32_t u;         /* for UP BIT                */
+static uint32_t l;         /* for LOAD/STORE BIT        */
 
-uint32_t rn;        /* for REGISTER Rn           */
-uint32_t rd;        /* for REGISTER Rd           */
-uint32_t rs;        /* for REGISTER Rd           */
-uint32_t rm;        /* for REGISTER Rm           */
+static uint32_t rn;        /* for REGISTER Rn           */
+static uint32_t rd;        /* for REGISTER Rd           */
+static uint32_t rs;        /* for REGISTER Rd           */
+static uint32_t rm;        /* for REGISTER Rm           */
 
 /* All functions return a 32bit integer. */
 
