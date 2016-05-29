@@ -143,7 +143,7 @@ void tokenize(char *orig_instr, struct instruction *tokens)
 
 	tokens->mnemonic = false;
 
-	if (strlen(token) > 1) {
+	if (strcmp(token, " ") > 0) {
 		tokens->mnemonic = true;
 		tokens->type = classify_instr(token);
 		tokens->code = instr_code(token, tokens->type);
