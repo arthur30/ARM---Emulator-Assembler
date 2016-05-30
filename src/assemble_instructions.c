@@ -108,26 +108,28 @@ uint32_t instr_sdt(struct instruction *instr)
 	 * P => Pre/Post indexing bit. See spec pg9.
 	 */
 
-	(void) instr;
 	cond = 14 << 28;
 	l = 0;
 	p = 0;
-	u = 1 << 23;
+	u = 0;
 	i = 0;
 	rn = instr->instr.sdt.rn << 16;
 	rd = instr->instr.sdt.rd << 12;
 	offset = instr->instr.sdt.offset.offset.imm;
 
 	if (instr->instr.sdt.load)
-		l = 1 << 20;
+		u = (uint32_t)1 << 23;
+
+	if (instr->instr.sdt.load)
+		l = (uint32_t)1 << 20;
 
 	if (instr->instr.sdt.preindexing)
-		p = 1 << 24;
+		p = (uint32_t)1 << 24;
 
 	if (instr->instr.sdt.offset.immediate)
-		i = 1 << 24;
+		i = (uint32_t)1 << 24;
 
-	return cond + (1 << 26) + i + p + u + l + rn + rd + offset;
+	return cond | (1 << 26) | i | p | u | l | rn | rd | offset;
 }
 
 uint32_t instr_branch(struct instruction *instr)
