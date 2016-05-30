@@ -117,7 +117,7 @@ uint32_t instr_sdt(struct instruction *instr)
 	rd = instr->instr.sdt.rd << 12;
 	offset = instr->instr.sdt.offset.offset.imm;
 
-	if (instr->instr.sdt.load)
+	if (instr->instr.sdt.up)
 		u = (uint32_t)1 << 23;
 
 	if (instr->instr.sdt.load)

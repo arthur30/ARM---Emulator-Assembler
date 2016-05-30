@@ -85,7 +85,7 @@ static void init_mult(struct instruction *tokens)
 static void init_sdt(struct instruction *tokens)
 {
 	char *token;
-	uint32_t add;
+	int32_t add;
 	int d;
 	uint8_t imm;
 	uint8_t shift;
@@ -132,14 +132,14 @@ static void init_sdt(struct instruction *tokens)
 			tokens->instr.sdt.preindexing = false;
 			add = atoi(token + 1);
 			tokens->instr.sdt.up = add > 0;
-			tokens->instr.sdt.offset.offset.imm = add;
+			tokens->instr.sdt.offset.offset.imm = (uint32_t)add;
 		}
 
 	} else {
 		tokens->instr.sdt.rn = atoi(strtok(token, "[,") + 1);
 		add = atoi(strtok(NULL, "# ]"));
 		tokens->instr.sdt.up = add > 0;
-		tokens->instr.sdt.offset.offset.imm = add;
+		tokens->instr.sdt.offset.offset.imm = (uint32_t)add;
 	}
 }
 
