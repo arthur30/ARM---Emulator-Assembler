@@ -1,14 +1,24 @@
 #include "assemble_tokenizer.h"
 #include "assemble_dictionary.h"
 
-#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
-#define SHIFT_BIT_SIZE (1 << 4)
-#define IMM_BIT_SIZE (1 << 8)
+#include <string.h>
+
+#define DATA_PROC_INSTR		0
+#define MULT_INSTR		1
+#define SINGLE_DATA_INSTR	2
+#define BRANCH_INSTR		3
+#define LSL_INSTR		4
+#define HALT_INSTR		5
+#define TST_INSTR		8
+#define TEQ_INSTR		9
+#define CMP_INSTR		10
+#define MOV_INSTR		13
+#define SHIFT_BIT_SIZE		(1 << 4)
+#define IMM_BIT_SIZE		(1 << 8)
 
 static int generate_op2(uint32_t op2, uint8_t *imm, uint8_t *shift)
 {
@@ -37,17 +47,19 @@ static void init_dpi(struct instruction *tokens)
 	tokens->instr.dpi.setcond = false;
 
 	switch (tokens->code) {
-	case 8:
-	case 9:
-	case 10:
+	case TST_INSTR:
+	case TEQ_INSTR:
+	case CMP_INSTR:
 		tokens->instr.dpi.setcond = true;
 		tokens->instr.dpi.rd = 0;
 		tokens->instr.dpi.rn = atoi(strtok(NULL, " ,") + 1);
 		break;
-	case 13:
+
+	case MOV_INSTR:
 		tokens->instr.dpi.rn = 0;
 		tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
 		break;
+
 	default:
 		tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
 		tokens->instr.dpi.rn = atoi(strtok(NULL, " ,") + 1);
@@ -55,8 +67,10 @@ static void init_dpi(struct instruction *tokens)
 	}
 
 	token = strtok(NULL, " ,");
-	tokens->instr.dpi.op2.immediate = token[0] == '#';
 	j = (uint32_t)strtol(token + 1, NULL, 0);
+
+	tokens->instr.dpi.op2.immediate = token[0] == '#';
+
 	if (generate_op2(j, &imm, &shift)) {
 		fprintf(stderr, "Operand2 value doesn't fit.");
 		exit(EXIT_FAILURE);
@@ -76,6 +90,7 @@ static void init_dpi(struct instruction *tokens)
 			tokens->instr.dpi.op2.offset.reg.constant = true;
 
 			token = strtok(NULL, " ,\n");
+
 			if (token[0] == '#') {
 				tokens->instr.dpi.op2.offset.reg.constant =
 									false;
@@ -111,7 +126,9 @@ static void init_sdt(struct instruction *tokens)
 
 	tokens->instr.sdt.load = !tokens->code;
 	tokens->instr.sdt.up = true;
+
 	d = atoi(strtok(NULL, " ,") + 1);
+
 	tokens->instr.sdt.rd = d;
 	tokens->instr.sdt.preindexing = true;
 	tokens->instr.sdt.offset.immediate = false;
@@ -166,6 +183,7 @@ static void init_sdt(struct instruction *tokens)
 
 	} else {
 		tokens->instr.sdt.rn = atoi(strtok(token, "[,") + 1);
+
 		token = strtok(NULL, " ,]\n");
 		add = strtol(token + 1, NULL, 0);
 
@@ -176,12 +194,15 @@ static void init_sdt(struct instruction *tokens)
 		} else {
 			tokens->instr.sdt.offset.immediate = true;
 			tokens->instr.sdt.offset.offset.reg.rm = add;
+
 			token = strtok(NULL, " ,\n");
 
 			if (token) {
 				tokens->instr.sdt.offset.offset.reg.shift_type =
 						instr_code(token, 6);
+
 				token = strtok(NULL, " ,]\n");
+
 				tokens->instr.sdt.offset.offset.reg.constant =
 						token[0] != '#';
 
@@ -226,6 +247,7 @@ void tokenize(char *orig_instr, struct instruction *tokens)
 	char *instr = strdup(orig_instr);
 
 	token = strtok(instr, ":");
+
 	tokens->label = token;
 
 	if (!strcmp(token, orig_instr))
@@ -245,22 +267,22 @@ void tokenize(char *orig_instr, struct instruction *tokens)
 		tokens->code = instr_code(token, tokens->type);
 
 		switch (tokens->type) {
-		case 0:
+		case DATA_PROC_INSTR:
 			init_dpi(tokens);
 			break;
-		case 1:
+		case MULT_INSTR:
 			init_mult(tokens);
 			break;
-		case 2:
+		case SINGLE_DATA_INSTR:
 			init_sdt(tokens);
 			break;
-		case 3:
+		case BRANCH_INSTR:
 			init_branch(tokens);
 			break;
-		case 4:
+		case LSL_INSTR:
 			init_lsl(tokens);
 			break;
-		case 5:
+		case HALT_INSTR:
 			tokens->type = 0;
 			break;
 		}
