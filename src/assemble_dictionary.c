@@ -75,6 +75,14 @@ struct map dict_all[] = {
 	{0, 0}
 };
 
+struct map dict_rot[] = {
+	{"lsl", 0},
+	{"lsr", 1},
+	{"asr", 2},
+	{"ror", 3},
+	{0, 0}
+};
+
 static uint32_t key_to_int(struct map *dict, char *key)
 {
 	int i = 0;
@@ -102,6 +110,8 @@ uint32_t instr_code(char *key, int type)
 		return key_to_int(dict_branch, key);
 	case 5:
 		return key_to_int(dict_dpi, key);
+	case 6:
+		return key_to_int(dict_rot, key);
 	default:
 		return -1;
 	}
