@@ -166,7 +166,7 @@ static void init_sdt(struct instruction *tokens)
 
 	} else {
 		tokens->instr.sdt.rn = atoi(strtok(token, "[,") + 1);
-		token = strtok(NULL, " ]\n");
+		token = strtok(NULL, " ,]\n");
 		add = strtol(token + 1, NULL, 0);
 
 		if (token[0] == '#') {
@@ -176,6 +176,24 @@ static void init_sdt(struct instruction *tokens)
 		} else {
 			tokens->instr.sdt.offset.immediate = true;
 			tokens->instr.sdt.offset.offset.reg.rm = add;
+			token = strtok(NULL, " ,\n");
+
+			if (token) {
+				tokens->instr.sdt.offset.offset.reg.shift_type =
+						instr_code(token, 6);
+				token = strtok(NULL, " ,]\n");
+				tokens->instr.sdt.offset.offset.reg.constant =
+						token[0] != '#';
+
+				if (token[0] == '#') {
+					tokens->instr.sdt.offset.offset.reg.
+					amount.integer = strtol(token + 1,
+								NULL, 0);
+				} else {
+					tokens->instr.sdt.offset.offset.reg.
+					amount.rs = strtol(token + 1, NULL, 0);
+				}
+			}
 		}
 	}
 }
