@@ -12,19 +12,33 @@
 
 uint32_t instr_dpi(struct instruction *instr)
 {
-	uint32_t cond = COND_ALWAYS;
-	uint32_t opcode = (uint32_t)(instr->code) << 21;
-	uint32_t rd = (uint32_t)instr->instr.dpi.rd << 12;
-	uint32_t rn = (uint32_t)instr->instr.dpi.rn << 16;
-	uint32_t rm = 0;
-	uint32_t i = 0;
-	uint32_t s = 0;
-	uint32_t imm = 0;
-	uint32_t shift = 0;
-	uint32_t operand2 = 0;
-	bool constant = false;
-	uint8_t shift_type = 0;
-	uint8_t amount = 0;
+	uint32_t cond;
+	uint32_t opcode;
+	uint32_t rd;
+	uint32_t rn;
+	uint32_t rm;
+	uint32_t i;
+	uint32_t s;
+	uint32_t imm;
+	uint32_t shift;
+	uint32_t operand2;
+	bool constant;
+	uint8_t shift_type;
+	uint8_t amount;
+
+	cond = COND_ALWAYS;
+	opcode = (uint32_t)(instr->code) << 21;
+	rd = (uint32_t)instr->instr.dpi.rd << 12;
+	rn = (uint32_t)instr->instr.dpi.rn << 16;
+	rm = 0;
+	i = 0;
+	s = 0;
+	imm = 0;
+	shift = 0;
+	operand2 = 0;
+	constant = false;
+	shift_type = 0;
+	amount = 0;
 
 	if (instr->code == 5)
 		return 0;
@@ -62,13 +76,21 @@ uint32_t instr_dpi(struct instruction *instr)
 
 uint32_t instr_multiply(struct instruction *instr)
 {
-	uint32_t cond = COND_ALWAYS;
-	uint32_t rd = instr->instr.mult.rd << 16;
-	uint32_t rs = instr->instr.mult.rs << 8;
-	uint32_t rn = 0;
-	uint32_t rm = instr->instr.mult.rm;
-	uint32_t a = 0;
-	uint32_t s = 0;
+	uint32_t cond;
+	uint32_t rd;
+	uint32_t rs;
+	uint32_t rn;
+	uint32_t rm;
+	uint32_t a;
+	uint32_t s;
+
+	cond = COND_ALWAYS;
+	rd = instr->instr.mult.rd << 16;
+	rs = instr->instr.mult.rs << 8;
+	rn = 0;
+	rm = instr->instr.mult.rm;
+	a = 0;
+	s = 0;
 
 	if (instr->instr.mult.accumulate) {
 		a = 1 << 21;
@@ -80,18 +102,31 @@ uint32_t instr_multiply(struct instruction *instr)
 
 uint32_t instr_sdt(struct instruction *instr)
 {
-	uint32_t cond = COND_ALWAYS;
-	uint32_t rn = instr->instr.sdt.rn << 16;
-	uint32_t rd = instr->instr.sdt.rd << 12;
-	uint32_t rm = 0;
-	uint32_t l = 0;
-	uint32_t p = 0;
-	uint32_t u = 0;
-	uint32_t i = 0;
-	uint32_t offset = instr->instr.sdt.offset.offset.imm;
-	bool constant = false;
-	uint8_t shift_type = 0;
-	uint8_t amount = 0;
+	uint32_t cond;
+	uint32_t rn;
+	uint32_t rd;
+	uint32_t rm;
+	uint32_t l;
+	uint32_t p;
+	uint32_t u;
+	uint32_t i;
+	uint32_t offset;
+	bool constant;
+	uint8_t shift_type;
+	uint8_t amount;
+
+	cond = COND_ALWAYS;
+	rn = instr->instr.sdt.rn << 16;
+	rd = instr->instr.sdt.rd << 12;
+	rm = 0;
+	l = 0;
+	p = 0;
+	u = 0;
+	i = 0;
+	offset = instr->instr.sdt.offset.offset.imm;
+	constant = false;
+	shift_type = 0;
+	amount = 0;
 
 	if (instr->instr.sdt.up)
 		u = (uint32_t)1 << 23;
@@ -129,8 +164,11 @@ uint32_t instr_sdt(struct instruction *instr)
 
 uint32_t instr_branch(struct instruction *instr)
 {
-	uint32_t cond = instr->code << 28;
-	uint32_t offset = (instr->instr.branch.offset >> 2) & ((1 << 24) - 1);
+	uint32_t cond;
+	uint32_t offset;
+
+	cond = instr->code << 28;
+	offset = (instr->instr.branch.offset >> 2) & ((1 << 24) - 1);
 
 	return cond + (10 << 24) + offset;
 }
