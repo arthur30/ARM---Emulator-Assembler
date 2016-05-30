@@ -100,6 +100,9 @@ static void init_sdt(struct instruction *tokens)
 
 	token = strtok(NULL, "");
 
+	if (token[0] == ' ')
+		token++;
+
 
 	if (token[0] == '=') {
 
