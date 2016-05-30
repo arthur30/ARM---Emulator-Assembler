@@ -115,6 +115,7 @@ uint32_t instr_sdt(struct instruction *instr)
 	i = 0;
 	rn = instr->instr.sdt.rn << 16;
 	rd = instr->instr.sdt.rd << 12;
+	rm = instr->instr.sdt.offset.offset.reg.rm;
 	offset = instr->instr.sdt.offset.offset.imm;
 
 	if (instr->instr.sdt.up)
@@ -127,9 +128,9 @@ uint32_t instr_sdt(struct instruction *instr)
 		p = (uint32_t)1 << 24;
 
 	if (instr->instr.sdt.offset.immediate)
-		i = (uint32_t)1 << 24;
+		i = (uint32_t)1 << 25;
 
-	return cond | (1 << 26) | i | p | u | l | rn | rd | offset;
+	return cond | (1 << 26) | i | p | u | l | rn | rd | offset | rm;
 }
 
 uint32_t instr_branch(struct instruction *instr)
