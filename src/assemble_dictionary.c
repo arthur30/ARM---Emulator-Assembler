@@ -1,7 +1,8 @@
+#include "assemble_dictionary.h"
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "assemble_dictionary.h"
 
 struct map {
 	const char *str;
