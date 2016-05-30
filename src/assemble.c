@@ -21,12 +21,20 @@ struct sym {
 struct labels {
 	int size;
 	int capacity;
+	int instr_num;
 	struct sym *table;
 } sym_table;
+
+struct constants {
+	int size;
+	int capacity;
+	uint32_t *table;
+} constant_table;
 
 static void initiate_labels(void)
 {
 	sym_table.size = 0;
+	sym_table.instr_num = 0;
 	sym_table.capacity = SYM_TABLE_CAPACITY;
 	sym_table.table = calloc(SYM_TABLE_CAPACITY, sizeof(struct sym));
 
@@ -47,9 +55,41 @@ static void extend_labels(void)
 	}
 }
 
-static void destroy_labels(void)
+static void destroy_tables(void)
 {
 	free(sym_table.table);
+	free(constant_table.table);
+}
+
+static void initiate_constants(void)
+{
+	constant_table.size = 0;
+	constant_table.capacity = SYM_TABLE_CAPACITY;
+	constant_table.table =
+		calloc(SYM_TABLE_CAPACITY, sizeof(uint32_t));
+
+	if (!constant_table.table) {
+		fprintf(stderr, "Couldn't allocate memory for constants.");
+		exit(EXIT_FAILURE);
+	}
+}
+
+static void extend_constants(void)
+{
+	if (constant_table.size == constant_table.capacity) {
+		constant_table.capacity = 2 * constant_table.capacity;
+		constant_table.table =
+			realloc(constant_table.table, constant_table.capacity);
+
+		if (!constant_table.table)
+			fprintf(stderr, "Coudln't extend memory for labels");
+	}
+}
+
+static void add_constant(uint32_t constant)
+{
+	constant_table.table[constant_table.size] = constant;
+	constant_table.size++;
 }
 
 static void load_io_files(char *inp, char *out)
@@ -82,10 +122,17 @@ static int lookout_symbol(char *key)
 	return -1;
 }
 
+static void sdt_pc_instr(struct instruction *instr, uint32_t instr_num)
+{
+	instr->instr.sdt.rn = 15;
+	instr->instr.sdt.up = instr->sdt_offset > 0;
+	instr->instr.sdt.offset.offset.imm = 4 * (sym_table.instr_num++) -
+						(4 * instr_num + 8);
+}
+
 static void first_pass(void)
 {
 	char *line = malloc(MAX_LINE_LENGTH);
-	int instr_num = 0;
 
 	if (!line) {
 		fprintf(stderr, "Couldn't allocate memory for the line.\n");
@@ -103,12 +150,13 @@ static void first_pass(void)
 		if (instr->label) {
 			sym_table.table[sym_table.size].label =
 						strcat(instr->label, "\n");
-			sym_table.table[sym_table.size].address = 4 * instr_num;
+			sym_table.table[sym_table.size].address =
+						4 * sym_table.instr_num;
 			sym_table.size++;
 		}
 
 		if (instr->mnemonic)
-			instr_num++;
+			sym_table.instr_num++;
 
 		free(instr);
 	}
@@ -119,7 +167,8 @@ static void first_pass(void)
 static void second_pass(void)
 {
 	char *line = malloc(MAX_LINE_LENGTH);
-	int instr_num = 0;
+	uint32_t instr_num = 0;
+	int i = 0;
 
 	if (!line) {
 		fprintf(stderr, "Couldn't allocate memory for the line.\n");
@@ -137,6 +186,7 @@ static void second_pass(void)
 		uint32_t instr_binary;
 
 		memset(instr, 0, sizeof(struct instruction));
+		extend_constants();
 		tokenize(line, instr);
 
 
@@ -150,7 +200,11 @@ static void second_pass(void)
 				instr_binary = instr_multiply(instr);
 				break;
 			case 2:
-				/* Handle the variable placement. */
+				if (instr->sdt_offset) {
+					add_constant(instr->sdt_offset);
+					sdt_pc_instr(instr, instr_num);
+				}
+
 				instr_binary = instr_sdt(instr);
 				break;
 			case 3:
@@ -178,6 +232,9 @@ static void second_pass(void)
 
 	}
 
+	for (i = 0; i < constant_table.size; i++)
+		fwrite(&constant_table.table[i], sizeof(uint32_t), 1, output);
+
 	free(instr);
 
 }
@@ -192,11 +249,12 @@ int main(int argc, char **argv)
 	load_io_files(argv[1], argv[2]);
 
 	initiate_labels();
+	initiate_constants();
 
 	first_pass();
 	second_pass();
 
-	destroy_labels();
+	destroy_tables();
 	fclose(input);
 	fclose(output);
 

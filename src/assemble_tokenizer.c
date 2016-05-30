@@ -100,15 +100,20 @@ static void init_sdt(struct instruction *tokens)
 
 	token = strtok(NULL, "");
 
+
 	if (token[0] == '=') {
+
+		if (tokens->code) {
+			fprintf(stderr, "Cannot store in immediate values.");
+			exit(EXIT_FAILURE);
+		}
+
 		add = strtol(token + 1, NULL, 0);
 
 		if (generate_op2(add, &imm, &shift)) {
-			printf("Came here.");
 			tokens->sdt_offset = add;
 			tokens->instr.sdt.offset.immediate = false;
 		} else {
-			printf("Reached here.");
 			tokens->type = 0;
 			tokens->code = 13;
 			tokens->instr.dpi.rn = 0;
