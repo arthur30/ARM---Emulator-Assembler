@@ -4,7 +4,7 @@ WARNINGS = -Wall -Wextra -Wformat=2 -pedantic \
            -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
            -Wstrict-overflow=5 -Wwrite-strings
 ERRORS   = -Werror -pedantic-errors
-DEFINES  = -D_DEFAULT_SOURCE -D_POSIX_SOURCE -D_BSD_SOURCE
+DEFINES  = -D_DEFAULT_SOURCE
 DEPSINFO = -MD -MP
 OPTIMIZE = -g -O0 -ggdb -DDEBUG
 ifeq ($(BUILD),release)
