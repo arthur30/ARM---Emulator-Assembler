@@ -112,6 +112,10 @@ uint32_t instr_sdt(struct instruction *instr)
 	 * P => Pre/Post indexing bit. See spec pg9.
 	 */
 
+	bool constant = false;
+	uint8_t shift_type = 0;
+	uint8_t amount = 0;
+
 	cond = 14 << 28;
 	l = 0;
 	p = 0;
@@ -119,7 +123,7 @@ uint32_t instr_sdt(struct instruction *instr)
 	i = 0;
 	rn = instr->instr.sdt.rn << 16;
 	rd = instr->instr.sdt.rd << 12;
-	rm = instr->instr.sdt.offset.offset.reg.rm;
+	rm = 0;
 	offset = instr->instr.sdt.offset.offset.imm;
 
 	if (instr->instr.sdt.up)
@@ -131,8 +135,28 @@ uint32_t instr_sdt(struct instruction *instr)
 	if (instr->instr.sdt.preindexing)
 		p = (uint32_t)1 << 24;
 
-	if (instr->instr.sdt.offset.immediate)
+	if (instr->instr.sdt.offset.immediate) {
+		rm = instr->instr.sdt.offset.offset.reg.rm;
+		shift_type = instr->instr.sdt.offset.offset.reg.shift_type;
+		constant = instr->instr.sdt.offset.offset.reg.constant;
+
+		if (!constant) {
+			amount = instr->instr.sdt.offset.offset.reg.amount.
+									integer;
+			operand2 = ((uint32_t)amount << 7) |
+				((uint32_t)shift_type << 5) |
+				((uint32_t)constant << 4) |
+				rm;
+		} else {
+			amount = instr->instr.sdt.offset.offset.reg.amount.rs;
+			operand2 = ((uint32_t)amount << 8) |
+				((uint32_t)shift_type << 5) |
+				((uint32_t)constant << 4) |
+				rm;
+		}
+
 		i = (uint32_t)1 << 25;
+	}
 
 	return cond | (1 << 26) | i | p | u | l | rn | rd | offset | rm;
 }
