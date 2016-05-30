@@ -129,20 +129,35 @@ static void init_sdt(struct instruction *tokens)
 
 	} else if (token[3] == ']') {
 		tokens->instr.sdt.rn = atoi(strtok(token, "[]") + 1);
-		token = strtok(NULL, "# ,\n");
+		token = strtok(NULL, " ,\n");
 
 		if (token) {
 			tokens->instr.sdt.preindexing = false;
 			add = strtol(token + 1, NULL, 0);
-			tokens->instr.sdt.up = add > 0;
-			tokens->instr.sdt.offset.offset.imm = (uint32_t)add;
+
+			if (token[0] == '#') {
+				tokens->instr.sdt.up = add > 0;
+				tokens->instr.sdt.offset.offset.imm =
+								(uint32_t)add;
+			} else {
+				tokens->instr.sdt.offset.immediate = true;
+				tokens->instr.sdt.offset.offset.reg.rm = add;
+			}
 		}
 
 	} else {
 		tokens->instr.sdt.rn = atoi(strtok(token, "[,") + 1);
-		add = strtol(strtok(NULL, "# ]"), NULL, 0);
-		tokens->instr.sdt.up = add > 0;
-		tokens->instr.sdt.offset.offset.imm = (uint32_t)abs(add);
+		token = strtok(NULL, " ]\n");
+		add = strtol(token + 1, NULL, 0);
+
+		if (token[0] == '#') {
+			tokens->instr.sdt.up = add > 0;
+			tokens->instr.sdt.offset.offset.imm =
+							(uint32_t)abs(add);
+		} else {
+			tokens->instr.sdt.offset.immediate = true;
+			tokens->instr.sdt.offset.offset.reg.rm = add;
+		}
 	}
 }
 
