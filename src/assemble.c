@@ -7,8 +7,12 @@
 #include <string.h>
 #include <stdint.h>
 
-#define MAX_LINE_LENGTH 512
-#define SYM_TABLE_CAPACITY 16
+#define MAX_LINE_LENGTH		512
+#define SYM_TABLE_CAPACITY	16
+#define DATA_PROC_INSTR		0
+#define MULT_INSTR		1
+#define SINGLE_DATA_INSTR	2
+#define BRANCH_INSTR		3
 
 static FILE *input;
 static FILE *output;
@@ -31,7 +35,7 @@ struct constants {
 	uint32_t *table;
 } constant_table;
 
-static void initiate_labels(void)
+static void initiate_tables(void)
 {
 	sym_table.size = 0;
 	sym_table.instr_num = 0;
@@ -42,27 +46,7 @@ static void initiate_labels(void)
 		fprintf(stderr, "Couldn't allocate memory for labels.");
 		exit(EXIT_FAILURE);
 	}
-}
 
-static void extend_labels(void)
-{
-	if (sym_table.size == sym_table.capacity) {
-		sym_table.capacity = 2 * sym_table.capacity;
-		sym_table.table = realloc(sym_table.table, sym_table.capacity);
-
-		if (!sym_table.table)
-			fprintf(stderr, "Coudln't extend memory for labels");
-	}
-}
-
-static void destroy_tables(void)
-{
-	free(sym_table.table);
-	free(constant_table.table);
-}
-
-static void initiate_constants(void)
-{
 	constant_table.size = 0;
 	constant_table.capacity = SYM_TABLE_CAPACITY;
 	constant_table.table =
@@ -74,16 +58,30 @@ static void initiate_constants(void)
 	}
 }
 
-static void extend_constants(void)
+static void extend_tables(void)
 {
+	if (sym_table.size == sym_table.capacity) {
+		sym_table.capacity = 2 * sym_table.capacity;
+		sym_table.table = realloc(sym_table.table, sym_table.capacity);
+
+		if (!sym_table.table)
+			fprintf(stderr, "Coudln't extend memory for labels");
+	}
+
 	if (constant_table.size == constant_table.capacity) {
 		constant_table.capacity = 2 * constant_table.capacity;
 		constant_table.table =
 			realloc(constant_table.table, constant_table.capacity);
 
 		if (!constant_table.table)
-			fprintf(stderr, "Coudln't extend memory for labels");
+			fprintf(stderr, "Coudln't extend memory for constants");
 	}
+}
+
+static void destroy_tables(void)
+{
+	free(sym_table.table);
+	free(constant_table.table);
 }
 
 static void add_constant(uint32_t constant)
@@ -143,7 +141,7 @@ static void first_pass(void)
 
 		struct instruction *instr = malloc(sizeof(struct instruction));
 
-		extend_labels();
+		extend_tables();
 		tokenize(line, instr);
 
 
@@ -186,20 +184,22 @@ static void second_pass(void)
 		uint32_t instr_binary;
 
 		memset(instr, 0, sizeof(struct instruction));
-		extend_constants();
+		extend_tables();
 		tokenize(line, instr);
 
 
 		if (instr->mnemonic) {
 
 			switch (instr->type) {
-			case 0:
+			case DATA_PROC_INSTR:
 				instr_binary = instr_dpi(instr);
 				break;
-			case 1:
+
+			case MULT_INSTR:
 				instr_binary = instr_multiply(instr);
 				break;
-			case 2:
+
+			case SINGLE_DATA_INSTR:
 				if (instr->sdt_offset) {
 					add_constant(instr->sdt_offset);
 					sdt_pc_instr(instr, instr_num);
@@ -207,7 +207,8 @@ static void second_pass(void)
 
 				instr_binary = instr_sdt(instr);
 				break;
-			case 3:
+
+			case BRANCH_INSTR:
 				jump_to = lookout_symbol(instr->jump);
 
 				if (jump_to == -1) {
@@ -221,6 +222,7 @@ static void second_pass(void)
 
 				instr_binary = instr_branch(instr);
 				break;
+
 			default:
 				fprintf(stderr, "Error: Invalid Instruction");
 				exit(EXIT_FAILURE);
@@ -239,8 +241,6 @@ static void second_pass(void)
 
 }
 
-
-
 int main(int argc, char **argv)
 {
 	if (argc != 3)
@@ -248,8 +248,7 @@ int main(int argc, char **argv)
 
 	load_io_files(argv[1], argv[2]);
 
-	initiate_labels();
-	initiate_constants();
+	initiate_tables();
 
 	first_pass();
 	second_pass();
