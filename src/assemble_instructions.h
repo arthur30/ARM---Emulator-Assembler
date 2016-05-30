@@ -1,8 +1,9 @@
 #ifndef ASSEMBLE_INSTRUCTIONS_H
 #define ASSEMBLE_INSTRUCTIONS_H
 
-#include <stdint.h>
 #include "assemble_tokenizer.h"
+
+#include <stdint.h>
 
 uint32_t instr_dpi(struct instruction *instr);
 

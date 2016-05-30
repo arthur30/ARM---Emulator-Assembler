@@ -8,45 +8,21 @@
 #include <string.h>
 #include <stdbool.h>
 
-/* Variables to build the instructions. */
-static uint32_t cond;      /* for COND                  */
-
-static uint32_t opcode;    /* for OPCODE                */
-static uint32_t operand2;  /* for OPERAND2              */
-static uint32_t imm;       /* for OPERAND2              */
-static uint32_t shift;     /* for OPERAND2              */
-static uint32_t offset;    /* for OFFSET                */
-
-static uint32_t i;         /* for IMMEDIATE OFFSET      */
-static uint32_t s;         /* for SET CONDITION BIT     */
-static uint32_t a;         /* for ACCUMULATE BIT        */
-static uint32_t p;         /* for PRE/POST INDEXING BIT */
-static uint32_t u;         /* for UP BIT                */
-static uint32_t l;         /* for LOAD/STORE BIT        */
-
-static uint32_t rn;        /* for REGISTER Rn           */
-static uint32_t rd;        /* for REGISTER Rd           */
-static uint32_t rs;        /* for REGISTER Rd           */
-static uint32_t rm;        /* for REGISTER Rm           */
-
-/* All functions return a 32bit integer. */
-
 uint32_t instr_dpi(struct instruction *instr)
 {
+	uint32_t cond = 14 << 28;
+	uint32_t opcode = (uint32_t)(instr->code) << 21;
+	uint32_t rd = (uint32_t)instr->instr.dpi.rd << 12;
+	uint32_t rn = (uint32_t)instr->instr.dpi.rn << 16;
+	uint32_t rm = 0;
+	uint32_t i = 0;
+	uint32_t s = 0;
+	uint32_t imm = 0;
+	uint32_t shift = 0;
+	uint32_t operand2 = 0;
 	bool constant = false;
 	uint8_t shift_type = 0;
 	uint8_t amount = 0;
-
-	cond = 14 << 28;
-	opcode = (uint32_t)(instr->code) << 21;
-	rd = (uint32_t)instr->instr.dpi.rd << 12;
-	rn = (uint32_t)instr->instr.dpi.rn << 16;
-	rm = 0;
-	i = 0;
-	s = 0;
-	imm = 0;
-	shift = 0;
-	operand2 = 0;
 
 	if (instr->code == 5)
 		return 0;
@@ -84,18 +60,17 @@ uint32_t instr_dpi(struct instruction *instr)
 
 uint32_t instr_multiply(struct instruction *instr)
 {
-	cond = 14 << 28;
-	s = 0;
-	rs = instr->instr.mult.rs << 8;
-	rm = instr->instr.mult.rm;
-	rd = instr->instr.mult.rd << 16;
+	uint32_t cond = 14 << 28;
+	uint32_t rd = instr->instr.mult.rd << 16;
+	uint32_t rs = instr->instr.mult.rs << 8;
+	uint32_t rn = 0;
+	uint32_t rm = instr->instr.mult.rm;
+	uint32_t a = 0;
+	uint32_t s = 0;
 
 	if (instr->instr.mult.accumulate) {
 		a = 1 << 21;
 		rn = instr->instr.mult.rn << 12;
-	} else {
-		a = 0;
-		rn = 0;
 	}
 
 	return cond + a + s + rd + rn + rs + 144 + rm;
@@ -103,28 +78,18 @@ uint32_t instr_multiply(struct instruction *instr)
 
 uint32_t instr_sdt(struct instruction *instr)
 {
-	/*
-	 * Instruction Result:
-	 * COND 01IP U00L -Rn- -Rd- Offset
-	 * L => (ldr -> 1) || (sdr -> 0)
-	 * I => Set if Offset is shifted register.
-	 * U => Set if Offset is added to base reg.
-	 * P => Pre/Post indexing bit. See spec pg9.
-	 */
-
+	uint32_t cond = 14 << 28;
+	uint32_t rn = instr->instr.sdt.rn << 16;
+	uint32_t rd = instr->instr.sdt.rd << 12;
+	uint32_t rm = 0;
+	uint32_t l = 0;
+	uint32_t p = 0;
+	uint32_t u = 0;
+	uint32_t i = 0;
+	uint32_t offset = instr->instr.sdt.offset.offset.imm;
 	bool constant = false;
 	uint8_t shift_type = 0;
 	uint8_t amount = 0;
-
-	cond = 14 << 28;
-	l = 0;
-	p = 0;
-	u = 0;
-	i = 0;
-	rn = instr->instr.sdt.rn << 16;
-	rd = instr->instr.sdt.rd << 12;
-	rm = 0;
-	offset = instr->instr.sdt.offset.offset.imm;
 
 	if (instr->instr.sdt.up)
 		u = (uint32_t)1 << 23;
@@ -136,6 +101,7 @@ uint32_t instr_sdt(struct instruction *instr)
 		p = (uint32_t)1 << 24;
 
 	if (instr->instr.sdt.offset.immediate) {
+		i = (uint32_t)1 << 25;
 		rm = instr->instr.sdt.offset.offset.reg.rm;
 		shift_type = instr->instr.sdt.offset.offset.reg.shift_type;
 		constant = instr->instr.sdt.offset.offset.reg.constant;
@@ -154,8 +120,6 @@ uint32_t instr_sdt(struct instruction *instr)
 				((uint32_t)constant << 4) |
 				rm;
 		}
-
-		i = (uint32_t)1 << 25;
 	}
 
 	return cond | (1 << 26) | i | p | u | l | rn | rd | offset | rm;
@@ -163,8 +127,8 @@ uint32_t instr_sdt(struct instruction *instr)
 
 uint32_t instr_branch(struct instruction *instr)
 {
-	cond = instr->code << 28;
-	offset = (instr->instr.branch.offset >> 2) & ((1 << 24) - 1);
+	uint32_t cond = instr->code << 28;
+	uint32_t offset = (instr->instr.branch.offset >> 2) & ((1 << 24) - 1);
 
 	return cond + (10 << 24) + offset;
 }
