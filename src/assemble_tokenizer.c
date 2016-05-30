@@ -130,16 +130,16 @@ static void init_sdt(struct instruction *tokens)
 
 		if (token) {
 			tokens->instr.sdt.preindexing = false;
-			add = atoi(token + 1);
+			add = strtol(token + 1, NULL, 0);
 			tokens->instr.sdt.up = add > 0;
 			tokens->instr.sdt.offset.offset.imm = (uint32_t)add;
 		}
 
 	} else {
 		tokens->instr.sdt.rn = atoi(strtok(token, "[,") + 1);
-		add = atoi(strtok(NULL, "# ]"));
+		add = strtol(strtok(NULL, "# ]"), NULL, 0);
 		tokens->instr.sdt.up = add > 0;
-		tokens->instr.sdt.offset.offset.imm = (uint32_t)add;
+		tokens->instr.sdt.offset.offset.imm = (uint32_t)abs(add);
 	}
 }
 
