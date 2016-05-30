@@ -143,13 +143,13 @@ uint32_t instr_sdt(struct instruction *instr)
 		if (!constant) {
 			amount = instr->instr.sdt.offset.offset.reg.amount.
 									integer;
-			operand2 = ((uint32_t)amount << 7) |
+			offset = ((uint32_t)amount << 7) |
 				((uint32_t)shift_type << 5) |
 				((uint32_t)constant << 4) |
 				rm;
 		} else {
 			amount = instr->instr.sdt.offset.offset.reg.amount.rs;
-			operand2 = ((uint32_t)amount << 8) |
+			offset = ((uint32_t)amount << 8) |
 				((uint32_t)shift_type << 5) |
 				((uint32_t)constant << 4) |
 				rm;
