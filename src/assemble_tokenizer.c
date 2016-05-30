@@ -87,12 +87,15 @@ static void init_sdt(struct instruction *tokens)
 	char *token;
 	uint32_t add;
 	int d;
+	uint8_t imm;
+	uint8_t shift;
 
 	tokens->instr.sdt.load = !tokens->code;
 	tokens->instr.sdt.up = true;
 	d = atoi(strtok(NULL, " ,") + 1);
 	tokens->instr.sdt.rd = d;
 	tokens->instr.sdt.preindexing = true;
+	tokens->instr.sdt.offset.immediate = false;
 	tokens->sdt_offset = 0;
 
 	token = strtok(NULL, "");
@@ -100,33 +103,37 @@ static void init_sdt(struct instruction *tokens)
 	if (token[0] == '=') {
 		add = strtol(token + 1, NULL, 0);
 
-		if (add >> 12) {
+		if (generate_op2(add, &imm, &shift)) {
+			printf("Came here.");
+			tokens->sdt_offset = add;
+			tokens->instr.sdt.offset.immediate = false;
+		} else {
+			printf("Reached here.");
 			tokens->type = 0;
 			tokens->code = 13;
 			tokens->instr.dpi.rn = 0;
 			tokens->instr.dpi.rd = d;
-			/* TODO: Rotation should be implemented here.*/
+			tokens->instr.dpi.setcond = false;
 			tokens->instr.dpi.op2.immediate = true;
-			tokens->instr.dpi.op2.offset.imm.imm = add;
-		} else
-			tokens->sdt_offset = add;
+			tokens->instr.dpi.op2.offset.imm.imm = imm;
+			tokens->instr.dpi.op2.offset.imm.rotate = shift;
+		}
 
 	} else if (token[3] == ']') {
 		tokens->instr.sdt.rn = atoi(strtok(token, "[]") + 1);
-		token = strtok(NULL, "# ,");
+		token = strtok(NULL, "# ,\n");
 
 		if (token) {
 			tokens->instr.sdt.preindexing = false;
-			tokens->instr.sdt.offset.immediate = true;
 			add = atoi(token + 1);
+			tokens->instr.sdt.up = add > 0;
 			tokens->instr.sdt.offset.offset.imm = add;
-		} else
-			tokens->instr.sdt.offset.immediate = false;
+		}
 
 	} else {
 		tokens->instr.sdt.rn = atoi(strtok(token, "[,") + 1);
-		tokens->instr.sdt.offset.immediate = true;
 		add = atoi(strtok(NULL, "# ]"));
+		tokens->instr.sdt.up = add > 0;
 		tokens->instr.sdt.offset.offset.imm = add;
 	}
 }
