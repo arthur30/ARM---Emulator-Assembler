@@ -1,6 +1,9 @@
 #ifndef EMULATE_ERRORS_H
 #define EMULATE_ERRORS_H
 
+#define NOT_ENOUGH_ARGS "Provide an input binary as an argument\n"
+#define BINARY_TOO_LARGE "Binary cannot be loaded into memory\n"
+
 #define OUT_OF_BOUNDS_MEM \
 	"Error: Out of bounds memory access at address 0x%08zx\n"
 #define GPIO_PIN_ACCESS \
