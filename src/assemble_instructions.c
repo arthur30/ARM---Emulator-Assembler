@@ -8,9 +8,11 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define COND_ALWAYS (14 << 28)
+
 uint32_t instr_dpi(struct instruction *instr)
 {
-	uint32_t cond = 14 << 28;
+	uint32_t cond = COND_ALWAYS;
 	uint32_t opcode = (uint32_t)(instr->code) << 21;
 	uint32_t rd = (uint32_t)instr->instr.dpi.rd << 12;
 	uint32_t rn = (uint32_t)instr->instr.dpi.rn << 16;
@@ -60,7 +62,7 @@ uint32_t instr_dpi(struct instruction *instr)
 
 uint32_t instr_multiply(struct instruction *instr)
 {
-	uint32_t cond = 14 << 28;
+	uint32_t cond = COND_ALWAYS;
 	uint32_t rd = instr->instr.mult.rd << 16;
 	uint32_t rs = instr->instr.mult.rs << 8;
 	uint32_t rn = 0;
@@ -78,7 +80,7 @@ uint32_t instr_multiply(struct instruction *instr)
 
 uint32_t instr_sdt(struct instruction *instr)
 {
-	uint32_t cond = 14 << 28;
+	uint32_t cond = COND_ALWAYS;
 	uint32_t rn = instr->instr.sdt.rn << 16;
 	uint32_t rd = instr->instr.sdt.rd << 12;
 	uint32_t rm = 0;
