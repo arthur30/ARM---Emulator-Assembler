@@ -66,8 +66,27 @@ static void init_dpi(struct instruction *tokens)
 	if (tokens->instr.dpi.op2.immediate) {
 		tokens->instr.dpi.op2.offset.imm.imm = imm;
 		tokens->instr.dpi.op2.offset.imm.rotate = shift;
-	} else
+	} else {
 		tokens->instr.dpi.op2.offset.reg.rm = j;
+		token = strtok(NULL, " ,\n");
+
+		if (token) {
+			tokens->instr.dpi.op2.offset.reg.shift_type =
+							instr_code(token, 6);
+			tokens->instr.dpi.op2.offset.reg.constant = true;
+
+			token = strtok(NULL, " ,\n");
+			if (token[0] == '#') {
+				tokens->instr.dpi.op2.offset.reg.constant =
+									false;
+				tokens->instr.dpi.op2.offset.reg.amount.integer
+						= strtol(token	+ 1, NULL, 0);
+			} else {
+				tokens->instr.dpi.op2.offset.reg.amount.rs =
+						strtol(token + 1, NULL, 0);
+			}
+		}
+	}
 }
 
 static void init_mult(struct instruction *tokens)
