@@ -67,7 +67,11 @@ uint32_t instr_dpi(struct instruction *instr)
 				((uint32_t)constant << 4) |
 				rm;
 		} else {
-			operand2 = rm;
+			amount = instr->instr.dpi.op2.offset.reg.amount.rs;
+			operand2 = ((uint32_t)amount << 8) |
+				((uint32_t)shift_type << 5) |
+				((uint32_t)constant << 4) |
+				rm;
 		}
 	}
 
