@@ -62,8 +62,6 @@ int tokenize(FILE *input, struct token_list *tokens)
 	size_t line_size, tok_size;
 	struct token *ctoken;
 
-	rewind(input);
-
 	line = NULL;
 	line_size = 0;
 	lineno = 0;
@@ -121,31 +119,6 @@ int tokenize(FILE *input, struct token_list *tokens)
 		ctoken = token_list_newtok(tokens);
 		ctoken->type = TOKEN_TYPE_NEWLINE;
 	}
-
-	/*
-	 *for (size_t i = 0; i < tokens->size; i++) {
-	 *	ctoken = &tokens->tokens[i];
-	 *	switch (ctoken->type) {
-	 *	case TOKEN_TYPE_BRACKET_OPEN:
-	 *		printf("open bracket\n");
-	 *		break;
-	 *	case TOKEN_TYPE_BRACKET_CLOSE:
-	 *		printf("close bracket\n");
-	 *		break;
-	 *	case TOKEN_TYPE_STRING:
-	 *		printf("string: %s\n", ctoken->str);
-	 *		break;
-	 *	case TOKEN_TYPE_NUMBER:
-	 *		printf("number: %ld\n", ctoken->num);
-	 *		break;
-	 *	case TOKEN_TYPE_NEWLINE:
-	 *		printf("newline\n");
-	 *		break;
-	 *	}
-	 *}
-	 */
-
-	rewind(input);
 
 	return 0;
 }
