@@ -4,10 +4,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define PI_MEMORY_SIZE (1 << 16)
-#define PI_REGISTER_COUNT 16
+#define PI_MEMORY_SIZE (1 << 16) /* Size of memory: 2^16 = 65536 bytes */
+#define PI_REGISTER_COUNT 16 /* number of available registers */
 
-#define R_PC 15
+#define R_PC 15 /* Program counter is register 15 */
+#define NUMBER_OF_BITS_TO_EXTRACT_FOR_REGISTERS 4 /* each register is represented by 4 bits */
 
 #define INSTR_BIT_IMM     (1 << 25)
 #define INSTR_BIT_SETCOND (1 << 20)
@@ -17,17 +18,22 @@
 #define INSTR_BIT_LOAD    (1 << 20)
 #define INSTR_BIT_CONST   (1 <<  4)
 
-#define INSTR_DATA_PROC_MASK 0x0C000000
-#define INSTR_DATA_PROC_BITP 0x00000000
+#define COND_FIRST_BIT      28
+#define COND_NUMBER_OF_BITS 4
 
-#define INSTR_MULT_MASK      0x0FC000F0
-#define INSTR_MULT_BITP      0x00000090
+/* All masks and bit patterns needed for decoding the instruction type: */
 
-#define INSTR_TRANSFER_MASK  0x0C600000
-#define INSTR_TRANSFER_BITP  0x04000000
+#define INSTR_DATA_PROC_MASK  0x0C000000
+#define INSTR_DATA_PROC_BITP  0x00000000
 
-#define INSTR_BRANCH_MASK    0x0F000000
-#define INSTR_BRANCH_BITP    0x0A000000
+#define INSTR_MULT_MASK       0x0FC000F0
+#define INSTR_MULT_BITP       0x00000090
+
+#define INSTR_TRANSFER_MASK   0x0C600000
+#define INSTR_TRANSFER_BITP   0x04000000
+
+#define INSTR_BRANCH_MASK     0x0F000000
+#define INSTR_BRANCH_BITP     0x0A000000
 
 #define GPIO_CONTROL_ADDRESS  0x20200000
 #define GPIO_CONTROL_SIZE     12
@@ -35,6 +41,41 @@
 #define GPIO_CLEARING_SIZE    4
 #define GPIO_TURNON_ADDRESS   0x2020001C
 #define GPIO_TURNON_SIZE      4
+
+/* Data processing Operand2(Case: Immediate value) constants: */
+#define OP2_IMMEDIATE_VALUE_FIRST_BIT           0
+#define OP2_IMMEDIATE_VALUE_LAST_BIT            8
+#define OP2_IMMEDIATE_VALUE_NUMBER_OF_ROTATIONS 4
+#define OP2_IMMEDIATE_VALUE_ROTATION_FIRST_BIT  8
+
+/* Data processing Operand2(Case: Register) constants: */
+#define OP2_REGISTER_RM_FIRST_BIT                  0
+#define OP2_REGISTER_SHIFT_TYPE_FIRST_BIT          5
+#define OP2_REGISTER_SHIFT_TYPE_NUMBER_OF_BITS     2
+#define OP2_REGISTER_SHIFT_CONSTANT_FIRST_BIT      7
+#define OP2_REGISTER_SHIFT_CONSTANT_NUMBER_OF_BITS 5
+#define OP2_REGISTER_SHIFT_REGISTER_FIRST_BIT      8
+
+/* Data processing constants: */
+#define DATA_PROC_RD_FIRST_BIT     12
+#define DATA_PROC_RN_FIRST_BIT     16
+#define DATA_PROC_OPCODE_FIRST_BIT 21
+
+/* Decode multiply constants: */
+#define MULT_RM_REGISTER_FIRST_BIT 0
+#define MULT_RS_REGISTER_FIRST_BIT 8
+#define MULT_RN_REGISTER_FIRST_BIT 12
+#define MULT_RD_REGISTER_FIRST_BIT 16
+
+/* Single data transfer constants: */
+#define TRANSFER_OFFSET_FIRST_BIT 0
+#define TRANSFER_OFFSET_LAST_BIT  12
+#define TRANSFER_RD_FIRST_BIT     12
+#define TRANSFER_RN_FIRST_BIT     16
+
+/* Branch constants: */
+#define BRANCH_OFFSET_FIRST_BIT 0
+#define BRANCH_OFFSET_LAST_BIT  24
 
 struct shift_reg {
 	bool constant;

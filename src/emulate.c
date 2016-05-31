@@ -11,6 +11,15 @@
 #include <string.h>
 #include <errno.h>
 
+#define NUMBER_OF_GENERAL_PURPOSE_REGISTERS 12
+
+#define CSPR_NEGATIVE_FLAG_BIT  31
+#define CSPR_ZERO_FLAG_BIT      30
+#define CSPR_CARRY_OUT_FLAG_BIT 29
+#define CSPR_OVERFLOW_FLAG_BIT  28
+
+#define MEMORY_BOUNDARY_ALLIGNEMENT_BYTES 4
+
 static void print_state(struct pi_state *pstate)
 {
 	size_t i;
@@ -19,7 +28,7 @@ static void print_state(struct pi_state *pstate)
 	size_t address;
 
 	fprintf(stdout, EMU_STATE_REG_HEAD);
-	for (i = 0; i < 13; i++) {
+	for (i = 0; i <= NUMBER_OF_GENERAL_PURPOSE_REGISTERS; i++) {
 		val = pstate->registers[i];
 		fprintf(stdout, EMU_STATE_REG_GEN, i, val, val);
 	}
@@ -27,16 +36,16 @@ static void print_state(struct pi_state *pstate)
 	pc = pstate->registers[R_PC];
 	fprintf(stdout, EMU_STATE_REG_PC, pc, pc);
 
-	cpsr = (pstate->cpsr.n << 31) |
-		(pstate->cpsr.z << 30) |
-		(pstate->cpsr.c << 29) |
-		(pstate->cpsr.v << 28);
+	cpsr =  (pstate->cpsr.n << CSPR_NEGATIVE_FLAG_BIT) |
+		(pstate->cpsr.z << CSPR_ZERO_FLAG_BIT)     |
+		(pstate->cpsr.c << CSPR_CARRY_OUT_FLAG_BIT)|
+		(pstate->cpsr.v << CSPR_OVERFLOW_FLAG_BIT);
 	fprintf(stdout, EMU_STATE_REG_CPSR, cpsr, cpsr);
 
 	fprintf(stdout, EMU_STATE_MEM_HEAD);
 	mem = pstate->memory;
-	for (address = 0; address < PI_MEMORY_SIZE; address += 4) {
-		if (!((uint32_t *)mem)[address / 4]) {
+	for (address = 0; address < PI_MEMORY_SIZE; address += MEMORY_BOUNDARY_ALLIGNEMENT_BYTES) {
+		if (!((uint32_t *)mem)[address / MEMORY_BOUNDARY_ALLIGNEMENT_BYTES]) {
 			/* skip if word at address is zero */
 			continue;
 		}
@@ -89,7 +98,7 @@ int main(int argc, char **argv)
 				break;
 		if (fetch(pstate))
 			break;
-		pstate->registers[R_PC] += 4;
+		pstate->registers[R_PC] += MEMORY_BOUNDARY_ALLIGNEMENT_BYTES;
 	}
 
 	print_state(pstate);
