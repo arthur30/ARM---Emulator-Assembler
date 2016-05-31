@@ -9,6 +9,7 @@
 #define GETFLAG(ic, flag) (!!(ic & flag))
 #define GETBITS(ic, p, n) (((ic) >> (p)) & ((1 << (n)) - 1))
 #define GETREG(ic, p) GETBITS(ic, p, 4)
+#define SEXT26(value) ((value) | (((value) & (1 << 25)) ? 0xFC000000 : 0))
 
 static bool instr_is_data_proc(uint32_t ic)
 {
@@ -138,7 +139,7 @@ static int decode_branch(uint32_t ic, struct pi_state *pstate)
 	branch = &pstate->pipeline.instruction.instr_bits.branch;
 
 	offset = GETBITS(ic, 0, 24) << 2;
-	offset |= (offset & (1 << 25)) ? 0xFC000000 : 0;
+	offset = SEXT26(offset);
 	branch->offset = offset;
 
 	return 0;
