@@ -67,8 +67,8 @@ int main(int argc, char **argv)
 	if (!input)
 		goto fail;
 
-	if (!fread(&pstate->memory, 1, PI_MEMORY_SIZE, input))
-		goto fail;
+	fread(&pstate->memory, 1, PI_MEMORY_SIZE, input);
+	fgetc(input); /* so that EOF is set if binary is exactly 64KiB */
 	if (ferror(input))
 		goto fail;
 	if (!feof(input)) {
