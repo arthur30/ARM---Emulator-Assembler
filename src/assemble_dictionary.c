@@ -1,8 +1,12 @@
 #include "assemble_dictionary.h"
 
+#include "pi_state.h"
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+
+#define MAP_SIZE(dict) (sizeof(dict) / sizeof(struct map))
 
 struct map {
 	const char *str;
@@ -10,109 +14,104 @@ struct map {
 };
 
 struct map dict_dpi[] = {
+	{"add", 4},
 	{"and", 0},
 	{"andeq", 5},
-	{"eor", 1},
-	{"sub", 2},
-	{"rsb", 3},
-	{"add", 4},
-	{"orr", 12},
-	{"mov", 13},
-	{"tst", 8},
-	{"teq", 9},
 	{"cmp", 10},
-	{0, 0}
+	{"eor", 1},
+	{"mov", 13},
+	{"orr", 12},
+	{"rsb", 3},
+	{"sub", 2},
+	{"teq", 9},
+	{"tst", 8},
 };
 
 struct map dict_branch[] = {
-	{"beq", 0},
-	{"bne", 1},
-	{"bge", 10},
-	{"blt", 11},
-	{"bgt", 12},
-	{"ble", 13},
 	{"b", 14},
 	{"bal", 14},
-	{0, 0}
+	{"beq", 0},
+	{"bge", 10},
+	{"bgt", 12},
+	{"ble", 13},
+	{"blt", 11},
+	{"bne", 1},
 };
 
 struct map dict_mult[] = {
-	{"mul", 0},
 	{"mla", 1},
-	{0, 0}
+	{"mul", 0},
 };
 
 struct map dict_sdt[] = {
 	{"ldr", 0},
 	{"str", 1},
-	{0, 0}
 };
 
 struct map dict_all[] = {
-	{"and", 0},
-	{"eor", 0},
-	{"sub", 0},
-	{"rsb", 0},
-	{"add", 0},
-	{"orr", 0},
-	{"mov", 0},
-	{"tst", 0},
-	{"teq", 0},
-	{"cmp", 0},
-	{"mul", 1},
-	{"mla", 1},
-	{"ldr", 2},
-	{"str", 2},
-	{"beq", 3},
-	{"bne", 3},
-	{"bge", 3},
-	{"blt", 3},
-	{"bgt", 3},
-	{"ble", 3},
-	{"b", 3},
-	{"bal", 3},
-	{"lsl", 4},
-	{"andeq", 5},
-	{0, 0}
+	{"add",   INSTR_TYPE_DATA_PROC},
+	{"and",   INSTR_TYPE_DATA_PROC},
+	{"andeq", INSTR_TYPE_HALT},
+	{"b",     INSTR_TYPE_BRANCH},
+	{"bal",   INSTR_TYPE_BRANCH},
+	{"beq",   INSTR_TYPE_BRANCH},
+	{"bge",   INSTR_TYPE_BRANCH},
+	{"bgt",   INSTR_TYPE_BRANCH},
+	{"ble",   INSTR_TYPE_BRANCH},
+	{"blt",   INSTR_TYPE_BRANCH},
+	{"bne",   INSTR_TYPE_BRANCH},
+	{"cmp",   INSTR_TYPE_DATA_PROC},
+	{"eor",   INSTR_TYPE_DATA_PROC},
+	{"ldr",   INSTR_TYPE_TRANSFER},
+	{"lsl",   5},
+	{"mla",   INSTR_TYPE_MULT},
+	{"mov",   INSTR_TYPE_DATA_PROC},
+	{"mul",   INSTR_TYPE_MULT},
+	{"orr",   INSTR_TYPE_DATA_PROC},
+	{"rsb",   INSTR_TYPE_DATA_PROC},
+	{"str",   INSTR_TYPE_TRANSFER},
+	{"sub",   INSTR_TYPE_DATA_PROC},
+	{"teq",   INSTR_TYPE_DATA_PROC},
+	{"tst",   INSTR_TYPE_DATA_PROC},
 };
 
 struct map dict_rot[] = {
+	{"asr", 2},
 	{"lsl", 0},
 	{"lsr", 1},
-	{"asr", 2},
 	{"ror", 3},
-	{0, 0}
 };
 
-static uint32_t key_to_int(struct map *dict, char *key)
+static int map_compar(const void *key, const void *map_elem)
 {
-	int i = 0;
-	const char *cand = dict[i].str;
+	return strcmp((char *)key, ((struct map *)map_elem)->str);
+}
 
-	while (cand) {
-		if (strcmp(cand, key) == 0)
-			return dict[i].n;
-		cand = dict[++i].str;
-	}
+static uint32_t bsearch_map(const void *key, const void *base, size_t nmemb)
+{
+	struct map *elem;
 
+	elem = bsearch(key, base, nmemb, sizeof(struct map), map_compar);
+	if (elem)
+		return elem->n;
 	return -1;
 }
 
 uint32_t instr_code(char *key, int type)
 {
 	switch (type) {
-	case 0:
-		return key_to_int(dict_dpi, key);
-	case 1:
-		return key_to_int(dict_mult, key);
-	case 2:
-		return key_to_int(dict_sdt, key);
-	case 3:
-		return key_to_int(dict_branch, key);
-	case 5:
-		return key_to_int(dict_dpi, key);
+	case INSTR_TYPE_HALT:
+		return bsearch_map(key, dict_dpi, MAP_SIZE(dict_dpi));
+	case INSTR_TYPE_DATA_PROC:
+		return bsearch_map(key, dict_dpi, MAP_SIZE(dict_dpi));
+	case INSTR_TYPE_MULT:
+		return bsearch_map(key, dict_mult, MAP_SIZE(dict_mult));
+	case INSTR_TYPE_TRANSFER:
+		return bsearch_map(key, dict_sdt, MAP_SIZE(dict_sdt));
+	case INSTR_TYPE_BRANCH:
+		return bsearch_map(key, dict_branch, MAP_SIZE(dict_branch));
 	case 6:
-		return key_to_int(dict_rot, key);
+		return bsearch_map(key, dict_rot, MAP_SIZE(dict_rot));
 	default:
 		return -1;
 	}
@@ -120,6 +119,6 @@ uint32_t instr_code(char *key, int type)
 
 uint32_t classify_instr(char *key)
 {
-	return key_to_int(dict_all, key);
+	return bsearch_map(key, dict_all, MAP_SIZE(dict_all));
 }
 

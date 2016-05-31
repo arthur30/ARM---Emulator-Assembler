@@ -1,7 +1,7 @@
 #ifndef ASSEMBLE_INSTRUCTIONS_H
 #define ASSEMBLE_INSTRUCTIONS_H
 
-#include "assemble_tokenizer.h"
+#include "assemble_parser.h"
 
 #include <stdint.h>
 

@@ -3,7 +3,7 @@ WARNINGS = -Wall -Wextra -Wformat=2 -pedantic \
            -Wfloat-equal -Wundef -Wcast-align \
            -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
            -Wstrict-overflow=5 -Wwrite-strings
-ERRORS   = -Werror -pedantic-errors
+ERRORS   = -Werror -pedantic-errors -Wno-error=unused-result
 DEFINES  = -D_DEFAULT_SOURCE
 DEPSINFO = -MD -MP
 OPTIMIZE = -g -O0 -ggdb -DDEBUG
