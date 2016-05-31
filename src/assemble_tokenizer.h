@@ -1,23 +1,36 @@
 #ifndef ASSEMBLE_TOKENIZER_H
 #define ASSEMBLE_TOKENIZER_H
 
-#include "emulate_pi_state.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
 
-struct instruction {
-	char *label;
-	char *jump;
-	bool mnemonic;
-	uint8_t type;
-	uint8_t code;
-	uint32_t sdt_offset;
-	union {
-		struct instr_data_proc dpi;
-		struct instr_mult mult;
-		struct instr_transfer sdt;
-		struct instr_branch branch;
-	} instr;
+enum token_type {
+	TOKEN_TYPE_STRING,
+	TOKEN_TYPE_NUMBER,
+	TOKEN_TYPE_BRACKET_OPEN,
+	TOKEN_TYPE_BRACKET_CLOSE,
+	TOKEN_TYPE_NEWLINE
 };
 
-void tokenize(char *instr, struct instruction *tokens);
+struct token {
+	enum token_type type;
+	size_t lineno;
+	size_t colno;
+	char *str;
+	size_t strlen;
+	int64_t num;
+};
+
+struct token_list {
+	size_t size;
+	size_t capacity;
+	struct token *tokens;
+};
+
+int token_list_alloc(struct token_list *list);
+struct token *token_list_newtok(struct token_list *list);
+struct token *token_list_getnext(struct token_list *list, size_t *pos);
+int tokenize(FILE *input, struct token_list *tokens);
 
 #endif

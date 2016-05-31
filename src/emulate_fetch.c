@@ -1,5 +1,6 @@
 #include "emulate_fetch.h"
-#include "emulate_pi_state.h"
+
+#include "pi_state.h"
 
 #include <string.h>
 #include <errno.h>

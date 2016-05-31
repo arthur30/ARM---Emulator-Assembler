@@ -1,7 +1,7 @@
 #ifndef ASSEMBLE_DICTIONARY_H
 #define ASSEMBLE_DICTIONARY_H
 
-#include<stdint.h>
+#include <stdint.h>
 
 uint32_t instr_code(char *key, int type);
 

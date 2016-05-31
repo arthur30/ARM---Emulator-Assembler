@@ -1,6 +1,7 @@
 #include "assemble_instructions.h"
 #include "assemble_dictionary.h"
-#include "emulate_pi_state.h"
+
+#include "pi_state.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -66,7 +67,6 @@ uint32_t instr_dpi(struct instruction *instr)
 				rm;
 		}
 	}
-
 
 	if (instr->instr.dpi.setcond)
 		s = 1 << 20;

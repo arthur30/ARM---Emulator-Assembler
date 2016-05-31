@@ -1,18 +1,18 @@
 #include "assemble_instructions.h"
-#include "assemble_tokenizer.h"
 #include "assemble_dictionary.h"
+#include "assemble_parser.h"
+#include "assemble_tokenizer.h"
+
+#include "pi_msgs.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <ctype.h>
+#include <errno.h>
 
-#define MAX_LINE_LENGTH		512
 #define SYM_TABLE_CAPACITY	16
-#define DATA_PROC_INSTR		0
-#define MULT_INSTR		1
-#define SINGLE_DATA_INSTR	2
-#define BRANCH_INSTR		3
 
 static FILE *input;
 static FILE *output;
@@ -27,15 +27,19 @@ struct labels {
 	int capacity;
 	int instr_num;
 	struct sym *table;
-} sym_table;
+};
+
+static struct labels sym_table;
 
 struct constants {
 	int size;
 	int capacity;
 	uint32_t *table;
-} constant_table;
+};
 
-static void initiate_tables(void)
+static struct constants constant_table;
+
+static int initiate_tables(void)
 {
 	sym_table.size = 0;
 	sym_table.instr_num = 0;
@@ -43,8 +47,8 @@ static void initiate_tables(void)
 	sym_table.table = calloc(SYM_TABLE_CAPACITY, sizeof(struct sym));
 
 	if (!sym_table.table) {
-		fprintf(stderr, "Couldn't allocate memory for labels.");
-		exit(EXIT_FAILURE);
+		fprintf(stderr, PI_ERR_MEM, "labels");
+		return -1;
 	}
 
 	constant_table.size = 0;
@@ -53,19 +57,23 @@ static void initiate_tables(void)
 		calloc(SYM_TABLE_CAPACITY, sizeof(uint32_t));
 
 	if (!constant_table.table) {
-		fprintf(stderr, "Couldn't allocate memory for constants.");
-		exit(EXIT_FAILURE);
+		fprintf(stderr, PI_ERR_MEM, "constants");
+		return -1;
 	}
+
+	return 0;
 }
 
-static void extend_tables(void)
+static int extend_tables(void)
 {
 	if (sym_table.size == sym_table.capacity) {
 		sym_table.capacity = 2 * sym_table.capacity;
 		sym_table.table = realloc(sym_table.table, sym_table.capacity);
 
-		if (!sym_table.table)
-			fprintf(stderr, "Coudln't extend memory for labels");
+		if (!sym_table.table) {
+			fprintf(stderr, PI_ERR_MEM, "extending labels");
+			return -1;
+		}
 	}
 
 	if (constant_table.size == constant_table.capacity) {
@@ -73,9 +81,13 @@ static void extend_tables(void)
 		constant_table.table =
 			realloc(constant_table.table, constant_table.capacity);
 
-		if (!constant_table.table)
-			fprintf(stderr, "Coudln't extend memory for constants");
+		if (!constant_table.table) {
+			fprintf(stderr, PI_ERR_MEM, "extending constants");
+			return -1;
+		}
 	}
+
+	return 0;
 }
 
 static void destroy_tables(void)
@@ -90,20 +102,22 @@ static void add_constant(uint32_t constant)
 	constant_table.size++;
 }
 
-static void load_io_files(char *inp, char *out)
+static int load_io_files(char *inp, char *out)
 {
 	input = fopen(inp, "r");
 	output = fopen(out, "wb");
 
-	if (input == NULL) {
-		printf("Error opening the input file");
+	if (!input) {
+		fprintf(stderr, PI_ERR_INPUT, inp, strerror(errno), errno);
+		return -1;
+	}
+
+	if (!output) {
+		fprintf(stderr, PI_ERR_OUTPUT, out, strerror(errno), errno);
 		exit(EXIT_FAILURE);
 	}
 
-	if (output == NULL) {
-		printf("Error opening the output file");
-		exit(EXIT_FAILURE);
-	}
+	return 0;
 }
 
 static int lookout_symbol(char *key)
@@ -128,26 +142,26 @@ static void sdt_pc_instr(struct instruction *instr, uint32_t instr_num)
 						(4 * instr_num + 8);
 }
 
-static void first_pass(void)
+static int first_pass(struct token_list *toks)
 {
-	char *line = malloc(MAX_LINE_LENGTH);
+	struct instruction *instr = malloc(sizeof(struct instruction));
+	int ret;
 
-	if (!line) {
-		fprintf(stderr, "Couldn't allocate memory for the line.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	while (fgets(line, MAX_LINE_LENGTH, input)) {
-
-		struct instruction *instr = malloc(sizeof(struct instruction));
+	for (;;) {
+		memset(instr, 0, sizeof(struct instruction));
 
 		extend_tables();
-		tokenize(line, instr);
 
+		ret = parse(toks, instr);
+		if (ret == 1)
+			break;
+		if (ret)
+			return -1;
+
+		toks = NULL;
 
 		if (instr->label) {
-			sym_table.table[sym_table.size].label =
-						strcat(instr->label, "\n");
+			sym_table.table[sym_table.size].label = instr->label;
 			sym_table.table[sym_table.size].address =
 						4 * sym_table.instr_num;
 			sym_table.size++;
@@ -156,28 +170,22 @@ static void first_pass(void)
 		if (instr->mnemonic)
 			sym_table.instr_num++;
 
-		free(instr);
 	}
 
-	free(line);
+	free(instr);
+
+	return 0;
 }
 
-static void second_pass(void)
+static int second_pass(struct token_list *toks)
 {
-	char *line = malloc(MAX_LINE_LENGTH);
 	uint32_t instr_num = 0;
 	int i = 0;
+	int ret;
 
-	if (!line) {
-		fprintf(stderr, "Couldn't allocate memory for the line.\n");
-		exit(EXIT_FAILURE);
-	}
+	struct instruction *instr = malloc(sizeof(struct instruction));
 
-	rewind(input);
-
-	struct instruction *instr = calloc(1, sizeof(struct instruction));
-
-	while (fgets(line, MAX_LINE_LENGTH, input)) {
+	for (;;) {
 		int jump_to;
 		int current;
 		int offset;
@@ -185,21 +193,31 @@ static void second_pass(void)
 
 		memset(instr, 0, sizeof(struct instruction));
 		extend_tables();
-		tokenize(line, instr);
 
+		ret = parse(toks, instr);
+		if (ret == 1)
+			break;
+		if (ret)
+			return -1;
+
+		toks = NULL;
 
 		if (instr->mnemonic) {
 
 			switch (instr->type) {
-			case DATA_PROC_INSTR:
+			case INSTR_TYPE_HALT:
+				instr_binary = 0;
+				break;
+
+			case INSTR_TYPE_DATA_PROC:
 				instr_binary = instr_dpi(instr);
 				break;
 
-			case MULT_INSTR:
+			case INSTR_TYPE_MULT:
 				instr_binary = instr_multiply(instr);
 				break;
 
-			case SINGLE_DATA_INSTR:
+			case INSTR_TYPE_TRANSFER:
 				if (instr->sdt_offset) {
 					add_constant(instr->sdt_offset);
 					sdt_pc_instr(instr, instr_num);
@@ -208,11 +226,12 @@ static void second_pass(void)
 				instr_binary = instr_sdt(instr);
 				break;
 
-			case BRANCH_INSTR:
+			case INSTR_TYPE_BRANCH:
 				jump_to = lookout_symbol(instr->jump);
 
 				if (jump_to == -1) {
-					fprintf(stderr, "Invlid label jump.");
+					fprintf(stderr, ASS_ERR_JUMP_TARGET,
+							instr->jump);
 					exit(EXIT_FAILURE);
 				}
 
@@ -224,13 +243,13 @@ static void second_pass(void)
 				break;
 
 			default:
-				fprintf(stderr, "Error: Invalid Instruction");
+				fprintf(stderr, ASS_ERR_INVALID_INSTR);
 				exit(EXIT_FAILURE);
 			}
 
 			fwrite(&instr_binary, sizeof(instr_binary), 1, output);
 			instr_num++;
-		 }
+		}
 
 	}
 
@@ -239,24 +258,53 @@ static void second_pass(void)
 
 	free(instr);
 
+	return 0;
+
 }
 
 int main(int argc, char **argv)
 {
-	if (argc != 3)
-		return EXIT_FAILURE;
+	struct token_list *tokens;
 
-	load_io_files(argv[1], argv[2]);
+	if (argc != 3) {
+		fprintf(stderr, ASS_ERR_ARGS);
+		goto fail;
+	}
 
-	initiate_tables();
+	if (load_io_files(argv[1], argv[2]))
+		goto fail;
 
-	first_pass();
-	second_pass();
+	tokens = malloc(sizeof(struct token_list));
+	if (!tokens) {
+		fprintf(stderr, PI_ERR_MEM, "tokens");
+		goto fail;
+	}
+	if (token_list_alloc(tokens))
+		goto fail;
+	if (tokenize(input, tokens)) {
+		fprintf(stderr, ASS_ERR_TOKENIZE);
+		goto fail;
+	}
+	fclose(input);
+
+	if (initiate_tables())
+		goto fail;
+
+	if (first_pass(tokens)) {
+		fprintf(stderr, ASS_ERR_PASS1);
+		goto fail;
+	}
+	if (second_pass(tokens)) {
+		fprintf(stderr, ASS_ERR_PASS2);
+		goto fail;
+	}
 
 	destroy_tables();
-	fclose(input);
 	fclose(output);
 
 	return EXIT_SUCCESS;
+
+fail:
+	return EXIT_FAILURE;
 }
 
