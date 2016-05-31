@@ -549,7 +549,7 @@ int execute(struct pi_state *pstate)
 	pstate->pipeline.decoded = false;
 	type = pstate->pipeline.instruction.type;
 
-	if (cond_check_res || type == HALT)
+	if (cond_check_res || type == INSTR_TYPE_HALT)
 		return instr_type_table[type](pstate);
 	return 0;
 }

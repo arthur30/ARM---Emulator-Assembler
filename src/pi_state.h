@@ -96,11 +96,11 @@ struct instr_branch {
 };
 
 enum instr_type {
-	HALT = 0,
-	DATA_PROC = 1,
-	MULT = 2,
-	TRANSFER = 3,
-	BRANCH = 4
+	INSTR_TYPE_HALT = 0,
+	INSTR_TYPE_DATA_PROC = 1,
+	INSTR_TYPE_MULT = 2,
+	INSTR_TYPE_TRANSFER = 3,
+	INSTR_TYPE_BRANCH = 4
 };
 
 struct instr {

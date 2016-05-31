@@ -1,5 +1,7 @@
 #include "assemble_dictionary.h"
 
+#include "pi_state.h"
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -49,30 +51,30 @@ struct map dict_sdt[] = {
 };
 
 struct map dict_all[] = {
-	{"and", 0},
-	{"eor", 0},
-	{"sub", 0},
-	{"rsb", 0},
-	{"add", 0},
-	{"orr", 0},
-	{"mov", 0},
-	{"tst", 0},
-	{"teq", 0},
-	{"cmp", 0},
-	{"mul", 1},
-	{"mla", 1},
-	{"ldr", 2},
-	{"str", 2},
-	{"beq", 3},
-	{"bne", 3},
-	{"bge", 3},
-	{"blt", 3},
-	{"bgt", 3},
-	{"ble", 3},
-	{"b", 3},
-	{"bal", 3},
-	{"lsl", 4},
-	{"andeq", 5},
+	{"and",   INSTR_TYPE_DATA_PROC},
+	{"eor",   INSTR_TYPE_DATA_PROC},
+	{"sub",   INSTR_TYPE_DATA_PROC},
+	{"rsb",   INSTR_TYPE_DATA_PROC},
+	{"add",   INSTR_TYPE_DATA_PROC},
+	{"orr",   INSTR_TYPE_DATA_PROC},
+	{"mov",   INSTR_TYPE_DATA_PROC},
+	{"tst",   INSTR_TYPE_DATA_PROC},
+	{"teq",   INSTR_TYPE_DATA_PROC},
+	{"cmp",   INSTR_TYPE_DATA_PROC},
+	{"mul",   INSTR_TYPE_MULT},
+	{"mla",   INSTR_TYPE_MULT},
+	{"ldr",   INSTR_TYPE_TRANSFER},
+	{"str",   INSTR_TYPE_TRANSFER},
+	{"beq",   INSTR_TYPE_BRANCH},
+	{"bne",   INSTR_TYPE_BRANCH},
+	{"bge",   INSTR_TYPE_BRANCH},
+	{"blt",   INSTR_TYPE_BRANCH},
+	{"bgt",   INSTR_TYPE_BRANCH},
+	{"ble",   INSTR_TYPE_BRANCH},
+	{"b",     INSTR_TYPE_BRANCH},
+	{"bal",   INSTR_TYPE_BRANCH},
+	{"lsl",   5},
+	{"andeq", INSTR_TYPE_HALT},
 	{0, 0}
 };
 
@@ -101,16 +103,16 @@ static uint32_t key_to_int(struct map *dict, char *key)
 uint32_t instr_code(char *key, int type)
 {
 	switch (type) {
-	case 0:
+	case INSTR_TYPE_HALT:
 		return key_to_int(dict_dpi, key);
-	case 1:
+	case INSTR_TYPE_DATA_PROC:
+		return key_to_int(dict_dpi, key);
+	case INSTR_TYPE_MULT:
 		return key_to_int(dict_mult, key);
-	case 2:
+	case INSTR_TYPE_TRANSFER:
 		return key_to_int(dict_sdt, key);
-	case 3:
+	case INSTR_TYPE_BRANCH:
 		return key_to_int(dict_branch, key);
-	case 5:
-		return key_to_int(dict_dpi, key);
 	case 6:
 		return key_to_int(dict_rot, key);
 	default:

@@ -9,12 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define DATA_PROC_INSTR		0
-#define MULT_INSTR		1
-#define SINGLE_DATA_INSTR	2
-#define BRANCH_INSTR		3
-#define LSL_INSTR		4
-#define HALT_INSTR		5
+#define LSL_INSTR		5
 #define TST_INSTR		8
 #define TEQ_INSTR		9
 #define CMP_INSTR		10
@@ -154,7 +149,7 @@ static void init_sdt(struct instruction *tokens)
 			tokens->sdt_offset = add;
 			tokens->instr.sdt.offset.immediate = false;
 		} else {
-			tokens->type = 0;
+			tokens->type = INSTR_TYPE_DATA_PROC;
 			tokens->code = 13;
 			tokens->instr.dpi.rn = 0;
 			tokens->instr.dpi.rd = d;
@@ -230,7 +225,7 @@ static void init_lsl(struct instruction *tokens)
 	char *token;
 	int j = 0;
 
-	tokens->type = 0;
+	tokens->type = INSTR_TYPE_DATA_PROC;
 	tokens->code = 13;
 	tokens->instr.dpi.rd = atoi(strtok(NULL, " ,") + 1);
 	tokens->instr.dpi.op2.immediate = false;
@@ -267,23 +262,23 @@ void tokenize(char *orig_instr, struct instruction *tokens)
 		tokens->code = instr_code(token, tokens->type);
 
 		switch (tokens->type) {
-		case DATA_PROC_INSTR:
+		case INSTR_TYPE_HALT:
+			tokens->type = 0;
+			break;
+		case INSTR_TYPE_DATA_PROC:
 			init_dpi(tokens);
 			break;
-		case MULT_INSTR:
+		case INSTR_TYPE_MULT:
 			init_mult(tokens);
 			break;
-		case SINGLE_DATA_INSTR:
+		case INSTR_TYPE_TRANSFER:
 			init_sdt(tokens);
 			break;
-		case BRANCH_INSTR:
+		case INSTR_TYPE_BRANCH:
 			init_branch(tokens);
 			break;
 		case LSL_INSTR:
 			init_lsl(tokens);
-			break;
-		case HALT_INSTR:
-			tokens->type = 0;
 			break;
 		}
 	}

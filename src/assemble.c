@@ -12,10 +12,6 @@
 
 #define MAX_LINE_LENGTH		512
 #define SYM_TABLE_CAPACITY	16
-#define DATA_PROC_INSTR		0
-#define MULT_INSTR		1
-#define SINGLE_DATA_INSTR	2
-#define BRANCH_INSTR		3
 
 static FILE *input;
 static FILE *output;
@@ -192,15 +188,19 @@ static void second_pass(void)
 		if (instr->mnemonic) {
 
 			switch (instr->type) {
-			case DATA_PROC_INSTR:
+			case INSTR_TYPE_HALT:
+				instr_binary = 0;
+				break;
+
+			case INSTR_TYPE_DATA_PROC:
 				instr_binary = instr_dpi(instr);
 				break;
 
-			case MULT_INSTR:
+			case INSTR_TYPE_MULT:
 				instr_binary = instr_multiply(instr);
 				break;
 
-			case SINGLE_DATA_INSTR:
+			case INSTR_TYPE_TRANSFER:
 				if (instr->sdt_offset) {
 					add_constant(instr->sdt_offset);
 					sdt_pc_instr(instr, instr_num);
@@ -209,7 +209,7 @@ static void second_pass(void)
 				instr_binary = instr_sdt(instr);
 				break;
 
-			case BRANCH_INSTR:
+			case INSTR_TYPE_BRANCH:
 				jump_to = lookout_symbol(instr->jump);
 
 				if (jump_to == -1) {

@@ -40,7 +40,7 @@ static void set_instruction_type(struct pi_state *pstate, enum instr_type type)
 
 static int decode_halt(struct pi_state *pstate)
 {
-	set_instruction_type(pstate, HALT);
+	set_instruction_type(pstate, INSTR_TYPE_HALT);
 	return 0;
 }
 
@@ -84,7 +84,7 @@ static int decode_data_proc(uint32_t ic, struct pi_state *pstate)
 {
 	struct instr_data_proc *data_proc;
 
-	set_instruction_type(pstate, DATA_PROC);
+	set_instruction_type(pstate, INSTR_TYPE_DATA_PROC);
 	ic = pstate->pipeline.instr_code;
 	data_proc = &pstate->pipeline.instruction.instr_bits.data_proc;
 
@@ -99,7 +99,7 @@ static int decode_mult(uint32_t ic, struct pi_state *pstate)
 {
 	struct instr_mult *mult;
 
-	set_instruction_type(pstate, MULT);
+	set_instruction_type(pstate, INSTR_TYPE_MULT);
 	ic = pstate->pipeline.instr_code;
 	mult = &pstate->pipeline.instruction.instr_bits.mult;
 
@@ -117,7 +117,7 @@ static int decode_transfer(uint32_t ic, struct pi_state *pstate)
 {
 	struct instr_transfer *transfer;
 
-	set_instruction_type(pstate, TRANSFER);
+	set_instruction_type(pstate, INSTR_TYPE_TRANSFER);
 	ic = pstate->pipeline.instr_code;
 	transfer = &pstate->pipeline.instruction.instr_bits.transfer;
 
@@ -134,12 +134,13 @@ static int decode_branch(uint32_t ic, struct pi_state *pstate)
 	struct instr_branch *branch;
 	int32_t offset;
 
-	set_instruction_type(pstate, BRANCH);
+	set_instruction_type(pstate, INSTR_TYPE_BRANCH);
 	ic = pstate->pipeline.instr_code;
 	branch = &pstate->pipeline.instruction.instr_bits.branch;
 
 	offset = GETBITS(ic, 0, 24) << 2;
 	offset = SEXT26(offset);
+
 	branch->offset = offset;
 
 	return 0;
