@@ -173,7 +173,7 @@ static void second_pass(void)
 
 	rewind(input);
 
-	struct instruction *instr = calloc(1, sizeof(struct instruction));
+	struct instruction *instr = malloc(sizeof(struct instruction));
 
 	while (fgets(line, MAX_LINE_LENGTH, input)) {
 		int jump_to;
