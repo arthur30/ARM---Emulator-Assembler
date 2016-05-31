@@ -21,11 +21,13 @@
 #define EMU_RUN_GPIO_PIN_ON  "PIN ON\n"
 
 #define EMU_STATE_REG_HEAD "Registers:\n"
-#define EMU_STATE_REG_GEN  "$%-2d : %10d (0x%08x)\n"
+#define EMU_STATE_REG_GEN  "$%-2zd : %10d (0x%08x)\n"
 #define EMU_STATE_REG_PC   "PC  : %10d (0x%08x)\n"
 #define EMU_STATE_REG_CPSR "CPSR: %10d (0x%08x)\n"
 #define EMU_STATE_MEM_HEAD "Non-zero memory:\n"
-#define EMU_STATE_MEM_VAL  "0x%08zx: 0x%02x%02x%02x%02x\n"
+#define EMU_STATE_MEM_BGN  "0x%08zx: 0x"
+#define EMU_STATE_MEM_BYTE "%02x"
+#define EMU_STATE_MEM_END  "\n"
 
 #define ASS_ERR_ARGS          "Run as: assemble <input> <output>\n"
 #define ASS_ERR_JUMP_TARGET   "Error: No such label: %s\n"

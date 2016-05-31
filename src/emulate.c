@@ -13,7 +13,7 @@
 
 static void print_state(struct pi_state *pstate)
 {
-	int i;
+	size_t i;
 	uint32_t val, pc, cpsr;
 	uint8_t *mem;
 	size_t address;
@@ -35,18 +35,15 @@ static void print_state(struct pi_state *pstate)
 
 	fprintf(stdout, EMU_STATE_MEM_HEAD);
 	mem = pstate->memory;
-	address = 0;
 	for (address = 0; address < PI_MEMORY_SIZE; address += 4) {
-		if (mem[address] |
-		    mem[address + 1] |
-		    mem[address + 2] |
-		    mem[address + 3])
-			fprintf(stdout, EMU_STATE_MEM_VAL,
-				address,
-				pstate->memory[address],
-				pstate->memory[address + 1],
-				pstate->memory[address + 2],
-				pstate->memory[address + 3]);
+		if (!((uint32_t *)mem)[address / 4]) {
+			/* skip if word at address is zero */
+			continue;
+		}
+		fprintf(stdout, EMU_STATE_MEM_BGN, address);
+		for (i = 0; i < 4; i++)
+			fprintf(stdout, EMU_STATE_MEM_BYTE, mem[address + i]);
+		fprintf(stdout, EMU_STATE_MEM_END);
 	}
 }
 
