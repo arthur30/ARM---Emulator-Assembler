@@ -2,10 +2,13 @@
 #include "assemble_tokenizer.h"
 #include "assemble_dictionary.h"
 
+#include "pi_msgs.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <errno.h>
 
 #define MAX_LINE_LENGTH		512
 #define SYM_TABLE_CAPACITY	16
@@ -43,7 +46,7 @@ static void initiate_tables(void)
 	sym_table.table = calloc(SYM_TABLE_CAPACITY, sizeof(struct sym));
 
 	if (!sym_table.table) {
-		fprintf(stderr, "Couldn't allocate memory for labels.");
+		fprintf(stderr, PI_ERR_MEM, "labels");
 		exit(EXIT_FAILURE);
 	}
 
@@ -53,7 +56,7 @@ static void initiate_tables(void)
 		calloc(SYM_TABLE_CAPACITY, sizeof(uint32_t));
 
 	if (!constant_table.table) {
-		fprintf(stderr, "Couldn't allocate memory for constants.");
+		fprintf(stderr, PI_ERR_MEM, "constants");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -65,7 +68,7 @@ static void extend_tables(void)
 		sym_table.table = realloc(sym_table.table, sym_table.capacity);
 
 		if (!sym_table.table)
-			fprintf(stderr, "Coudln't extend memory for labels");
+			fprintf(stderr, PI_ERR_MEM, "extending labels");
 	}
 
 	if (constant_table.size == constant_table.capacity) {
@@ -74,7 +77,7 @@ static void extend_tables(void)
 			realloc(constant_table.table, constant_table.capacity);
 
 		if (!constant_table.table)
-			fprintf(stderr, "Coudln't extend memory for constants");
+			fprintf(stderr, PI_ERR_MEM, "extending constants");
 	}
 }
 
@@ -96,12 +99,12 @@ static void load_io_files(char *inp, char *out)
 	output = fopen(out, "wb");
 
 	if (input == NULL) {
-		printf("Error opening the input file");
+		fprintf(stderr, PI_ERR_INPUT, inp, strerror(errno), errno);
 		exit(EXIT_FAILURE);
 	}
 
 	if (output == NULL) {
-		printf("Error opening the output file");
+		fprintf(stderr, PI_ERR_OUTPUT, out, strerror(errno), errno);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -133,7 +136,7 @@ static void first_pass(void)
 	char *line = malloc(MAX_LINE_LENGTH);
 
 	if (!line) {
-		fprintf(stderr, "Couldn't allocate memory for the line.\n");
+		fprintf(stderr, PI_ERR_MEM, "line");
 		exit(EXIT_FAILURE);
 	}
 
@@ -169,7 +172,7 @@ static void second_pass(void)
 	int i = 0;
 
 	if (!line) {
-		fprintf(stderr, "Couldn't allocate memory for the line.\n");
+		fprintf(stderr, PI_ERR_MEM, "line");
 		exit(EXIT_FAILURE);
 	}
 
@@ -212,7 +215,8 @@ static void second_pass(void)
 				jump_to = lookout_symbol(instr->jump);
 
 				if (jump_to == -1) {
-					fprintf(stderr, "Invlid label jump.");
+					fprintf(stderr, ASS_ERR_JUMP_TARGET,
+							instr->jump);
 					exit(EXIT_FAILURE);
 				}
 
@@ -224,7 +228,7 @@ static void second_pass(void)
 				break;
 
 			default:
-				fprintf(stderr, "Error: Invalid Instruction");
+				fprintf(stderr, ASS_ERR_INVALID_INSTR);
 				exit(EXIT_FAILURE);
 			}
 
@@ -243,8 +247,10 @@ static void second_pass(void)
 
 int main(int argc, char **argv)
 {
-	if (argc != 3)
+	if (argc != 3) {
+		fprintf(stderr, ASS_ERR_ARGS);
 		return EXIT_FAILURE;
+	}
 
 	load_io_files(argv[1], argv[2]);
 

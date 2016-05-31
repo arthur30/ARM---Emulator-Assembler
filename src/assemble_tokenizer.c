@@ -1,6 +1,8 @@
 #include "assemble_tokenizer.h"
 #include "assemble_dictionary.h"
 
+#include "pi_msgs.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -72,7 +74,7 @@ static void init_dpi(struct instruction *tokens)
 	tokens->instr.dpi.op2.immediate = token[0] == '#';
 
 	if (generate_op2(j, &imm, &shift)) {
-		fprintf(stderr, "Operand2 value doesn't fit.");
+		fprintf(stderr, ASS_ERR_OP2_FIT, j);
 		exit(EXIT_FAILURE);
 
 	}
@@ -143,7 +145,7 @@ static void init_sdt(struct instruction *tokens)
 	if (token[0] == '=') {
 
 		if (tokens->code) {
-			fprintf(stderr, "Cannot store in immediate values.");
+			fprintf(stderr, ASS_ERR_STR_IMM);
 			exit(EXIT_FAILURE);
 		}
 

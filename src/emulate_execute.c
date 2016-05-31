@@ -1,6 +1,7 @@
 #include "emulate_execute.h"
 #include "emulate_pi_state.h"
-#include "emulate_errors.h"
+
+#include "pi_msgs.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,7 +39,7 @@ op_undef(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 	(void)op2;
 	(void)cpsr;
 
-	printf("Hit undefined operation\n");
+	fprintf(stderr, EMU_ERR_UNDEF_DPI_OP);
 	errno = EINVAL;
 	return -1;
 }
@@ -370,19 +371,19 @@ static uint8_t *get_gpio(struct pi_state *pstate, size_t address)
 			memcpy(&pstate->gpio_control[i], &addr, sizeof(addr));
 		}
 
-		fprintf(stdout, GPIO_PIN_ACCESS, low, high);
+		fprintf(stdout, EMU_RUN_GPIO_PIN_ACCESS, low, high);
 		return &pstate->gpio_control[address - GPIO_CONTROL_ADDRESS];
 	}
 
 	if (address >= GPIO_CLEARING_ADDRESS &&
 	    address - GPIO_CLEARING_ADDRESS < GPIO_CONTROL_SIZE) {
-		fprintf(stdout, GPIO_PIN_OFF);
+		fprintf(stdout, EMU_RUN_GPIO_PIN_OFF);
 		return gpio_dummy;
 	}
 
 	if (address >= GPIO_TURNON_ADDRESS &&
 	    address - GPIO_TURNON_ADDRESS < GPIO_TURNON_SIZE) {
-		fprintf(stdout, GPIO_PIN_ON);
+		fprintf(stdout, EMU_RUN_GPIO_PIN_ON);
 		return gpio_dummy;
 	}
 
@@ -398,7 +399,7 @@ static uint8_t *get_memory(struct pi_state *pstate, size_t address)
 		return gpio;
 
 	if (address + 4 >= PI_MEMORY_SIZE) {
-		fprintf(stdout, OUT_OF_BOUNDS_MEM, address);
+		fprintf(stdout, EMU_RUN_OUT_OF_BOUNDS_MEM, address);
 		errno = EINVAL;
 		return NULL;
 	}
@@ -472,7 +473,7 @@ static int (*instr_type_table[5]) (struct pi_state *pstate) = {
 static int cond_uninmlemented(struct cpsrreg *cpsr)
 {
 	(void)cpsr;
-	printf("Got unimplemented condition\n");
+	fprintf(stderr, EMU_ERR_UNDEF_COND);
 	return -1;
 }
 
