@@ -1,19 +1,40 @@
-#ifndef EMULATE_PI_STATE_H
-#define EMULATE_PI_STATE_H
+#ifndef PI_STATE_H
+#define PI_STATE_H
 
 #include <stdint.h>
 #include <stdbool.h>
 
 #define PI_MEMORY_SIZE (1 << 16)
 #define PI_REGISTER_COUNT 16
+
 #define R_PC 15
 
-#define GPIO_CONTROL_ADDRESS 0x20200000
-#define GPIO_CONTROL_SIZE 12
+#define INSTR_BIT_IMM     (1 << 25)
+#define INSTR_BIT_SETCOND (1 << 20)
+#define INSTR_BIT_ACC     (1 << 21)
+#define INSTR_BIT_INDEX   (1 << 24)
+#define INSTR_BIT_UP      (1 << 23)
+#define INSTR_BIT_LOAD    (1 << 20)
+#define INSTR_BIT_CONST   (1 <<  4)
+
+#define INSTR_DATA_PROC_MASK 0x0C000000
+#define INSTR_DATA_PROC_BITP 0x00000000
+
+#define INSTR_MULT_MASK      0x0FC000F0
+#define INSTR_MULT_BITP      0x00000090
+
+#define INSTR_TRANSFER_MASK  0x0C600000
+#define INSTR_TRANSFER_BITP  0x04000000
+
+#define INSTR_BRANCH_MASK    0x0F000000
+#define INSTR_BRANCH_BITP    0x0A000000
+
+#define GPIO_CONTROL_ADDRESS  0x20200000
+#define GPIO_CONTROL_SIZE     12
 #define GPIO_CLEARING_ADDRESS 0x20200028
-#define GPIO_CLEARING_SIZE 4
-#define GPIO_TURNON_ADDRESS 0x2020001C
-#define GPIO_TURNON_SIZE 4
+#define GPIO_CLEARING_SIZE    4
+#define GPIO_TURNON_ADDRESS   0x2020001C
+#define GPIO_TURNON_SIZE      4
 
 struct shift_reg {
 	bool constant;

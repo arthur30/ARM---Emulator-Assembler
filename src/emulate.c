@@ -1,8 +1,8 @@
-#include "emulate_pi_state.h"
 #include "emulate_fetch.h"
 #include "emulate_decode.h"
 #include "emulate_execute.h"
 
+#include "pi_state.h"
 #include "pi_msgs.h"
 
 #include <stdlib.h>

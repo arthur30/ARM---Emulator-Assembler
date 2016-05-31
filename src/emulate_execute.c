@@ -1,6 +1,6 @@
 #include "emulate_execute.h"
-#include "emulate_pi_state.h"
 
+#include "pi_state.h"
 #include "pi_msgs.h"
 
 #include <stdlib.h>

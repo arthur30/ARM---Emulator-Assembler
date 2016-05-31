@@ -1,7 +1,7 @@
 #ifndef ASSEMBLE_TOKENIZER_H
 #define ASSEMBLE_TOKENIZER_H
 
-#include "emulate_pi_state.h"
+#include "pi_state.h"
 
 struct instruction {
 	char *label;
