@@ -39,7 +39,7 @@ struct constants {
 
 static struct constants constant_table;
 
-static void initiate_tables(void)
+static int initiate_tables(void)
 {
 	sym_table.size = 0;
 	sym_table.instr_num = 0;
@@ -48,7 +48,7 @@ static void initiate_tables(void)
 
 	if (!sym_table.table) {
 		fprintf(stderr, PI_ERR_MEM, "labels");
-		exit(EXIT_FAILURE);
+		return -1;
 	}
 
 	constant_table.size = 0;
@@ -58,18 +58,22 @@ static void initiate_tables(void)
 
 	if (!constant_table.table) {
 		fprintf(stderr, PI_ERR_MEM, "constants");
-		exit(EXIT_FAILURE);
+		return -1;
 	}
+
+	return 0;
 }
 
-static void extend_tables(void)
+static int extend_tables(void)
 {
 	if (sym_table.size == sym_table.capacity) {
 		sym_table.capacity = 2 * sym_table.capacity;
 		sym_table.table = realloc(sym_table.table, sym_table.capacity);
 
-		if (!sym_table.table)
+		if (!sym_table.table) {
 			fprintf(stderr, PI_ERR_MEM, "extending labels");
+			return -1;
+		}
 	}
 
 	if (constant_table.size == constant_table.capacity) {
@@ -77,9 +81,13 @@ static void extend_tables(void)
 		constant_table.table =
 			realloc(constant_table.table, constant_table.capacity);
 
-		if (!constant_table.table)
+		if (!constant_table.table) {
 			fprintf(stderr, PI_ERR_MEM, "extending constants");
+			return -1;
+		}
 	}
+
+	return 0;
 }
 
 static void destroy_tables(void)
@@ -94,20 +102,22 @@ static void add_constant(uint32_t constant)
 	constant_table.size++;
 }
 
-static void load_io_files(char *inp, char *out)
+static int load_io_files(char *inp, char *out)
 {
 	input = fopen(inp, "r");
 	output = fopen(out, "wb");
 
-	if (input == NULL) {
+	if (!input) {
 		fprintf(stderr, PI_ERR_INPUT, inp, strerror(errno), errno);
-		exit(EXIT_FAILURE);
+		return -1;
 	}
 
-	if (output == NULL) {
+	if (!output) {
 		fprintf(stderr, PI_ERR_OUTPUT, out, strerror(errno), errno);
 		exit(EXIT_FAILURE);
 	}
+
+	return 0;
 }
 
 static int lookout_symbol(char *key)
@@ -258,26 +268,43 @@ int main(int argc, char **argv)
 
 	if (argc != 3) {
 		fprintf(stderr, ASS_ERR_ARGS);
-		return EXIT_FAILURE;
+		goto fail;
 	}
 
-	load_io_files(argv[1], argv[2]);
+	if (load_io_files(argv[1], argv[2]))
+		goto fail;
 
 	tokens = malloc(sizeof(struct token_list));
-	token_list_alloc(tokens);
-	tokenize(input, tokens);
+	if (!tokens) {
+		fprintf(stderr, PI_ERR_MEM, "tokens");
+		goto fail;
+	}
+	if (token_list_alloc(tokens))
+		goto fail;
+	if (tokenize(input, tokens)) {
+		fprintf(stderr, ASS_ERR_TOKENIZE);
+		goto fail;
+	}
+	fclose(input);
 
-	initiate_tables();
+	if (initiate_tables())
+		goto fail;
 
-	if (first_pass(tokens))
-		fprintf(stderr, "First pass failed\n");
-	if (second_pass(tokens))
-		fprintf(stderr, "Second pass failed\n");
+	if (first_pass(tokens)) {
+		fprintf(stderr, ASS_ERR_PASS1);
+		goto fail;
+	}
+	if (second_pass(tokens)) {
+		fprintf(stderr, ASS_ERR_PASS2);
+		goto fail;
+	}
 
 	destroy_tables();
-	fclose(input);
 	fclose(output);
 
 	return EXIT_SUCCESS;
+
+fail:
+	return EXIT_FAILURE;
 }
 

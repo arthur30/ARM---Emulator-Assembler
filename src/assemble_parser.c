@@ -404,6 +404,8 @@ static int init_lsl(struct instruction *tokens)
  */
 int parse(struct token_list *toklist, struct instruction *tokens)
 {
+	int ret;
+
 	if (toklist) {
 		toks = toklist;
 		tokens_position = 0;
@@ -422,7 +424,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			tok->str[tok->strlen - 1] == ':') {
 		tokens->label = strndup(tok->str, tok->strlen - 1);
 		if (!nexttok())
-			return -1;
+			goto fail;
 	}
 
 	tokens->mnemonic = false;
@@ -437,19 +439,35 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 
 		switch (tokens->type) {
 		case INSTR_TYPE_HALT:
-			return init_halt(tokens);
+			ret = init_halt(tokens);
+			break;
 		case INSTR_TYPE_DATA_PROC:
-			return init_dpi(tokens);
+			ret = init_dpi(tokens);
+			break;
 		case INSTR_TYPE_MULT:
-			return init_mult(tokens);
+			ret = init_mult(tokens);
+			break;
 		case INSTR_TYPE_TRANSFER:
-			return init_sdt(tokens);
+			ret = init_sdt(tokens);
+			break;
 		case INSTR_TYPE_BRANCH:
-			return init_branch(tokens);
+			ret = init_branch(tokens);
+			break;
 		case LSL_INSTR:
-			return init_lsl(tokens);
+			ret = init_lsl(tokens);
+			break;
 		}
+
+		if (ret)
+			goto fail;
 	}
 
 	return 0;
+
+fail:
+	if (tok)
+		fprintf(stderr, ASS_ERR_PARSE_NEAR, tok->lineno, tok->colno);
+	else
+		fprintf(stderr, ASS_ERR_PARSE_EOF);
+	return -1;
 }
