@@ -12,7 +12,6 @@
 #include <ctype.h>
 #include <errno.h>
 
-#define MAX_LINE_LENGTH		512
 #define SYM_TABLE_CAPACITY	16
 
 static FILE *input;
