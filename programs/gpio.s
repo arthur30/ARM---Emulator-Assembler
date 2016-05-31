@@ -6,13 +6,13 @@
 ; r3 => To set and clear bit 16 for pin 16.
 ; r4 => Loop variable.
 
-ldr r0, =0x20200004		; Memory address of GPIO pins 10-19
-ldr r1, =0x20200028		; Memory address to clear the pins
-ldr r2, =0x2020001C		; Memory address to set the pins
+	ldr r0, =0x20200004	; Memory address of GPIO pins 10-19
+	ldr r1, =0x20200028	; Memory address to clear the pins
+	ldr r2, =0x2020001C	; Memory address to set the pins
 
-mov r3, #1			; r3 = 1
-lsl r3, #18 			; lsl by 18(sets bit for pin 16)
-str r3, [r0]			; Accessed Pin 16
+	mov r3, #1		; r3 = 1
+	lsl r3, #18 		; lsl by 18(sets bit for pin 16)
+	str r3, [r0]		; Accessed Pin 16
 
 turn_on:
 	mov r3, #1		; r3 = 1
