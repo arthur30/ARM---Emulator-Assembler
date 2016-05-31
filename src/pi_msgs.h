@@ -34,7 +34,7 @@
 #define ASS_ERR_PARSE_NEAR    "Error: Parsing failed near line %zd col %zd\n"
 #define ASS_ERR_PARSE_EOF     "Error: Parsing failed, unexpected end of file\n"
 #define ASS_ERR_PASS1         "Error: First pass failed\n"
-#define ASS_ERR_PASS2         "Error: First second failed\n"
+#define ASS_ERR_PASS2         "Error: Second pass failed\n"
 #define ASS_ERR_JUMP_TARGET   "Error: No such label: %s\n"
 #define ASS_ERR_INVALID_INSTR "Error: Invalid instruction\n"
 #define ASS_ERR_OP2_FIT       "Error: Cannot fit '%d' into operand2 value\n"
