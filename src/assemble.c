@@ -27,13 +27,17 @@ struct labels {
 	int capacity;
 	int instr_num;
 	struct sym *table;
-} sym_table;
+};
+
+static struct labels sym_table;
 
 struct constants {
 	int size;
 	int capacity;
 	uint32_t *table;
-} constant_table;
+};
+
+static struct constants constant_table;
 
 static void initiate_tables(void)
 {
