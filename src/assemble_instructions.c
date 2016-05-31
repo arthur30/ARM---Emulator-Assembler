@@ -67,7 +67,6 @@ uint32_t instr_dpi(struct instruction *instr)
 		}
 	}
 
-
 	if (instr->instr.dpi.setcond)
 		s = 1 << 20;
 

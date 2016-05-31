@@ -147,7 +147,6 @@ static void first_pass(void)
 		extend_tables();
 		tokenize(line, instr);
 
-
 		if (instr->label) {
 			sym_table.table[sym_table.size].label =
 						strcat(instr->label, "\n");
@@ -189,7 +188,6 @@ static void second_pass(void)
 		memset(instr, 0, sizeof(struct instruction));
 		extend_tables();
 		tokenize(line, instr);
-
 
 		if (instr->mnemonic) {
 
@@ -234,7 +232,7 @@ static void second_pass(void)
 
 			fwrite(&instr_binary, sizeof(instr_binary), 1, output);
 			instr_num++;
-		 }
+		}
 
 	}
 

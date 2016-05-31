@@ -141,7 +141,6 @@ static void init_sdt(struct instruction *tokens)
 	if (token[0] == ' ')
 		token++;
 
-
 	if (token[0] == '=') {
 
 		if (tokens->code) {
@@ -254,7 +253,6 @@ void tokenize(char *orig_instr, struct instruction *tokens)
 
 	if (!strcmp(token, orig_instr))
 		tokens->label = NULL;
-
 
 	if (tokens->label)
 		token = strtok(NULL, " ");
