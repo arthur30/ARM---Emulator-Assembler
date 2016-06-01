@@ -111,10 +111,10 @@ static int init_dpi(struct instruction *tokens)
 	uint8_t imm;
 	uint8_t shift;
 
-	tokens->instr.dpi.opcode = tokens->code;
+	tokens->instr.dpi.opcode = tokens->opcode;
 	tokens->instr.dpi.setcond = false;
 
-	switch (tokens->code) {
+	switch (tokens->opcode) {
 	case TST_INSTR:
 	case TEQ_INSTR:
 	case CMP_INSTR:
@@ -193,7 +193,7 @@ static int init_dpi(struct instruction *tokens)
 
 static int init_mult(struct instruction *tokens)
 {
-	tokens->instr.mult.accumulate = tokens->code;
+	tokens->instr.mult.accumulate = tokens->opcode;
 	tokens->instr.mult.setcond = false;
 
 	if (!nexttok() || !tok_is_reg())
@@ -208,7 +208,7 @@ static int init_mult(struct instruction *tokens)
 		return -1;
 	tokens->instr.mult.rs = atoi(tok->str + 1);
 
-	if (tokens->code) {
+	if (tokens->opcode) {
 		if (!nexttok() || !tok_is_reg())
 			return -1;
 		tokens->instr.mult.rn = atoi(tok->str + 1);
@@ -226,7 +226,7 @@ static int init_sdt(struct instruction *tokens)
 	uint8_t imm;
 	uint8_t shift;
 
-	tokens->instr.sdt.load = !tokens->code;
+	tokens->instr.sdt.load = !tokens->opcode;
 	tokens->instr.sdt.up = true;
 
 	if (!nexttok() || !tok_is_reg())
@@ -253,7 +253,7 @@ static int init_sdt(struct instruction *tokens)
 			tokens->instr.sdt.offset.immediate = false;
 		} else {
 			tokens->type = INSTR_TYPE_DATA_PROC;
-			tokens->code = 13;
+			tokens->opcode = 13;
 			tokens->instr.dpi.rn = 0;
 			tokens->instr.dpi.rd = rd;
 			tokens->instr.dpi.setcond = false;
@@ -367,7 +367,7 @@ static int init_lsl(struct instruction *tokens)
 		return -1;
 
 	tokens->type = INSTR_TYPE_DATA_PROC;
-	tokens->code = 13;
+	tokens->opcode = 13;
 	tokens->instr.dpi.rd = tok_get_reg();
 	tokens->instr.dpi.op2.immediate = false;
 	tokens->instr.dpi.op2.offset.reg.rm = tokens->instr.dpi.rd;
@@ -422,7 +422,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 		tokens->mnemonic = true;
 		memcpy(instr, tok->str, 3);
 		tokens->type = classify_instr(instr);
-		tokens->code = instr_code(tok->str, tokens->type);
+		tokens->opcode = instr_code(tok->str, tokens->type);
 		tokens->cond = classify_cond(tok->str + 3);
 
 		switch (tokens->type) {

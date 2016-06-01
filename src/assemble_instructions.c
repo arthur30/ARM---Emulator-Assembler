@@ -27,7 +27,7 @@ uint32_t instr_dpi(struct instruction *instr)
 	uint8_t amount;
 
 	cond = (uint32_t)(instr->cond) << 28;
-	opcode = (uint32_t)(instr->code) << 21;
+	opcode = (uint32_t)(instr->opcode) << 21;
 	rd = (uint32_t)instr->instr.dpi.rd << 12;
 	rn = (uint32_t)instr->instr.dpi.rn << 16;
 	rm = 0;
@@ -40,7 +40,7 @@ uint32_t instr_dpi(struct instruction *instr)
 	shift_type = 0;
 	amount = 0;
 
-	if (instr->code == 5)
+	if (instr->opcode == 5)
 		return 0;
 
 	if (instr->instr.dpi.op2.immediate) {
