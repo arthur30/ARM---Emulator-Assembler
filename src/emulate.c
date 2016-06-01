@@ -36,7 +36,8 @@ static void print_state(struct pi_state *pstate)
 	fprintf(stdout, EMU_STATE_MEM_HEAD);
 	mem = pstate->memory;
 	for (address = 0; address < PI_MEMORY_SIZE; address += 4) {
-		if (!((uint32_t *)mem)[address / 4]) {
+		memcpy(&val, mem + address, PI_WORD_SIZE);
+		if (!val) {
 			/* skip if word at address is zero */
 			continue;
 		}

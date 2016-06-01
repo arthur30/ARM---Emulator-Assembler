@@ -6,6 +6,7 @@
 
 #define PI_MEMORY_SIZE (1 << 16)
 #define PI_REGISTER_COUNT 16
+#define PI_WORD_SIZE 4
 
 #define R_PC 15
 
