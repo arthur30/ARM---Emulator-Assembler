@@ -1,6 +1,7 @@
 #include "emulate_fetch.h"
 #include "emulate_decode.h"
 #include "emulate_execute.h"
+#include "emulate_memory.h"
 
 #include "pi_state.h"
 #include "pi_msgs.h"
@@ -31,7 +32,7 @@ static void print_state(struct pi_state *pstate)
 	fprintf(stdout, EMU_STATE_REG_CPSR, cpsr, cpsr);
 
 	fprintf(stdout, EMU_STATE_MEM_HEAD);
-	mem = pstate->memory;
+	mem = get_memory(pstate, 0);
 	for (address = 0; address < PI_MEMORY_SIZE; address += 4) {
 		memcpy(&val, mem + address, PI_WORD_SIZE);
 		if (!val) {
@@ -60,6 +61,10 @@ int main(int argc, char **argv)
 		fprintf(stderr, PI_ERR_MEM, "pi state");
 		goto fail;
 	}
+	if (init_pi_memory(pstate)) {
+		fprintf(stderr, PI_ERR_MEM, "pi state memory");
+		goto fail;
+	}
 
 	input = fopen(argv[1], "rb");
 	if (!input) {
@@ -67,7 +72,7 @@ int main(int argc, char **argv)
 		goto fail;
 	}
 
-	(void)fread(&pstate->memory, 1, PI_MEMORY_SIZE, input);
+	(void)fread(get_memory(pstate, 0), 1, PI_MEMORY_SIZE, input);
 	(void)fgetc(input); /* so that EOF is set if binary is exactly 64KiB */
 	if (ferror(input)) {
 		fprintf(stderr, PI_ERR_INPUT_IO, strerror(errno), errno);

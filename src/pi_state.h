@@ -1,6 +1,7 @@
 #ifndef PI_STATE_H
 #define PI_STATE_H
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -121,8 +122,20 @@ struct instr {
 	} instr_bits;
 };
 
+struct memrange {
+	size_t base;
+	size_t size;
+	uint8_t *store;
+	const char *msg;
+};
+
+struct pi_memory {
+	size_t count;
+	struct memrange *ranges;
+};
+
 struct pi_state {
-	uint8_t memory[PI_MEMORY_SIZE];
+	struct pi_memory memory;
 	uint8_t gpio_control[GPIO_CONTROL_SIZE];
 	uint32_t registers[PI_REGISTER_COUNT];
 	struct pipeline {

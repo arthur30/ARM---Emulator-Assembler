@@ -1,4 +1,5 @@
 #include "emulate_fetch.h"
+#include "emulate_memory.h"
 
 #include "pi_state.h"
 
@@ -16,7 +17,7 @@ int fetch(struct pi_state *pstate)
 	}
 
 	nextinstr = 0;
-	mem = &pstate->memory[pstate->registers[R_PC]];
+	mem = get_memory(pstate, pstate->registers[R_PC]);
 	memcpy(&nextinstr, mem, sizeof(nextinstr));
 	pstate->pipeline.fetched = true;
 	pstate->pipeline.instr_code = nextinstr;
