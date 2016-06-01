@@ -1,4 +1,5 @@
 #include "emulate_execute.h"
+#include "emulate_memory.h"
 
 #include "pi_state.h"
 #include "pi_msgs.h"
@@ -347,60 +348,6 @@ static int execute_mult(struct pi_state *pstate)
 	set_cpsr_zn(*rd, &pstate->registers[R_CPSR]);
 
 	return 0;
-}
-
-static uint8_t gpio_dummy[4];
-static uint8_t *get_gpio(struct pi_state *pstate, size_t address)
-{
-	int range, low, high;
-	size_t i;
-	uint32_t addr;
-
-	if (address >= GPIO_CONTROL_ADDRESS &&
-	    address - GPIO_CONTROL_ADDRESS < GPIO_CONTROL_SIZE) {
-		range = (address - GPIO_CONTROL_ADDRESS) / 4;
-		low = range * 10;
-		high = range * 10 + 9;
-
-		for (i = 0; i < GPIO_CONTROL_SIZE; i += 4) {
-			addr = GPIO_CONTROL_ADDRESS + i;
-			memcpy(&pstate->gpio_control[i], &addr, sizeof(addr));
-		}
-
-		fprintf(stdout, EMU_RUN_GPIO_PIN_ACCESS, low, high);
-		return &pstate->gpio_control[address - GPIO_CONTROL_ADDRESS];
-	}
-
-	if (address >= GPIO_CLEARING_ADDRESS &&
-	    address - GPIO_CLEARING_ADDRESS < GPIO_CONTROL_SIZE) {
-		fprintf(stdout, EMU_RUN_GPIO_PIN_OFF);
-		return gpio_dummy;
-	}
-
-	if (address >= GPIO_TURNON_ADDRESS &&
-	    address - GPIO_TURNON_ADDRESS < GPIO_TURNON_SIZE) {
-		fprintf(stdout, EMU_RUN_GPIO_PIN_ON);
-		return gpio_dummy;
-	}
-
-	return NULL;
-
-}
-
-static uint8_t *get_memory(struct pi_state *pstate, size_t address)
-{
-	uint8_t *gpio = get_gpio(pstate, address);
-
-	if (gpio)
-		return gpio;
-
-	if (address + 4 >= PI_MEMORY_SIZE) {
-		fprintf(stdout, EMU_RUN_OUT_OF_BOUNDS_MEM, address);
-		errno = EFAULT;
-		return NULL;
-	}
-
-	return &pstate->memory[address];
 }
 
 static int execute_transfer(struct pi_state *pstate)

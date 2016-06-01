@@ -18,8 +18,12 @@
 
 #define EMU_RUN_OUT_OF_BOUNDS_MEM \
 	"Error: Out of bounds memory access at address 0x%08zx\n"
-#define EMU_RUN_GPIO_PIN_ACCESS \
-	"One GPIO pin from %d to %d has been accessed\n"
+#define EMU_RUN_GPIO_PIN_ACCESS1 \
+	"One GPIO pin from 0 to 9 has been accessed\n"
+#define EMU_RUN_GPIO_PIN_ACCESS2 \
+	"One GPIO pin from 10 to 19 has been accessed\n"
+#define EMU_RUN_GPIO_PIN_ACCESS3 \
+	"One GPIO pin from 20 to 29 has been accessed\n"
 #define EMU_RUN_GPIO_PIN_OFF "PIN OFF\n"
 #define EMU_RUN_GPIO_PIN_ON  "PIN ON\n"
 
