@@ -407,6 +407,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 	int ret;
 
 	if (toklist) {
+		ret = 0;
 		toks = toklist;
 		tokens_position = 0;
 	}
