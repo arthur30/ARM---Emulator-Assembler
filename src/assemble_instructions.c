@@ -9,7 +9,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define COND_ALWAYS (14 << 28)
 
 uint32_t instr_dpi(struct instruction *instr)
 {
@@ -27,8 +26,8 @@ uint32_t instr_dpi(struct instruction *instr)
 	uint8_t shift_type;
 	uint8_t amount;
 
-	cond = COND_ALWAYS;
-	opcode = (uint32_t)(instr->code) << 21;
+	cond = (uint32_t)(instr->cond) << 28;
+	opcode = (uint32_t)(instr->opcode) << 21;
 	rd = (uint32_t)instr->instr.dpi.rd << 12;
 	rn = (uint32_t)instr->instr.dpi.rn << 16;
 	rm = 0;
@@ -41,7 +40,7 @@ uint32_t instr_dpi(struct instruction *instr)
 	shift_type = 0;
 	amount = 0;
 
-	if (instr->code == 5)
+	if (instr->opcode == 5)
 		return 0;
 
 	if (instr->instr.dpi.op2.immediate) {
@@ -84,7 +83,7 @@ uint32_t instr_multiply(struct instruction *instr)
 	uint32_t a;
 	uint32_t s;
 
-	cond = COND_ALWAYS;
+	cond = (uint32_t)(instr->cond) << 28;
 	rd = instr->instr.mult.rd << 16;
 	rs = instr->instr.mult.rs << 8;
 	rn = 0;
@@ -115,7 +114,7 @@ uint32_t instr_sdt(struct instruction *instr)
 	uint8_t shift_type;
 	uint8_t amount;
 
-	cond = COND_ALWAYS;
+	cond = (uint32_t)(instr->cond) << 28;
 	rn = instr->instr.sdt.rn << 16;
 	rd = instr->instr.sdt.rd << 12;
 	rm = 0;
@@ -167,7 +166,7 @@ uint32_t instr_branch(struct instruction *instr)
 	uint32_t cond;
 	uint32_t offset;
 
-	cond = instr->code << 28;
+	cond = instr->cond << 28;
 	offset = (instr->instr.branch.offset >> 2) & ((1 << 24) - 1);
 
 	return cond + (10 << 24) + offset;
