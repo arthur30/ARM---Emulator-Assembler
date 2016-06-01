@@ -391,6 +391,8 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 	int ret;
 	char *instr;
 
+	instr = NULL;
+
 	if (toklist) {
 		toks = toklist;
 		tokens_position = 0;
@@ -448,9 +450,14 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			goto fail;
 	}
 
+	free(instr);
+
 	return 0;
 
 fail:
+
+	free(instr);
+
 	if (tok)
 		fprintf(stderr, ASS_ERR_PARSE_NEAR, tok->lineno, tok->colno);
 	else
