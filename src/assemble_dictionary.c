@@ -27,17 +27,6 @@ struct map dict_dpi[] = {
 	{"tst", 8},
 };
 
-struct map dict_branch[] = {
-	{"b", 14},
-	{"bal", 14},
-	{"beq", 0},
-	{"bge", 10},
-	{"bgt", 12},
-	{"ble", 13},
-	{"blt", 11},
-	{"bne", 1},
-};
-
 struct map dict_mult[] = {
 	{"mla", 1},
 	{"mul", 0},
@@ -125,7 +114,7 @@ uint32_t instr_code(char *key, int type)
 	case INSTR_TYPE_TRANSFER:
 		return bsearch_map(key, dict_sdt, MAP_SIZE(dict_sdt));
 	case INSTR_TYPE_BRANCH:
-		return bsearch_map(key, dict_branch, MAP_SIZE(dict_branch));
+		return -1;
 	case 6:
 		return bsearch_map(key, dict_rot, MAP_SIZE(dict_rot));
 	default:
