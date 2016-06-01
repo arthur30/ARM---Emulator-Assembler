@@ -10,17 +10,20 @@
 
 #define SHIFT_ROR 3
 
-static void set_cpsr_c(struct cpsrreg *cpsr, bool val)
-{
-	if (cpsr)
-		cpsr->c = val;
-}
-
-static void set_cpsr_zn(uint32_t res, struct cpsrreg *cpsr)
+static void set_cpsr_c(uint32_t *cpsr, bool val)
 {
 	if (cpsr) {
-		cpsr->z = !res;
-		cpsr->n = !!(res >> 31);
+		*cpsr &= ~CPSR_BIT_C;
+		*cpsr |= val ? CPSR_BIT_C : 0;
+	}
+}
+
+static void set_cpsr_zn(uint32_t res, uint32_t *cpsr)
+{
+	if (cpsr) {
+		*cpsr &= ~CPSR_BIT_Z & ~CPSR_BIT_N;
+		*cpsr |= !res ? CPSR_BIT_Z : 0;
+		*cpsr |= !!(res >> 31) ? CPSR_BIT_N : 0;
 	}
 }
 
@@ -32,7 +35,7 @@ static int execute_halt(struct pi_state *pstate)
 }
 
 static int
-op_undef(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_undef(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	(void)rd;
 	(void)rn;
@@ -45,7 +48,7 @@ op_undef(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_and(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_and(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	uint32_t res = rn & op2;
 
@@ -55,7 +58,7 @@ op_and(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_eor(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_eor(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	uint32_t res = rn ^ op2;
 
@@ -65,7 +68,7 @@ op_eor(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_sub(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_sub(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	uint64_t res;
 	bool carry;
@@ -79,7 +82,7 @@ op_sub(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_rsb(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_rsb(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	uint64_t res;
 	bool carry = true;
@@ -93,7 +96,7 @@ op_rsb(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_add(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_add(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	uint64_t res;
 	bool carry;
@@ -107,7 +110,7 @@ op_add(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_tst(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_tst(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	(void)rd;
 	uint32_t res = rn & op2;
@@ -117,7 +120,7 @@ op_tst(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_teq(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_teq(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	(void)rd;
 	uint32_t res = rn ^ op2;
@@ -127,7 +130,7 @@ op_teq(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_cmp(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_cmp(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	(void)rd;
 	uint64_t res;
@@ -141,7 +144,7 @@ op_cmp(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_orr(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_orr(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	uint32_t res = rn | op2;
 
@@ -151,7 +154,7 @@ op_orr(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int
-op_mov(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
+op_mov(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 {
 	(void)rn;
 	uint32_t res = op2;
@@ -162,7 +165,7 @@ op_mov(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 }
 
 static int (*data_proc_table[16])
-(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr) = {
+(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr) = {
 	/* 0000 */ op_and,
 	/* 0001 */ op_eor,
 	/* 0010 */ op_sub,
@@ -310,7 +313,7 @@ static int execute_data_proc(struct pi_state *pstate)
 {
 	struct instr_data_proc *data_proc;
 	struct instr_op2 *op2;
-	struct cpsrreg *cpsr;
+	uint32_t *cpsr;
 	uint32_t *rd;
 	uint32_t rn;
 	uint32_t op2val;
@@ -319,13 +322,13 @@ static int execute_data_proc(struct pi_state *pstate)
 
 	data_proc = &pstate->pipeline.instruction.instr_bits.data_proc;
 	op2 = &data_proc->op2;
-	carry = pstate->cpsr.c;
+	carry = !!(pstate->registers[R_CPSR] & CPSR_BIT_C);
 
 	rd = &pstate->registers[data_proc->rd];
 	rn = pstate->registers[data_proc->rn];
 	get_op2(&op2val, op2, pstate, &carry);
 
-	cpsr = data_proc->setcond ? &pstate->cpsr : NULL;
+	cpsr = data_proc->setcond ? &pstate->registers[R_CPSR] : NULL;
 	set_cpsr_c(cpsr, carry);
 
 	opcode = data_proc->opcode;
@@ -348,7 +351,7 @@ static int execute_mult(struct pi_state *pstate)
 	rm = pstate->registers[mult->rm];
 
 	*rd = rm * rs + (mult->accumulate ? rn : 0);
-	set_cpsr_zn(*rd, &pstate->cpsr);
+	set_cpsr_zn(*rd, &pstate->registers[R_CPSR]);
 
 	return 0;
 }
@@ -419,7 +422,7 @@ static int execute_transfer(struct pi_state *pstate)
 
 	transfer = &pstate->pipeline.instruction.instr_bits.transfer;
 	offset = &transfer->offset;
-	carry = pstate->cpsr.c;
+	carry = !!(pstate->registers[R_CPSR] & CPSR_BIT_C);
 
 	rd = &pstate->registers[transfer->rd];
 	rn = pstate->registers[transfer->rn];
@@ -470,50 +473,50 @@ static int (*instr_type_table[5]) (struct pi_state *pstate) = {
 	execute_branch
 };
 
-static int cond_uninmlemented(struct cpsrreg *cpsr)
+static int cond_uninmlemented(uint32_t cpsr)
 {
 	(void)cpsr;
 	fprintf(stderr, EMU_ERR_UNDEF_COND);
 	return -1;
 }
 
-static int cond_eq(struct cpsrreg *cpsr)
+static int cond_eq(uint32_t cpsr)
 {
-	return cpsr->z;
+	return (cpsr & CPSR_BIT_Z);
 }
 
-static int cond_ne(struct cpsrreg *cpsr)
+static int cond_ne(uint32_t cpsr)
 {
-	return !cpsr->z;
+	return !(cpsr & CPSR_BIT_Z);
 }
 
-static int cond_ge(struct cpsrreg *cpsr)
+static int cond_ge(uint32_t cpsr)
 {
-	return cpsr->n == cpsr->v;
+	return !!(cpsr & CPSR_BIT_N) == !!(cpsr & CPSR_BIT_V);
 }
 
-static int cond_lt(struct cpsrreg *cpsr)
+static int cond_lt(uint32_t cpsr)
 {
-	return cpsr->n != cpsr->v;
+	return !!(cpsr & CPSR_BIT_N) != !!(cpsr & CPSR_BIT_V);
 }
 
-static int cond_gt(struct cpsrreg *cpsr)
+static int cond_gt(uint32_t cpsr)
 {
-	return !cpsr->z && (cpsr->n == cpsr->v);
+	return cond_ne(cpsr) && cond_ge(cpsr);
 }
 
-static int cond_le(struct cpsrreg *cpsr)
+static int cond_le(uint32_t cpsr)
 {
-	return cpsr->z || (cpsr->n != cpsr->v);
+	return cond_eq(cpsr) || cond_lt(cpsr);
 }
 
-static int cond_al(struct cpsrreg *cpsr)
+static int cond_al(uint32_t cpsr)
 {
 	(void)cpsr;
 	return true;
 }
 
-static int (*cond_table[16]) (struct cpsrreg *cpsr) = {
+static int (*cond_table[16]) (uint32_t cpsr) = {
 	/* 0000 */ cond_eq,
 	/* 0001 */ cond_ne,
 	/* 0010 */ cond_uninmlemented,
@@ -534,7 +537,8 @@ static int (*cond_table[16]) (struct cpsrreg *cpsr) = {
 
 static int check_cond(struct pi_state *pstate)
 {
-	return cond_table[pstate->pipeline.instruction.cond](&pstate->cpsr);
+	return cond_table[pstate->pipeline.instruction.cond]
+		(pstate->registers[R_CPSR]);
 }
 
 int execute(struct pi_state *pstate)

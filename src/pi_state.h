@@ -5,10 +5,16 @@
 #include <stdbool.h>
 
 #define PI_MEMORY_SIZE (1 << 16)
-#define PI_REGISTER_COUNT 16
+#define PI_REGISTER_COUNT 17
 #define PI_WORD_SIZE 4
 
 #define R_PC 15
+#define R_CPSR 16
+
+#define CPSR_BIT_N (1 << 31)
+#define CPSR_BIT_Z (1 << 30)
+#define CPSR_BIT_C (1 << 29)
+#define CPSR_BIT_V (1 << 28)
 
 #define INSTR_BIT_IMM     (1 << 25)
 #define INSTR_BIT_SETCOND (1 << 20)
@@ -115,18 +121,10 @@ struct instr {
 	} instr_bits;
 };
 
-struct cpsrreg {
-	bool n;
-	bool z;
-	bool c;
-	bool v;
-};
-
 struct pi_state {
 	uint8_t memory[PI_MEMORY_SIZE];
 	uint8_t gpio_control[GPIO_CONTROL_SIZE];
 	uint32_t registers[PI_REGISTER_COUNT];
-	struct cpsrreg cpsr;
 	struct pipeline {
 		bool fetched;
 		bool decoded;

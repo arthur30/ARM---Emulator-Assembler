@@ -27,10 +27,7 @@ static void print_state(struct pi_state *pstate)
 	pc = pstate->registers[R_PC];
 	fprintf(stdout, EMU_STATE_REG_PC, pc, pc);
 
-	cpsr = (pstate->cpsr.n << 31) |
-		(pstate->cpsr.z << 30) |
-		(pstate->cpsr.c << 29) |
-		(pstate->cpsr.v << 28);
+	cpsr = pstate->registers[R_CPSR];
 	fprintf(stdout, EMU_STATE_REG_CPSR, cpsr, cpsr);
 
 	fprintf(stdout, EMU_STATE_MEM_HEAD);
