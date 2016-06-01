@@ -389,7 +389,7 @@ static int init_lsl(struct instruction *tokens)
 int parse(struct token_list *toklist, struct instruction *tokens)
 {
 	int ret;
-	char instr[3];
+	char *instr;
 
 	if (toklist) {
 		toks = toklist;
@@ -412,6 +412,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			goto fail;
 	}
 
+
 	tokens->mnemonic = false;
 
 	if (tok) {
@@ -419,7 +420,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			return 0;
 
 		tokens->mnemonic = true;
-		memcpy(instr, tok->str, 3);
+		instr = strndup(tok->str, 3);
 		tokens->type = classify_instr(instr);
 		tokens->opcode = instr_code(tok->str, tokens->type);
 		tokens->cond = classify_cond(tok->str + 3);
