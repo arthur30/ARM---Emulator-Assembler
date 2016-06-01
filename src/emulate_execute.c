@@ -24,13 +24,6 @@ static void set_cpsr_zn(uint32_t res, struct cpsrreg *cpsr)
 	}
 }
 
-static int execute_halt(struct pi_state *pstate)
-{
-	(void)pstate;
-	errno = 0;
-	return 1;
-}
-
 static int
 op_undef(uint32_t *rd, uint32_t rn, uint32_t op2, struct cpsrreg *cpsr)
 {
@@ -400,7 +393,7 @@ static uint8_t *get_memory(struct pi_state *pstate, size_t address)
 
 	if (address + 4 >= PI_MEMORY_SIZE) {
 		fprintf(stdout, EMU_RUN_OUT_OF_BOUNDS_MEM, address);
-		errno = EINVAL;
+		errno = EFAULT;
 		return NULL;
 	}
 
@@ -433,8 +426,8 @@ static int execute_transfer(struct pi_state *pstate)
 	}
 
 	mem = get_memory(pstate, rn);
-	if (!mem)
-		return -1;
+	if (!mem) /* out of bonds memory is just printed, continue */
+		return 0;
 
 	if (transfer->load)
 		memcpy(rd, mem, 4);
@@ -463,7 +456,7 @@ static int execute_branch(struct pi_state *pstate)
 }
 
 static int (*instr_type_table[5]) (struct pi_state *pstate) = {
-	execute_halt,
+	NULL,
 	execute_data_proc,
 	execute_mult,
 	execute_transfer,
@@ -540,16 +533,15 @@ static int check_cond(struct pi_state *pstate)
 int execute(struct pi_state *pstate)
 {
 	enum instr_type type;
-	int cond_check_res;
-
-	cond_check_res = check_cond(pstate);
-	if (cond_check_res == -1)
-		return -1;
 
 	pstate->pipeline.decoded = false;
 	type = pstate->pipeline.instruction.type;
 
-	if (cond_check_res || type == INSTR_TYPE_HALT)
+	if (type == INSTR_TYPE_HALT)
+		return 1;
+
+	if (check_cond(pstate))
 		return instr_type_table[type](pstate);
+
 	return 0;
 }

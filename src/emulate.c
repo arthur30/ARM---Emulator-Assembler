@@ -82,17 +82,29 @@ int main(int argc, char **argv)
 	}
 
 	for (;;) {
-		if (pstate->pipeline.decoded)
-			if (execute(pstate) && !errno)
-				break;
-		if (pstate->pipeline.fetched)
-			if (decode(pstate))
-				break;
-		if (fetch(pstate))
-			break;
+		if (pstate->pipeline.decoded) {
+			switch (execute(pstate)) {
+			case -1:
+				fprintf(stderr, EMU_ERR_EXEC);
+				goto fail;
+			case 1: /* halt */
+				goto finished;
+			}
+		}
+		if (pstate->pipeline.fetched) {
+			if (decode(pstate)) {
+				fprintf(stderr, EMU_ERR_DECODE);
+				goto fail;
+			}
+		}
+		if (fetch(pstate)) {
+			fprintf(stderr, EMU_ERR_FETCH);
+			goto fail;
+		}
 		pstate->registers[R_PC] += 4;
 	}
 
+finished:
 	print_state(pstate);
 
 	return EXIT_SUCCESS;
@@ -100,5 +112,6 @@ int main(int argc, char **argv)
 fail:
 	if (errno)
 		fprintf(stderr, PI_ERR_GENERIC, strerror(errno), errno);
+
 	return EXIT_FAILURE;
 }

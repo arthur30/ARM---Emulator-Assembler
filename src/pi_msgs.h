@@ -10,8 +10,11 @@
 
 #define EMU_ERR_ARGS         "Run as: emulate <input>\n"
 #define EMU_ERR_BIN_SIZE     "Error: Binary too large, does not fit in memory\n"
-#define EMU_ERR_UNDEF_DPI_OP "Error: Undefined dpi opcode"
-#define EMU_ERR_UNDEF_COND   "Error: Undefined dpi opcode"
+#define EMU_ERR_EXEC         "Error: while executing instruction\n"
+#define EMU_ERR_DECODE       "Error: while decoding instruction\n"
+#define EMU_ERR_FETCH        "Error: while fetching instruction\n"
+#define EMU_ERR_UNDEF_DPI_OP "Error: Undefined dpi opcode\n"
+#define EMU_ERR_UNDEF_COND   "Error: Undefined dpi opcode\n"
 
 #define EMU_RUN_OUT_OF_BOUNDS_MEM \
 	"Error: Out of bounds memory access at address 0x%08zx\n"
