@@ -17,7 +17,6 @@
 #define MOV_INSTR		13
 #define SHIFT_BIT_SIZE		(1 << 4)
 #define IMM_BIT_SIZE		(1 << 8)
-#define NULL_INSTR		"nil"
 
 /* These globals are justified,
  * since parse() used in a similar fashion as strtok
@@ -390,7 +389,7 @@ static int init_lsl(struct instruction *tokens)
 int parse(struct token_list *toklist, struct instruction *tokens)
 {
 	int ret;
-	char instr[] = NULL_INSTR;
+	char instr[3];
 
 	if (toklist) {
 		toks = toklist;
