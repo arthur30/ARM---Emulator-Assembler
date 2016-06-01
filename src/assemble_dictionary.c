@@ -51,7 +51,6 @@ struct map dict_sdt[] = {
 struct map dict_all[] = {
 	{"add",   INSTR_TYPE_DATA_PROC},
 	{"and",   INSTR_TYPE_DATA_PROC},
-	{"andeq", INSTR_TYPE_HALT},
 	{"b",     INSTR_TYPE_BRANCH},
 	{"bal",   INSTR_TYPE_BRANCH},
 	{"beq",   INSTR_TYPE_BRANCH},
@@ -82,6 +81,25 @@ struct map dict_rot[] = {
 	{"ror", 3},
 };
 
+struct map dict_cond[] = {
+	{"", 14},
+	{"al", 14},
+	{"cc", 3},
+	{"cs", 2},
+	{"eq", 0},
+	{"ge", 10},
+	{"gt", 12},
+	{"hi", 8},
+	{"le", 13},
+	{"ls", 9},
+	{"lt", 11},
+	{"mi", 4},
+	{"ne", 1},
+	{"pl", 5},
+	{"vc", 7},
+	{"vs", 6},
+};
+
 static int map_compar(const void *key, const void *map_elem)
 {
 	return strcmp((char *)key, ((struct map *)map_elem)->str);
@@ -100,8 +118,6 @@ static uint32_t bsearch_map(const void *key, const void *base, size_t nmemb)
 uint32_t instr_code(char *key, int type)
 {
 	switch (type) {
-	case INSTR_TYPE_HALT:
-		return bsearch_map(key, dict_dpi, MAP_SIZE(dict_dpi));
 	case INSTR_TYPE_DATA_PROC:
 		return bsearch_map(key, dict_dpi, MAP_SIZE(dict_dpi));
 	case INSTR_TYPE_MULT:
@@ -120,5 +136,10 @@ uint32_t instr_code(char *key, int type)
 uint32_t classify_instr(char *key)
 {
 	return bsearch_map(key, dict_all, MAP_SIZE(dict_all));
+}
+
+uint32_t classify_cond(char *key)
+{
+	return bsearch_map(key, dict_cond, MAP_SIZE(dict_cond));
 }
 
