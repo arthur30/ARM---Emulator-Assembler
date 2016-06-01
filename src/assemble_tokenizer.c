@@ -67,9 +67,16 @@ int tokenize(FILE *input, struct token_list *tokens)
 	lineno = 0;
 
 	while (getline(&line, &line_size, input) > 0) {
-		strtok(line, ";"); /* remove comments */
-
 		++lineno;
+
+		/* skip if first char is comment,
+		 * otherwise zero it out
+		 */
+		if (line[0] == ';')
+			continue;
+		if (!strtok(line, ";\n"))
+			continue;
+
 		str = line;
 		while ((tok = strtok(str, " ,\t\n"))) {
 			str = NULL;
