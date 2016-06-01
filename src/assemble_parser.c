@@ -17,6 +17,7 @@
 #define MOV_INSTR		13
 #define SHIFT_BIT_SIZE		(1 << 4)
 #define IMM_BIT_SIZE		(1 << 8)
+#define NULL_INSTR		"nil"
 
 /* These globals are justified,
  * since parse() used in a similar fashion as strtok
@@ -102,22 +103,6 @@ static int generate_op2(uint32_t op2, uint8_t *imm, uint8_t *shift)
 	}
 
 	return -1;
-}
-
-
-static int init_halt(struct instruction *tokens)
-{
-	(void)tokens;
-
-	if (!nexttok() || !tok_is_reg())
-		return -1;
-	if (!nexttok() || !tok_is_reg())
-		return -1;
-	if (!nexttok() || !tok_is_reg())
-		return -1;
-	if (!nexttok() || !tok_is_newline())
-		return -1;
-	return 0;
 }
 
 static int init_dpi(struct instruction *tokens)
@@ -405,6 +390,7 @@ static int init_lsl(struct instruction *tokens)
 int parse(struct token_list *toklist, struct instruction *tokens)
 {
 	int ret;
+	char instr[] = NULL_INSTR;
 
 	if (toklist) {
 		toks = toklist;
@@ -434,13 +420,12 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			return 0;
 
 		tokens->mnemonic = true;
-		tokens->type = classify_instr(tok->str);
+		memcpy(instr, tok->str, 3);
+		tokens->type = classify_instr(instr);
 		tokens->code = instr_code(tok->str, tokens->type);
+		tokens->cond = classify_cond(tok->str + 3);
 
 		switch (tokens->type) {
-		case INSTR_TYPE_HALT:
-			ret = init_halt(tokens);
-			break;
 		case INSTR_TYPE_DATA_PROC:
 			ret = init_dpi(tokens);
 			break;
@@ -451,6 +436,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			ret = init_sdt(tokens);
 			break;
 		case INSTR_TYPE_BRANCH:
+			tokens->cond = classify_cond(tok->str + 1);
 			ret = init_branch(tokens);
 			break;
 		case LSL_INSTR:
