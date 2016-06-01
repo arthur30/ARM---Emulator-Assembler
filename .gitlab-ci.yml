@@ -1,6 +1,0 @@
-before_script:
-  - cd src
-
-compile:
-  script:
-    - make
