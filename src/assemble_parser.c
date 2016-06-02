@@ -166,7 +166,7 @@ static int init_dpi(struct instruction *tokens)
 			if (!tok_is_string())
 				return -1;
 			tokens->instr.dpi.op2.offset.reg.shift_type =
-							shift_code(tok->str);
+						classify_shift(tok->str);
 			tokens->instr.dpi.op2.offset.reg.constant = true;
 
 			if (!nexttok())
@@ -300,7 +300,7 @@ static int init_sdt(struct instruction *tokens)
 			tokens->instr.sdt.sdt.offset.offset.reg.shift_type =
 						instr_code(tok->str, 6);
 			tokens->instr.sdt.sdt.offset.offset.reg.shift_type =
-						shift_code(tok->str);
+						classify_shift(tok->str);
 
 			if (!nexttok())
 				return -1;

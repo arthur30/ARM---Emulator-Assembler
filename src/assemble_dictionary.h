@@ -5,7 +5,7 @@
 
 uint32_t instr_code(char *key, int type);
 
-uint32_t shift_code(char *key);
+uint32_t classify_shift(char *key);
 
 uint32_t classify_instr(char *key);
 

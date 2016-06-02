@@ -120,7 +120,7 @@ uint32_t instr_code(char *key, int type)
 	}
 }
 
-uint32_t shift_code(char *key)
+uint32_t classify_shift(char *key)
 {
 	return bsearch_map(key, dict_rot, MAP_SIZE(dict_rot));
 }
