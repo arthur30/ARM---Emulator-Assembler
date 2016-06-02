@@ -44,7 +44,7 @@
 #define ASS_ERR_PASS2         "Error: Second pass failed\n"
 #define ASS_ERR_JUMP_TARGET   "Error: No such label: %s\n"
 #define ASS_ERR_INVALID_INSTR "Error: Invalid instruction\n"
-#define ASS_ERR_OP2_FIT       "Error: Cannot fit '%d' into operand2 value\n"
+#define ASS_ERR_OP2_FIT       "Error: Cannot fit '%zd' into operand2 value\n"
 #define ASS_ERR_STR_IMM       "Error: Invalid str at immediate address\n"
 
 #endif

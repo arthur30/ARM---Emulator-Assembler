@@ -9,8 +9,6 @@
 #include <string.h>
 #include <errno.h>
 
-#define SHIFT_ROR 3
-
 static void set_cpsr_c(uint32_t *cpsr, bool val)
 {
 	if (cpsr) {
@@ -158,24 +156,24 @@ op_mov(uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr)
 	return 0;
 }
 
-static int (*data_proc_table[16])
+static int (*data_proc_table[INSTR_DPI_OPCODE_COUNT])
 (uint32_t *rd, uint32_t rn, uint32_t op2, uint32_t *cpsr) = {
-	/* 0000 */ op_and,
-	/* 0001 */ op_eor,
-	/* 0010 */ op_sub,
-	/* 0011 */ op_rsb,
-	/* 0100 */ op_add,
-	/* 0101 */ op_undef,
-	/* 0110 */ op_undef,
-	/* 0111 */ op_undef,
-	/* 1000 */ op_tst,
-	/* 1001 */ op_teq,
-	/* 1010 */ op_cmp,
-	/* 1011 */ op_undef,
-	/* 1100 */ op_orr,
-	/* 1101 */ op_mov,
-	/* 1110 */ op_undef,
-	/* 1111 */ op_undef
+	/* 0000 */[INSTR_DPI_AND] = op_and,
+	/* 0001 */[INSTR_DPI_EOR] = op_eor,
+	/* 0010 */[INSTR_DPI_SUB] = op_sub,
+	/* 0011 */[INSTR_DPI_RSB] = op_rsb,
+	/* 0100 */[INSTR_DPI_ADD] = op_add,
+	/* 0101 */ /* not implemented */
+	/* 0110 */ /* not implemented */
+	/* 0111 */ /* not implemented */
+	/* 1000 */[INSTR_DPI_TST] = op_tst,
+	/* 1001 */[INSTR_DPI_TEQ] = op_teq,
+	/* 1010 */[INSTR_DPI_CMP] = op_cmp,
+	/* 1011 */ /* not implemented */
+	/* 1100 */[INSTR_DPI_ORR] = op_orr,
+	/* 1101 */[INSTR_DPI_MOV] = op_mov,
+	/* 1110 */ /* not implemented */
+	/* 1111 */ /* not implemented */
 };
 
 static int shift_lsl(uint32_t *r, uint32_t val, uint32_t amount, bool *carry)
@@ -234,12 +232,12 @@ static int shift_ror(uint32_t *r, uint32_t val, uint32_t amount, bool *carry)
 	return 0;
 }
 
-static int (*shift_table[4])
+static int (*shift_table[INSTR_SHIFT_COUNT])
 (uint32_t *r, uint32_t val, uint32_t amount, bool *carry) = {
-	/* 00 */ shift_lsl,
-	/* 01 */ shift_lsr,
-	/* 10 */ shift_asr,
-	/* 11 */ shift_ror
+	/* 00 */[INSTR_SHIFT_LSL] = shift_lsl,
+	/* 01 */[INSTR_SHIFT_LSR] = shift_lsr,
+	/* 10 */[INSTR_SHIFT_ASR] = shift_asr,
+	/* 11 */[INSTR_SHIFT_ROR] = shift_ror
 };
 
 static int get_shift_reg
@@ -269,7 +267,7 @@ static int get_op2
 	struct shift_reg *reg;
 
 	if (op2->immediate) {
-		type = SHIFT_ROR;
+		type = INSTR_SHIFT_ROR;
 		val = op2->offset.imm.imm;
 		amount = op2->offset.imm.rotate;
 		amount *= 2;
@@ -326,6 +324,8 @@ static int execute_data_proc(struct pi_state *pstate)
 	set_cpsr_c(cpsr, carry);
 
 	opcode = data_proc->opcode;
+	if (!data_proc_table[opcode])
+		return op_undef(rd, rn, op2val, cpsr);
 	return data_proc_table[opcode](rd, rn, op2val, cpsr);
 }
 
@@ -405,12 +405,12 @@ static int execute_branch(struct pi_state *pstate)
 	return 0;
 }
 
-static int (*instr_type_table[5]) (struct pi_state *pstate) = {
-	NULL,
-	execute_data_proc,
-	execute_mult,
-	execute_transfer,
-	execute_branch
+static int (*instr_type_table[]) (struct pi_state *pstate) = {
+	[INSTR_TYPE_HALT] = NULL,
+	[INSTR_TYPE_DATA_PROC] = execute_data_proc,
+	[INSTR_TYPE_MULT] = execute_mult,
+	[INSTR_TYPE_TRANSFER] = execute_transfer,
+	[INSTR_TYPE_BRANCH] = execute_branch
 };
 
 static int cond_uninmlemented(uint32_t cpsr)
@@ -456,29 +456,36 @@ static int cond_al(uint32_t cpsr)
 	return true;
 }
 
-static int (*cond_table[16]) (uint32_t cpsr) = {
-	/* 0000 */ cond_eq,
-	/* 0001 */ cond_ne,
-	/* 0010 */ cond_uninmlemented,
-	/* 0011 */ cond_uninmlemented,
-	/* 0100 */ cond_uninmlemented,
-	/* 0101 */ cond_uninmlemented,
-	/* 0110 */ cond_uninmlemented,
-	/* 0111 */ cond_uninmlemented,
-	/* 1000 */ cond_uninmlemented,
-	/* 1001 */ cond_uninmlemented,
-	/* 1010 */ cond_ge,
-	/* 1011 */ cond_lt,
-	/* 1100 */ cond_gt,
-	/* 1101 */ cond_le,
-	/* 1110 */ cond_al,
-	/* 1111 */ cond_uninmlemented,
+static int (*cond_table[INSTR_COND_COUNT]) (uint32_t cpsr) = {
+	/* 0000 */[INSTR_COND_EQ] = cond_eq,
+	/* 0001 */[INSTR_COND_NE] = cond_ne,
+	/* 0010 */ /* not implemented */
+	/* 0011 */ /* not implemented */
+	/* 0100 */ /* not implemented */
+	/* 0101 */ /* not implemented */
+	/* 0110 */ /* not implemented */
+	/* 0111 */ /* not implemented */
+	/* 1000 */ /* not implemented */
+	/* 1001 */ /* not implemented */
+	/* 1010 */[INSTR_COND_GE] = cond_ge,
+	/* 1011 */[INSTR_COND_LT] = cond_lt,
+	/* 1100 */[INSTR_COND_GT] = cond_gt,
+	/* 1101 */[INSTR_COND_LE] = cond_le,
+	/* 1110 */[INSTR_COND_AL] = cond_al,
+	/* 1111 */ /* not valid */
 };
 
 static int check_cond(struct pi_state *pstate)
 {
-	return cond_table[pstate->pipeline.instruction.cond]
-		(pstate->registers[R_CPSR]);
+	uint8_t cond;
+	uint32_t cpsr;
+
+	cond = pstate->pipeline.instruction.cond;
+	cpsr = pstate->registers[R_CPSR];
+
+	if (!cond_table[cond])
+		return cond_uninmlemented(cpsr);
+	return cond_table[cond](cpsr);
 }
 
 int execute(struct pi_state *pstate)

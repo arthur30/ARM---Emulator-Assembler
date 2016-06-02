@@ -14,17 +14,17 @@ struct map {
 };
 
 struct map dict_dpi[] = {
-	{"add", 4},
-	{"and", 0},
-	{"andeq", 5},
-	{"cmp", 10},
-	{"eor", 1},
-	{"mov", 13},
-	{"orr", 12},
-	{"rsb", 3},
-	{"sub", 2},
-	{"teq", 9},
-	{"tst", 8},
+	{"add", INSTR_DPI_ADD},
+	{"and", INSTR_DPI_AND},
+	{"cmp", INSTR_DPI_CMP},
+	{"eor", INSTR_DPI_EOR},
+	{"lsl", INSTR_DPI_LSL},
+	{"mov", INSTR_DPI_MOV},
+	{"orr", INSTR_DPI_ORR},
+	{"rsb", INSTR_DPI_RSB},
+	{"sub", INSTR_DPI_SUB},
+	{"teq", INSTR_DPI_TEQ},
+	{"tst", INSTR_DPI_TST},
 };
 
 struct map dict_mult[] = {
@@ -51,7 +51,7 @@ struct map dict_all[] = {
 	{"cmp",   INSTR_TYPE_DATA_PROC},
 	{"eor",   INSTR_TYPE_DATA_PROC},
 	{"ldr",   INSTR_TYPE_TRANSFER},
-	{"lsl",   5},
+	{"lsl",   INSTR_TYPE_DATA_PROC},
 	{"mla",   INSTR_TYPE_MULT},
 	{"mov",   INSTR_TYPE_DATA_PROC},
 	{"mul",   INSTR_TYPE_MULT},
@@ -64,29 +64,29 @@ struct map dict_all[] = {
 };
 
 struct map dict_rot[] = {
-	{"asr", 2},
-	{"lsl", 0},
-	{"lsr", 1},
-	{"ror", 3},
+	{"asr", INSTR_SHIFT_ASR},
+	{"lsl", INSTR_SHIFT_LSL},
+	{"lsr", INSTR_SHIFT_LSR},
+	{"ror", INSTR_SHIFT_ROR},
 };
 
 struct map dict_cond[] = {
-	{"", 14},
-	{"al", 14},
-	{"cc", 3},
-	{"cs", 2},
-	{"eq", 0},
-	{"ge", 10},
-	{"gt", 12},
-	{"hi", 8},
-	{"le", 13},
-	{"ls", 9},
-	{"lt", 11},
-	{"mi", 4},
-	{"ne", 1},
-	{"pl", 5},
-	{"vc", 7},
-	{"vs", 6},
+	{"", INSTR_COND_AL},
+	{"al", INSTR_COND_AL},
+	{"cc", INSTR_COND_CC},
+	{"cs", INSTR_COND_CS},
+	{"eq", INSTR_COND_EQ},
+	{"ge", INSTR_COND_GE},
+	{"gt", INSTR_COND_GT},
+	{"hi", INSTR_COND_HI},
+	{"le", INSTR_COND_LE},
+	{"ls", INSTR_COND_LS},
+	{"lt", INSTR_COND_LT},
+	{"mi", INSTR_COND_MI},
+	{"ne", INSTR_COND_NE},
+	{"pl", INSTR_COND_PL},
+	{"vc", INSTR_COND_VC},
+	{"vs", INSTR_COND_VS},
 };
 
 static int map_compar(const void *key, const void *map_elem)
@@ -115,11 +115,14 @@ uint32_t instr_code(char *key, int type)
 		return bsearch_map(key, dict_sdt, MAP_SIZE(dict_sdt));
 	case INSTR_TYPE_BRANCH:
 		return -1;
-	case 6:
-		return bsearch_map(key, dict_rot, MAP_SIZE(dict_rot));
 	default:
 		return -1;
 	}
+}
+
+uint32_t shift_code(char *key)
+{
+	return bsearch_map(key, dict_rot, MAP_SIZE(dict_rot));
 }
 
 uint32_t classify_instr(char *key)
