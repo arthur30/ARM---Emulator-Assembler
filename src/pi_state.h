@@ -12,6 +12,8 @@
 #define R_PC 15
 #define R_CPSR 16
 
+#define REG_ADDR_BIT_COUNT 4
+
 #define CPSR_BIT_N (1 << 31)
 #define CPSR_BIT_Z (1 << 30)
 #define CPSR_BIT_C (1 << 29)
@@ -27,6 +29,9 @@
 
 #define INSTR_COND_COUNT 15
 
+#define COND_FIRST_BIT      28
+#define COND_NUMBER_OF_BITS 4
+
 #define INSTR_DATA_PROC_MASK 0x0C000000
 #define INSTR_DATA_PROC_BITP 0x00000000
 
@@ -37,11 +42,14 @@
 #define INSTR_MULT_MASK      0x0FC000F0
 #define INSTR_MULT_BITP      0x00000090
 
-#define INSTR_TRANSFER_MASK  0x0C600000
-#define INSTR_TRANSFER_BITP  0x04000000
+#define INSTR_MULT_MASK       0x0FC000F0
+#define INSTR_MULT_BITP       0x00000090
 
-#define INSTR_BRANCH_MASK    0x0F000000
-#define INSTR_BRANCH_BITP    0x0A000000
+#define INSTR_TRANSFER_MASK   0x0C600000
+#define INSTR_TRANSFER_BITP   0x04000000
+
+#define INSTR_BRANCH_MASK     0x0F000000
+#define INSTR_BRANCH_BITP     0x0A000000
 
 #define GPIO_CONTROL_ADDRESS  0x20200000
 #define GPIO_CONTROL_SIZE     12
@@ -49,6 +57,40 @@
 #define GPIO_CLEARING_SIZE    4
 #define GPIO_TURNON_ADDRESS   0x2020001C
 #define GPIO_TURNON_SIZE      4
+
+/* Data processing Operand2(Case: Immediate value) constants: */
+#define OP2_IMMEDIATE_VALUE_FIRST_BIT           0
+#define OP2_IMMEDIATE_VALUE_LAST_BIT            8
+#define OP2_IMMEDIATE_VALUE_ROTATION_FIRST_BIT  8
+
+/* Data processing Operand2(Case: Register) constants: */
+#define OP2_REG_RM_FIRST_BIT			0
+#define OP2_SHIFT_REG_TYPE_FIRST_BIT		5
+#define OP2_SHIFT_REG_TYPE_BIT_COUNT		2
+#define OP2_SHIFT_REG_CONST_FIRST_BIT		7
+#define OP2_SHIFT_REG_CONST_BIT_COUNT		5
+#define OP2_SHIFT_REG_REG_FIRST_BIT		8
+
+/* Data processing constants: */
+#define DATA_PROC_RD_FIRST_BIT     12
+#define DATA_PROC_RN_FIRST_BIT     16
+#define DATA_PROC_OPCODE_FIRST_BIT 21
+
+/* Decode multiply constants: */
+#define MULT_RM_REG_FIRST_BIT 0
+#define MULT_RS_REG_FIRST_BIT 8
+#define MULT_RN_REG_FIRST_BIT 12
+#define MULT_RD_REG_FIRST_BIT 16
+
+/* Single data transfer constants: */
+#define TRANSFER_OFFSET_FIRST_BIT 0
+#define TRANSFER_OFFSET_LAST_BIT  12
+#define TRANSFER_RD_FIRST_BIT     12
+#define TRANSFER_RN_FIRST_BIT     16
+
+/* Branch constants: */
+#define BRANCH_OFFSET_FIRST_BIT 0
+#define BRANCH_OFFSET_BIT_COUNT	24
 
 struct shift_reg {
 	bool constant;

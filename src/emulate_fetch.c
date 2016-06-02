@@ -6,6 +6,7 @@
 #include <string.h>
 #include <errno.h>
 
+/* fetch instruction from memory */
 int fetch(struct pi_state *pstate)
 {
 	uint32_t nextinstr;
