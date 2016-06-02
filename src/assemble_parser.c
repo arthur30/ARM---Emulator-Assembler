@@ -90,6 +90,27 @@ static int generate_op2(uint32_t op2, uint8_t *imm, uint8_t *shift)
 	return -1;
 }
 
+static int init_lsl(struct instruction *tokens)
+{
+	if (!nexttok() || !tok_is_reg())
+		return -1;
+
+	tokens->type = INSTR_TYPE_DATA_PROC;
+	tokens->opcode = 13;
+	tokens->instr.dpi.rd = tok_get_reg();
+	tokens->instr.dpi.op2.immediate = false;
+	tokens->instr.dpi.op2.offset.reg.rm = tokens->instr.dpi.rd;
+	tokens->instr.dpi.op2.offset.reg.shift_type = 0;
+	tokens->instr.dpi.op2.offset.reg.constant = 0;
+
+	if (!nexttok() || !tok_is_number())
+		return -1;
+
+	tokens->instr.dpi.op2.offset.reg.amount.integer = tok->num;
+
+	return 0;
+}
+
 static int init_dpi(struct instruction *tokens)
 {
 	uint32_t j = 0;
@@ -100,9 +121,9 @@ static int init_dpi(struct instruction *tokens)
 	tokens->instr.dpi.setcond = false;
 
 	switch (tokens->opcode) {
-	case TST_INSTR:
-	case TEQ_INSTR:
-	case CMP_INSTR:
+	case INSTR_DPI_TST:
+	case INSTR_DPI_TEQ:
+	case INSTR_DPI_CMP:
 		tokens->instr.dpi.setcond = true;
 		tokens->instr.dpi.rd = 0;
 		if (!nexttok() || !tok_is_reg())
@@ -110,12 +131,15 @@ static int init_dpi(struct instruction *tokens)
 		tokens->instr.dpi.rn = tok_get_reg();
 		break;
 
-	case MOV_INSTR:
+	case INSTR_DPI_MOV:
 		tokens->instr.dpi.rn = 0;
 		if (!nexttok() || !tok_is_reg())
 			return -1;
 		tokens->instr.dpi.rd = tok_get_reg();
 		break;
+
+	case INSTR_DPI_LSL:
+		return init_lsl(tokens);
 
 	default:
 		if (!nexttok() || !tok_is_reg())
@@ -346,27 +370,6 @@ static int init_branch(struct instruction *tokens)
 	return 0;
 }
 
-static int init_lsl(struct instruction *tokens)
-{
-	if (!nexttok() || !tok_is_reg())
-		return -1;
-
-	tokens->type = INSTR_TYPE_DATA_PROC;
-	tokens->opcode = 13;
-	tokens->instr.dpi.rd = tok_get_reg();
-	tokens->instr.dpi.op2.immediate = false;
-	tokens->instr.dpi.op2.offset.reg.rm = tokens->instr.dpi.rd;
-	tokens->instr.dpi.op2.offset.reg.shift_type = 0;
-	tokens->instr.dpi.op2.offset.reg.constant = 0;
-
-	if (!nexttok() || !tok_is_number())
-		return -1;
-
-	tokens->instr.dpi.op2.offset.reg.amount.integer = tok->num;
-
-	return 0;
-}
-
 /* return values:
  * -1 on error
  *  0 on ok
@@ -427,9 +430,6 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 		case INSTR_TYPE_BRANCH:
 			tokens->cond = classify_cond(tok->str + 1);
 			ret = init_branch(tokens);
-			break;
-		case LSL_INSTR:
-			ret = init_lsl(tokens);
 			break;
 		}
 

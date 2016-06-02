@@ -111,6 +111,20 @@ enum instr_type {
 	INSTR_TYPE_BRANCH = 4
 };
 
+enum instr_dpi_opcode {
+	INSTR_DPI_AND = 0,
+	INSTR_DPI_EOR = 1,
+	INSTR_DPI_SUB = 2,
+	INSTR_DPI_RSB = 3,
+	INSTR_DPI_ADD = 4,
+	INSTR_DPI_TST = 8,
+	INSTR_DPI_TEQ = 9,
+	INSTR_DPI_CMP = 10,
+	INSTR_DPI_ORR = 12,
+	INSTR_DPI_MOV = 13,
+	INSTR_DPI_LSL = 16
+};
+
 struct instr {
 	uint8_t cond;
 	enum instr_type type;

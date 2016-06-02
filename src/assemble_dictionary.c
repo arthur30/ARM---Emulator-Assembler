@@ -14,17 +14,17 @@ struct map {
 };
 
 struct map dict_dpi[] = {
-	{"add", 4},
-	{"and", 0},
-	{"andeq", 5},
-	{"cmp", 10},
-	{"eor", 1},
-	{"mov", 13},
-	{"orr", 12},
-	{"rsb", 3},
-	{"sub", 2},
-	{"teq", 9},
-	{"tst", 8},
+	{"add", INSTR_DPI_ADD},
+	{"and", INSTR_DPI_AND},
+	{"cmp", INSTR_DPI_CMP},
+	{"eor", INSTR_DPI_EOR},
+	{"lsl", INSTR_DPI_LSL},
+	{"mov", INSTR_DPI_MOV},
+	{"orr", INSTR_DPI_ORR},
+	{"rsb", INSTR_DPI_RSB},
+	{"sub", INSTR_DPI_SUB},
+	{"teq", INSTR_DPI_TEQ},
+	{"tst", INSTR_DPI_TST},
 };
 
 struct map dict_mult[] = {
@@ -51,7 +51,7 @@ struct map dict_all[] = {
 	{"cmp",   INSTR_TYPE_DATA_PROC},
 	{"eor",   INSTR_TYPE_DATA_PROC},
 	{"ldr",   INSTR_TYPE_TRANSFER},
-	{"lsl",   5},
+	{"lsl",   INSTR_TYPE_DATA_PROC},
 	{"mla",   INSTR_TYPE_MULT},
 	{"mov",   INSTR_TYPE_DATA_PROC},
 	{"mul",   INSTR_TYPE_MULT},
