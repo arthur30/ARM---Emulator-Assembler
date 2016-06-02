@@ -64,29 +64,29 @@ struct map dict_all[] = {
 };
 
 struct map dict_rot[] = {
-	{"asr", 2},
-	{"lsl", 0},
-	{"lsr", 1},
-	{"ror", 3},
+	{"asr", INSTR_SHIFT_ASR},
+	{"lsl", INSTR_SHIFT_LSL},
+	{"lsr", INSTR_SHIFT_LSR},
+	{"ror", INSTR_SHIFT_ROR},
 };
 
 struct map dict_cond[] = {
-	{"", 14},
-	{"al", 14},
-	{"cc", 3},
-	{"cs", 2},
-	{"eq", 0},
-	{"ge", 10},
-	{"gt", 12},
-	{"hi", 8},
-	{"le", 13},
-	{"ls", 9},
-	{"lt", 11},
-	{"mi", 4},
-	{"ne", 1},
-	{"pl", 5},
-	{"vc", 7},
-	{"vs", 6},
+	{"", INSTR_COND_AL},
+	{"al", INSTR_COND_AL},
+	{"cc", INSTR_COND_CC},
+	{"cs", INSTR_COND_CS},
+	{"eq", INSTR_COND_EQ},
+	{"ge", INSTR_COND_GE},
+	{"gt", INSTR_COND_GT},
+	{"hi", INSTR_COND_HI},
+	{"le", INSTR_COND_LE},
+	{"ls", INSTR_COND_LS},
+	{"lt", INSTR_COND_LT},
+	{"mi", INSTR_COND_MI},
+	{"ne", INSTR_COND_NE},
+	{"pl", INSTR_COND_PL},
+	{"vc", INSTR_COND_VC},
+	{"vs", INSTR_COND_VS},
 };
 
 static int map_compar(const void *key, const void *map_elem)
@@ -115,11 +115,14 @@ uint32_t instr_code(char *key, int type)
 		return bsearch_map(key, dict_sdt, MAP_SIZE(dict_sdt));
 	case INSTR_TYPE_BRANCH:
 		return -1;
-	case 6:
-		return bsearch_map(key, dict_rot, MAP_SIZE(dict_rot));
 	default:
 		return -1;
 	}
+}
+
+uint32_t shift_code(char *key)
+{
+	return bsearch_map(key, dict_rot, MAP_SIZE(dict_rot));
 }
 
 uint32_t classify_instr(char *key)
