@@ -36,51 +36,37 @@ static struct token *nexttok(void)
 
 static bool tok_is_string(void)
 {
-	if (tok->type != TOKEN_TYPE_STRING)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_STRING;
 }
 
 static bool tok_is_number(void)
 {
-	if (tok->type != TOKEN_TYPE_NUMBER)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_NUMBER;
 }
 
 static bool tok_is_bracket_open(void)
 {
-	if (tok->type != TOKEN_TYPE_BRACKET_OPEN)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_BRACKET_OPEN;
 }
 
 static bool tok_is_bracket_close(void)
 {
-	if (tok->type != TOKEN_TYPE_BRACKET_CLOSE)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_BRACKET_CLOSE;
 }
 
 static bool tok_is_newline(void)
 {
-	if (tok->type != TOKEN_TYPE_NEWLINE)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_NEWLINE;
 }
 
 static bool tok_is_reg(void)
 {
-	if (tok->type != TOKEN_TYPE_STRING || tok->str[0] != 'r')
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_STRING && tok->str[0] == 'r';
 }
 
 static bool tok_is_reg_or_number(void)
 {
-	if (!tok_is_reg() && !tok_is_number())
-		return false;
-	return true;
+	return tok_is_reg() || tok_is_number();
 }
 
 static uint8_t tok_get_reg(void)
@@ -104,32 +90,16 @@ static int generate_op2(uint32_t op2, uint8_t *imm, uint8_t *shift)
 	return -1;
 }
 
-
-static int init_halt(struct instruction *tokens)
-{
-	(void)tokens;
-
-	if (!nexttok() || !tok_is_reg())
-		return -1;
-	if (!nexttok() || !tok_is_reg())
-		return -1;
-	if (!nexttok() || !tok_is_reg())
-		return -1;
-	if (!nexttok() || !tok_is_newline())
-		return -1;
-	return 0;
-}
-
 static int init_dpi(struct instruction *tokens)
 {
 	uint32_t j = 0;
 	uint8_t imm;
 	uint8_t shift;
 
-	tokens->instr.dpi.opcode = tokens->code;
+	tokens->instr.dpi.opcode = tokens->opcode;
 	tokens->instr.dpi.setcond = false;
 
-	switch (tokens->code) {
+	switch (tokens->opcode) {
 	case TST_INSTR:
 	case TEQ_INSTR:
 	case CMP_INSTR:
@@ -208,7 +178,7 @@ static int init_dpi(struct instruction *tokens)
 
 static int init_mult(struct instruction *tokens)
 {
-	tokens->instr.mult.accumulate = tokens->code;
+	tokens->instr.mult.accumulate = tokens->opcode;
 	tokens->instr.mult.setcond = false;
 
 	if (!nexttok() || !tok_is_reg())
@@ -223,7 +193,7 @@ static int init_mult(struct instruction *tokens)
 		return -1;
 	tokens->instr.mult.rs = atoi(tok->str + 1);
 
-	if (tokens->code) {
+	if (tokens->opcode) {
 		if (!nexttok() || !tok_is_reg())
 			return -1;
 		tokens->instr.mult.rn = atoi(tok->str + 1);
@@ -241,7 +211,7 @@ static int init_sdt(struct instruction *tokens)
 	uint8_t imm;
 	uint8_t shift;
 
-	tokens->instr.sdt.load = !tokens->code;
+	tokens->instr.sdt.load = !tokens->opcode;
 	tokens->instr.sdt.up = true;
 
 	if (!nexttok() || !tok_is_reg())
@@ -268,7 +238,7 @@ static int init_sdt(struct instruction *tokens)
 			tokens->instr.sdt.offset.immediate = false;
 		} else {
 			tokens->type = INSTR_TYPE_DATA_PROC;
-			tokens->code = 13;
+			tokens->opcode = 13;
 			tokens->instr.dpi.rn = 0;
 			tokens->instr.dpi.rd = rd;
 			tokens->instr.dpi.setcond = false;
@@ -382,7 +352,7 @@ static int init_lsl(struct instruction *tokens)
 		return -1;
 
 	tokens->type = INSTR_TYPE_DATA_PROC;
-	tokens->code = 13;
+	tokens->opcode = 13;
 	tokens->instr.dpi.rd = tok_get_reg();
 	tokens->instr.dpi.op2.immediate = false;
 	tokens->instr.dpi.op2.offset.reg.rm = tokens->instr.dpi.rd;
@@ -405,8 +375,12 @@ static int init_lsl(struct instruction *tokens)
 int parse(struct token_list *toklist, struct instruction *tokens)
 {
 	int ret;
+	char *instr;
+
+	instr = NULL;
 
 	if (toklist) {
+		ret = 0;
 		toks = toklist;
 		tokens_position = 0;
 	}
@@ -427,6 +401,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			goto fail;
 	}
 
+
 	tokens->mnemonic = false;
 
 	if (tok) {
@@ -434,13 +409,12 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			return 0;
 
 		tokens->mnemonic = true;
-		tokens->type = classify_instr(tok->str);
-		tokens->code = instr_code(tok->str, tokens->type);
+		instr = strndup(tok->str, 3);
+		tokens->type = classify_instr(instr);
+		tokens->opcode = instr_code(tok->str, tokens->type);
+		tokens->cond = classify_cond(tok->str + 3);
 
 		switch (tokens->type) {
-		case INSTR_TYPE_HALT:
-			ret = init_halt(tokens);
-			break;
 		case INSTR_TYPE_DATA_PROC:
 			ret = init_dpi(tokens);
 			break;
@@ -451,6 +425,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			ret = init_sdt(tokens);
 			break;
 		case INSTR_TYPE_BRANCH:
+			tokens->cond = classify_cond(tok->str + 1);
 			ret = init_branch(tokens);
 			break;
 		case LSL_INSTR:
@@ -462,9 +437,14 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 			goto fail;
 	}
 
+	free(instr);
+
 	return 0;
 
 fail:
+
+	free(instr);
+
 	if (tok)
 		fprintf(stderr, ASS_ERR_PARSE_NEAR, tok->lineno, tok->colno);
 	else

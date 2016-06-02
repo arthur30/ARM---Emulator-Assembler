@@ -10,13 +10,20 @@
 
 #define EMU_ERR_ARGS         "Run as: emulate <input>\n"
 #define EMU_ERR_BIN_SIZE     "Error: Binary too large, does not fit in memory\n"
-#define EMU_ERR_UNDEF_DPI_OP "Error: Undefined dpi opcode"
-#define EMU_ERR_UNDEF_COND   "Error: Undefined dpi opcode"
+#define EMU_ERR_EXEC         "Error: while executing instruction\n"
+#define EMU_ERR_DECODE       "Error: while decoding instruction\n"
+#define EMU_ERR_FETCH        "Error: while fetching instruction\n"
+#define EMU_ERR_UNDEF_DPI_OP "Error: Undefined dpi opcode\n"
+#define EMU_ERR_UNDEF_COND   "Error: Undefined dpi opcode\n"
 
 #define EMU_RUN_OUT_OF_BOUNDS_MEM \
 	"Error: Out of bounds memory access at address 0x%08zx\n"
-#define EMU_RUN_GPIO_PIN_ACCESS \
-	"One GPIO pin from %d to %d has been accessed\n"
+#define EMU_RUN_GPIO_PIN_ACCESS1 \
+	"One GPIO pin from 0 to 9 has been accessed\n"
+#define EMU_RUN_GPIO_PIN_ACCESS2 \
+	"One GPIO pin from 10 to 19 has been accessed\n"
+#define EMU_RUN_GPIO_PIN_ACCESS3 \
+	"One GPIO pin from 20 to 29 has been accessed\n"
 #define EMU_RUN_GPIO_PIN_OFF "PIN OFF\n"
 #define EMU_RUN_GPIO_PIN_ON  "PIN ON\n"
 
@@ -34,7 +41,7 @@
 #define ASS_ERR_PARSE_NEAR    "Error: Parsing failed near line %zd col %zd\n"
 #define ASS_ERR_PARSE_EOF     "Error: Parsing failed, unexpected end of file\n"
 #define ASS_ERR_PASS1         "Error: First pass failed\n"
-#define ASS_ERR_PASS2         "Error: First second failed\n"
+#define ASS_ERR_PASS2         "Error: Second pass failed\n"
 #define ASS_ERR_JUMP_TARGET   "Error: No such label: %s\n"
 #define ASS_ERR_INVALID_INSTR "Error: Invalid instruction\n"
 #define ASS_ERR_OP2_FIT       "Error: Cannot fit '%d' into operand2 value\n"

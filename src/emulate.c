@@ -1,6 +1,7 @@
 #include "emulate_fetch.h"
 #include "emulate_decode.h"
 #include "emulate_execute.h"
+#include "emulate_memory.h"
 
 #include "pi_state.h"
 #include "pi_msgs.h"
@@ -36,16 +37,14 @@ static void print_state(struct pi_state *pstate)
 	pc = pstate->registers[R_PC];
 	fprintf(stdout, EMU_STATE_REG_PC, pc, pc);
 
-	cpsr =  (pstate->cpsr.n << CSPR_NEGATIVE_FLAG_BIT) |
-		(pstate->cpsr.z << CSPR_ZERO_FLAG_BIT)     |
-		(pstate->cpsr.c << CSPR_CARRY_OUT_FLAG_BIT)|
-		(pstate->cpsr.v << CSPR_OVERFLOW_FLAG_BIT);
+	cpsr = pstate->registers[R_CPSR];
 	fprintf(stdout, EMU_STATE_REG_CPSR, cpsr, cpsr);
 
 	fprintf(stdout, EMU_STATE_MEM_HEAD);
-	mem = pstate->memory;
-	for (address = 0; address < PI_MEMORY_SIZE; address += MEMORY_BOUNDARY_ALLIGNEMENT_BYTES) {
-		if (!((uint32_t *)mem)[address / MEMORY_BOUNDARY_ALLIGNEMENT_BYTES]) {
+	mem = get_memory(pstate, 0);
+	for (address = 0; address < PI_MEMORY_SIZE; address += 4) {
+		memcpy(&val, mem + address, PI_WORD_SIZE);
+		if (!val) {
 			/* skip if word at address is zero */
 			continue;
 		}
@@ -71,6 +70,10 @@ int main(int argc, char **argv)
 		fprintf(stderr, PI_ERR_MEM, "pi state");
 		goto fail;
 	}
+	if (init_pi_memory(pstate)) {
+		fprintf(stderr, PI_ERR_MEM, "pi state memory");
+		goto fail;
+	}
 
 	input = fopen(argv[1], "rb");
 	if (!input) {
@@ -78,8 +81,8 @@ int main(int argc, char **argv)
 		goto fail;
 	}
 
-	fread(&pstate->memory, 1, PI_MEMORY_SIZE, input);
-	fgetc(input); /* so that EOF is set if binary is exactly 64KiB */
+	(void)fread(get_memory(pstate, 0), 1, PI_MEMORY_SIZE, input);
+	(void)fgetc(input); /* so that EOF is set if binary is exactly 64KiB */
 	if (ferror(input)) {
 		fprintf(stderr, PI_ERR_INPUT_IO, strerror(errno), errno);
 		goto fail;
@@ -90,17 +93,29 @@ int main(int argc, char **argv)
 	}
 
 	for (;;) {
-		if (pstate->pipeline.decoded)
-			if (execute(pstate) && !errno)
-				break;
-		if (pstate->pipeline.fetched)
-			if (decode(pstate))
-				break;
-		if (fetch(pstate))
-			break;
-		pstate->registers[R_PC] += MEMORY_BOUNDARY_ALLIGNEMENT_BYTES;
+		if (pstate->pipeline.decoded) {
+			switch (execute(pstate)) {
+			case -1:
+				fprintf(stderr, EMU_ERR_EXEC);
+				goto fail;
+			case 1: /* halt */
+				goto finished;
+			}
+		}
+		if (pstate->pipeline.fetched) {
+			if (decode(pstate)) {
+				fprintf(stderr, EMU_ERR_DECODE);
+				goto fail;
+			}
+		}
+		if (fetch(pstate)) {
+			fprintf(stderr, EMU_ERR_FETCH);
+			goto fail;
+		}
+		pstate->registers[R_PC] += 4;
 	}
 
+finished:
 	print_state(pstate);
 
 	return EXIT_SUCCESS;
@@ -108,5 +123,6 @@ int main(int argc, char **argv)
 fail:
 	if (errno)
 		fprintf(stderr, PI_ERR_GENERIC, strerror(errno), errno);
+
 	return EXIT_FAILURE;
 }

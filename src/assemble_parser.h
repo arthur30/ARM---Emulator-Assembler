@@ -10,7 +10,8 @@ struct instruction {
 	char *jump;
 	bool mnemonic;
 	uint8_t type;
-	uint8_t code;
+	uint8_t cond;
+	uint8_t opcode;
 	uint32_t sdt_offset;
 	union {
 		struct instr_data_proc dpi;

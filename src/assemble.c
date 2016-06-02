@@ -205,10 +205,6 @@ static int second_pass(struct token_list *toks)
 		if (instr->mnemonic) {
 
 			switch (instr->type) {
-			case INSTR_TYPE_HALT:
-				instr_binary = 0;
-				break;
-
 			case INSTR_TYPE_DATA_PROC:
 				instr_binary = instr_dpi(instr);
 				break;
