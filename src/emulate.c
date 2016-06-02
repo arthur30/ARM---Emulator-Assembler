@@ -14,10 +14,11 @@
 
 #define NUMBER_OF_GENERAL_PURPOSE_REGISTERS 12
 
-#define CSPR_NEGATIVE_FLAG_BIT  31
-#define CSPR_ZERO_FLAG_BIT      30
-#define CSPR_CARRY_OUT_FLAG_BIT 29
-#define CSPR_OVERFLOW_FLAG_BIT  28
+/* CSPR_NEGATIVE_FLAG_BIT  31
+ * CSPR_ZERO_FLAG_BIT      30
+ * CSPR_CARRY_OUT_FLAG_BIT 29
+ * CSPR_OVERFLOW_FLAG_BIT  28
+*/
 
 #define MEMORY_BOUNDARY_ALLIGNEMENT_BYTES 4
 
@@ -112,7 +113,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, EMU_ERR_FETCH);
 			goto fail;
 		}
-		pstate->registers[R_PC] += 4;
+		pstate->registers[R_PC] += MEMORY_BOUNDARY_ALLIGNEMENT_BYTES;
 	}
 
 finished:
