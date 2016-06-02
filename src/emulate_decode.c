@@ -11,7 +11,7 @@
 /* gets n bits starting at bit p from the number ic*/
 #define GETBITS(ic, p, n) (((ic) >> (p)) & ((1 << (n)) - 1))
 /* get the register starting at bit p */
-#define GETREG(ic, p) GETBITS(ic, p, NUMBER_OF_BITS_TO_EXTRACT_FOR_REGISTERS)
+#define GETREG(ic, p) GETBITS(ic, p, REG_ADDR_BIT_COUNT)
 /* extends a 26 bit (signed) value to 32 bits - Sign = bit 25  */
 #define SEXT26(value) ((value) | (((value) & (1 << 25)) ? 0xFC000000 : 0))
 /* sets the i-th bit of num */

@@ -12,7 +12,7 @@
 #define R_PC 15
 #define R_CPSR 16
 
-#define NUMBER_OF_BITS_TO_EXTRACT_FOR_REGISTERS 4
+#define REG_ADDR_BIT_COUNT 4
 
 #define CPSR_BIT_N (1 << 31)
 #define CPSR_BIT_Z (1 << 30)
