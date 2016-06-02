@@ -414,7 +414,7 @@ int parse(struct token_list *toklist, struct instruction *tokens)
 		tokens->mnemonic = true;
 		instr = strndup(tok->str, 3);
 		tokens->type = classify_instr(instr);
-		tokens->opcode = instr_code(tok->str, tokens->type);
+		tokens->opcode = instr_code(instr, tokens->type);
 		tokens->cond = classify_cond(tok->str + 3);
 
 		switch (tokens->type) {
