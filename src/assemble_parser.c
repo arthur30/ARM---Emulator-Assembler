@@ -36,51 +36,37 @@ static struct token *nexttok(void)
 
 static bool tok_is_string(void)
 {
-	if (tok->type != TOKEN_TYPE_STRING)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_STRING;
 }
 
 static bool tok_is_number(void)
 {
-	if (tok->type != TOKEN_TYPE_NUMBER)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_NUMBER;
 }
 
 static bool tok_is_bracket_open(void)
 {
-	if (tok->type != TOKEN_TYPE_BRACKET_OPEN)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_BRACKET_OPEN;
 }
 
 static bool tok_is_bracket_close(void)
 {
-	if (tok->type != TOKEN_TYPE_BRACKET_CLOSE)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_BRACKET_CLOSE;
 }
 
 static bool tok_is_newline(void)
 {
-	if (tok->type != TOKEN_TYPE_NEWLINE)
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_NEWLINE;
 }
 
 static bool tok_is_reg(void)
 {
-	if (tok->type != TOKEN_TYPE_STRING || tok->str[0] != 'r')
-		return false;
-	return true;
+	return tok->type == TOKEN_TYPE_STRING && tok->str[0] == 'r';
 }
 
 static bool tok_is_reg_or_number(void)
 {
-	if (!tok_is_reg() && !tok_is_number())
-		return false;
-	return true;
+	return tok_is_reg() || tok_is_number();
 }
 
 static uint8_t tok_get_reg(void)
