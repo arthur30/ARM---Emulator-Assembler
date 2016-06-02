@@ -54,18 +54,18 @@ static int decode_halt(struct pi_state *pstate)
 
 static int decode_shift_register(uint32_t ic, struct shift_reg *reg)
 {
-	reg->rm = GETREG(ic, OP2_REGISTER_RM_FIRST_BIT);
+	reg->rm = GETREG(ic, OP2_REG_RM_FIRST_BIT);
 	reg->constant = !GETFLAG(ic, INSTR_BIT_CONST);
 	reg->shift_type = GETBITS(ic
-	, OP2_REGISTER_SHIFT_TYPE_FIRST_BIT
-	, OP2_REGISTER_SHIFT_TYPE_NUMBER_OF_BITS);
+	, OP2_SHIFT_REG_TYPE_FIRST_BIT
+	, OP2_SHIFT_REG_TYPE_NUMBER_OF_BITS);
 	if (reg->constant)
 		reg->amount.integer = GETBITS(ic
-		, OP2_REGISTER_SHIFT_CONSTANT_FIRST_BIT
-		, OP2_REGISTER_SHIFT_CONSTANT_NUMBER_OF_BITS);
+		, OP2_SHIFT_REG_CONST_FIRST_BIT
+		, OP2_SHIFT_REG_CONST_NUMBER_OF_BITS);
 	else
 		reg->amount.rs = GETREG(ic
-		, OP2_REGISTER_SHIFT_REGISTER_FIRST_BIT);
+		, OP2_SHIFT_REG_REG_FIRST_BIT);
 	return 0;
 }
 
@@ -78,7 +78,7 @@ static int decode_op2(uint32_t ic, struct instr_op2 *op2)
 		, OP2_IMMEDIATE_VALUE_LAST_BIT);
 		op2->offset.imm.rotate = GETBITS(ic
 		, OP2_IMMEDIATE_VALUE_ROTATION_FIRST_BIT
-		, OP2_IMMEDIATE_VALUE_NUMBER_OF_ROTATIONS);
+		, OP2_IMMEDIATE_VALUE_ROTATIONS_COUNT);
 	} else {
 		decode_shift_register(ic, &op2->offset.reg);
 	}
@@ -137,10 +137,10 @@ static int decode_mult(uint32_t ic, struct pi_state *pstate)
 
 	mult->accumulate = GETFLAG(ic, INSTR_BIT_ACC);
 	mult->setcond = GETFLAG(ic, INSTR_BIT_SETCOND);
-	mult->rd = GETREG(ic, MULT_RD_REGISTER_FIRST_BIT);
-	mult->rn = GETREG(ic, MULT_RN_REGISTER_FIRST_BIT);
-	mult->rs = GETREG(ic, MULT_RS_REGISTER_FIRST_BIT);
-	mult->rm = GETREG(ic, MULT_RM_REGISTER_FIRST_BIT);
+	mult->rd = GETREG(ic, MULT_RD_REG_FIRST_BIT);
+	mult->rn = GETREG(ic, MULT_RN_REG_FIRST_BIT);
+	mult->rs = GETREG(ic, MULT_RS_REG_FIRST_BIT);
+	mult->rm = GETREG(ic, MULT_RM_REG_FIRST_BIT);
 
 	return 0;
 }
@@ -177,7 +177,7 @@ static int decode_branch(uint32_t ic, struct pi_state *pstate)
 	branch = &pstate->pipeline.instruction.instr_bits.branch;
 
 	offset = GETBITS(ic
-		 , BRANCH_OFFSET_FIRST_BIT, BRANCH_OFFSET_LAST_BIT) << 2;
+		 , BRANCH_OFFSET_FIRST_BIT, BRANCH_OFFSET_NO_BITS) << 2;
 	offset = SEXT26(offset);
 
 	branch->offset = offset;
@@ -213,5 +213,5 @@ int decode(struct pi_state *pstate)
 		return decode_branch(ic, pstate);
 
 	errno = EINVAL;
-	return -1; /* error */
+	return -1;
 }

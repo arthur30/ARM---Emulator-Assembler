@@ -12,15 +12,7 @@
 #include <string.h>
 #include <errno.h>
 
-#define NUMBER_OF_GENERAL_PURPOSE_REGISTERS 12
-
-/* CSPR_NEGATIVE_FLAG_BIT  31
- * CSPR_ZERO_FLAG_BIT      30
- * CSPR_CARRY_OUT_FLAG_BIT 29
- * CSPR_OVERFLOW_FLAG_BIT  28
-*/
-
-#define MEMORY_BOUNDARY_ALLIGNEMENT_BYTES 4
+#define GP_REG_COUNT 13
 
 static void print_state(struct pi_state *pstate)
 {
@@ -30,7 +22,7 @@ static void print_state(struct pi_state *pstate)
 	size_t address;
 
 	fprintf(stdout, EMU_STATE_REG_HEAD);
-	for (i = 0; i <= NUMBER_OF_GENERAL_PURPOSE_REGISTERS; i++) {
+	for (i = 0; i < GP_REG_COUNT; i++) {
 		val = pstate->registers[i];
 		fprintf(stdout, EMU_STATE_REG_GEN, i, val, val);
 	}
@@ -43,7 +35,7 @@ static void print_state(struct pi_state *pstate)
 
 	fprintf(stdout, EMU_STATE_MEM_HEAD);
 	mem = get_memory(pstate, 0);
-	for (address = 0; address < PI_MEMORY_SIZE; address += 4) {
+	for (address = 0; address < PI_MEMORY_SIZE; address += PI_WORD_SIZE) {
 		memcpy(&val, mem + address, PI_WORD_SIZE);
 		if (!val) {
 			/* skip if word at address is zero */
@@ -113,7 +105,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, EMU_ERR_FETCH);
 			goto fail;
 		}
-		pstate->registers[R_PC] += MEMORY_BOUNDARY_ALLIGNEMENT_BYTES;
+		pstate->registers[R_PC] += PI_WORD_SIZE;
 	}
 
 finished:

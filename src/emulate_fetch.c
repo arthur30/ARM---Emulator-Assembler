@@ -14,7 +14,7 @@ int fetch(struct pi_state *pstate)
 
 	if (pstate->registers[R_PC] >= PI_MEMORY_SIZE) {
 		errno = EFAULT;
-		return -1; /* error */
+		return -1;
 	}
 
 	nextinstr = 0;

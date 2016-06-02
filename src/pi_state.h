@@ -54,16 +54,16 @@
 /* Data processing Operand2(Case: Immediate value) constants: */
 #define OP2_IMMEDIATE_VALUE_FIRST_BIT           0
 #define OP2_IMMEDIATE_VALUE_LAST_BIT            8
-#define OP2_IMMEDIATE_VALUE_NUMBER_OF_ROTATIONS 4
+#define OP2_IMMEDIATE_VALUE_ROTATIONS_COUNT     4
 #define OP2_IMMEDIATE_VALUE_ROTATION_FIRST_BIT  8
 
 /* Data processing Operand2(Case: Register) constants: */
-#define OP2_REGISTER_RM_FIRST_BIT                  0
-#define OP2_REGISTER_SHIFT_TYPE_FIRST_BIT          5
-#define OP2_REGISTER_SHIFT_TYPE_NUMBER_OF_BITS     2
-#define OP2_REGISTER_SHIFT_CONSTANT_FIRST_BIT      7
-#define OP2_REGISTER_SHIFT_CONSTANT_NUMBER_OF_BITS 5
-#define OP2_REGISTER_SHIFT_REGISTER_FIRST_BIT      8
+#define OP2_REG_RM_FIRST_BIT			0
+#define OP2_SHIFT_REG_TYPE_FIRST_BIT		5
+#define OP2_SHIFT_REG_TYPE_NUMBER_OF_BITS	2
+#define OP2_SHIFT_REG_CONST_FIRST_BIT		7
+#define OP2_SHIFT_REG_CONST_NUMBER_OF_BITS	5
+#define OP2_SHIFT_REG_REG_FIRST_BIT		8
 
 /* Data processing constants: */
 #define DATA_PROC_RD_FIRST_BIT     12
@@ -71,10 +71,10 @@
 #define DATA_PROC_OPCODE_FIRST_BIT 21
 
 /* Decode multiply constants: */
-#define MULT_RM_REGISTER_FIRST_BIT 0
-#define MULT_RS_REGISTER_FIRST_BIT 8
-#define MULT_RN_REGISTER_FIRST_BIT 12
-#define MULT_RD_REGISTER_FIRST_BIT 16
+#define MULT_RM_REG_FIRST_BIT 0
+#define MULT_RS_REG_FIRST_BIT 8
+#define MULT_RN_REG_FIRST_BIT 12
+#define MULT_RD_REG_FIRST_BIT 16
 
 /* Single data transfer constants: */
 #define TRANSFER_OFFSET_FIRST_BIT 0
@@ -84,7 +84,7 @@
 
 /* Branch constants: */
 #define BRANCH_OFFSET_FIRST_BIT 0
-#define BRANCH_OFFSET_LAST_BIT  24
+#define BRANCH_OFFSET_NO_BITS	24
 
 struct shift_reg {
 	bool constant;
