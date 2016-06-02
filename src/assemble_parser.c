@@ -10,11 +10,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define LSL_INSTR		5
-#define TST_INSTR		8
-#define TEQ_INSTR		9
-#define CMP_INSTR		10
-#define MOV_INSTR		13
 #define SHIFT_BIT_SIZE		(1 << 4)
 #define IMM_BIT_SIZE		(1 << 8)
 
