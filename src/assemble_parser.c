@@ -113,7 +113,6 @@ static int init_lsl(struct instruction *tokens)
 
 static int init_dpi(struct instruction *tokens)
 {
-	uint32_t j = 0;
 	uint8_t imm;
 	uint8_t shift;
 
@@ -158,7 +157,7 @@ static int init_dpi(struct instruction *tokens)
 
 	if (tokens->instr.dpi.op2.immediate) {
 		if (generate_op2(tok->num, &imm, &shift)) {
-			fprintf(stderr, ASS_ERR_OP2_FIT, j);
+			fprintf(stderr, ASS_ERR_OP2_FIT, tok->num);
 			return -1;
 		}
 		tokens->instr.dpi.op2.offset.imm.imm = imm;
