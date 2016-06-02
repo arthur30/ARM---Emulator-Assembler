@@ -25,8 +25,14 @@
 #define INSTR_BIT_LOAD    (1 << 20)
 #define INSTR_BIT_CONST   (1 <<  4)
 
+#define INSTR_COND_COUNT 15
+
 #define INSTR_DATA_PROC_MASK 0x0C000000
 #define INSTR_DATA_PROC_BITP 0x00000000
+
+#define INSTR_DPI_OPCODE_COUNT 16
+
+#define INSTR_SHIFT_COUNT 4
 
 #define INSTR_MULT_MASK      0x0FC000F0
 #define INSTR_MULT_BITP      0x00000090
@@ -111,6 +117,24 @@ enum instr_type {
 	INSTR_TYPE_BRANCH = 4
 };
 
+enum instr_cond {
+	INSTR_COND_EQ = 0,
+	INSTR_COND_NE = 1,
+	INSTR_COND_CS = 2,
+	INSTR_COND_CC = 3,
+	INSTR_COND_MI = 4,
+	INSTR_COND_PL = 5,
+	INSTR_COND_VS = 6,
+	INSTR_COND_VC = 7,
+	INSTR_COND_HI = 8,
+	INSTR_COND_LS = 9,
+	INSTR_COND_GE = 10,
+	INSTR_COND_LT = 11,
+	INSTR_COND_GT = 12,
+	INSTR_COND_LE = 13,
+	INSTR_COND_AL = 14,
+};
+
 enum instr_dpi_opcode {
 	INSTR_DPI_AND = 0,
 	INSTR_DPI_EOR = 1,
@@ -123,6 +147,13 @@ enum instr_dpi_opcode {
 	INSTR_DPI_ORR = 12,
 	INSTR_DPI_MOV = 13,
 	INSTR_DPI_LSL = 16
+};
+
+enum instr_shift_type {
+	INSTR_SHIFT_LSL = 0,
+	INSTR_SHIFT_LSR = 1,
+	INSTR_SHIFT_ASR = 2,
+	INSTR_SHIFT_ROR = 3,
 };
 
 struct instr {

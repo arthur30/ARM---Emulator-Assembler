@@ -91,7 +91,7 @@ static int init_lsl(struct instruction *tokens)
 		return -1;
 
 	tokens->type = INSTR_TYPE_DATA_PROC;
-	tokens->opcode = 13;
+	tokens->opcode = INSTR_DPI_MOV;
 	tokens->instr.dpi.rd = tok_get_reg();
 	tokens->instr.dpi.op2.immediate = false;
 	tokens->instr.dpi.op2.offset.reg.rm = tokens->instr.dpi.rd;
@@ -166,7 +166,7 @@ static int init_dpi(struct instruction *tokens)
 			if (!tok_is_string())
 				return -1;
 			tokens->instr.dpi.op2.offset.reg.shift_type =
-							instr_code(tok->str, 6);
+							shift_code(tok->str);
 			tokens->instr.dpi.op2.offset.reg.constant = true;
 
 			if (!nexttok())
@@ -256,7 +256,7 @@ static int init_sdt(struct instruction *tokens)
 			tokens->instr.sdt.sdt.offset.immediate = false;
 		} else {
 			tokens->type = INSTR_TYPE_DATA_PROC;
-			tokens->opcode = 13;
+			tokens->opcode = INSTR_DPI_MOV;
 			tokens->instr.dpi.rn = 0;
 			tokens->instr.dpi.rd = rd;
 			tokens->instr.dpi.setcond = false;
@@ -298,7 +298,9 @@ static int init_sdt(struct instruction *tokens)
 
 		if (tok_is_string()) {
 			tokens->instr.sdt.sdt.offset.offset.reg.shift_type =
-					instr_code(tok->str, 6);
+						instr_code(tok->str, 6);
+			tokens->instr.sdt.offset.offset.reg.shift_type =
+						shift_code(tok->str);
 
 			if (!nexttok())
 				return -1;
