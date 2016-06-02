@@ -299,7 +299,7 @@ static int init_sdt(struct instruction *tokens)
 		if (tok_is_string()) {
 			tokens->instr.sdt.sdt.offset.offset.reg.shift_type =
 						instr_code(tok->str, 6);
-			tokens->instr.sdt.offset.offset.reg.shift_type =
+			tokens->instr.sdt.sdt.offset.offset.reg.shift_type =
 						shift_code(tok->str);
 
 			if (!nexttok())
