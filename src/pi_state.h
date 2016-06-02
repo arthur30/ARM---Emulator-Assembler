@@ -61,15 +61,14 @@
 /* Data processing Operand2(Case: Immediate value) constants: */
 #define OP2_IMMEDIATE_VALUE_FIRST_BIT           0
 #define OP2_IMMEDIATE_VALUE_LAST_BIT            8
-#define OP2_IMMEDIATE_VALUE_ROTATIONS_COUNT     4
 #define OP2_IMMEDIATE_VALUE_ROTATION_FIRST_BIT  8
 
 /* Data processing Operand2(Case: Register) constants: */
 #define OP2_REG_RM_FIRST_BIT			0
 #define OP2_SHIFT_REG_TYPE_FIRST_BIT		5
-#define OP2_SHIFT_REG_TYPE_NUMBER_OF_BITS	2
+#define OP2_SHIFT_REG_TYPE_BIT_COUNT		2
 #define OP2_SHIFT_REG_CONST_FIRST_BIT		7
-#define OP2_SHIFT_REG_CONST_NUMBER_OF_BITS	5
+#define OP2_SHIFT_REG_CONST_BIT_COUNT		5
 #define OP2_SHIFT_REG_REG_FIRST_BIT		8
 
 /* Data processing constants: */
@@ -91,7 +90,7 @@
 
 /* Branch constants: */
 #define BRANCH_OFFSET_FIRST_BIT 0
-#define BRANCH_OFFSET_NO_BITS	24
+#define BRANCH_OFFSET_BIT_COUNT	24
 
 struct shift_reg {
 	bool constant;

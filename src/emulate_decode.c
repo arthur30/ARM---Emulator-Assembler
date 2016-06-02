@@ -58,11 +58,11 @@ static int decode_shift_register(uint32_t ic, struct shift_reg *reg)
 	reg->constant = !GETFLAG(ic, INSTR_BIT_CONST);
 	reg->shift_type = GETBITS(ic
 	, OP2_SHIFT_REG_TYPE_FIRST_BIT
-	, OP2_SHIFT_REG_TYPE_NUMBER_OF_BITS);
+	, OP2_SHIFT_REG_TYPE_BIT_COUNT);
 	if (reg->constant)
 		reg->amount.integer = GETBITS(ic
 		, OP2_SHIFT_REG_CONST_FIRST_BIT
-		, OP2_SHIFT_REG_CONST_NUMBER_OF_BITS);
+		, OP2_SHIFT_REG_CONST_BIT_COUNT);
 	else
 		reg->amount.rs = GETREG(ic
 		, OP2_SHIFT_REG_REG_FIRST_BIT);
@@ -78,7 +78,7 @@ static int decode_op2(uint32_t ic, struct instr_op2 *op2)
 		, OP2_IMMEDIATE_VALUE_LAST_BIT);
 		op2->offset.imm.rotate = GETBITS(ic
 		, OP2_IMMEDIATE_VALUE_ROTATION_FIRST_BIT
-		, OP2_IMMEDIATE_VALUE_ROTATIONS_COUNT);
+		, INSTR_SHIFT_COUNT);
 	} else {
 		decode_shift_register(ic, &op2->offset.reg);
 	}
@@ -177,7 +177,7 @@ static int decode_branch(uint32_t ic, struct pi_state *pstate)
 	branch = &pstate->pipeline.instruction.instr_bits.branch;
 
 	offset = GETBITS(ic
-		 , BRANCH_OFFSET_FIRST_BIT, BRANCH_OFFSET_NO_BITS) << 2;
+		 , BRANCH_OFFSET_FIRST_BIT, BRANCH_OFFSET_BIT_COUNT) << 2;
 	offset = SEXT26(offset);
 
 	branch->offset = offset;
