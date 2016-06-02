@@ -7,17 +7,21 @@
 
 struct instruction {
 	char *label;
-	char *jump;
 	bool mnemonic;
 	uint8_t type;
 	uint8_t cond;
 	uint8_t opcode;
-	uint32_t sdt_offset;
 	union {
 		struct instr_data_proc dpi;
 		struct instr_mult mult;
-		struct instr_transfer sdt;
-		struct instr_branch branch;
+		struct {
+			struct instr_transfer sdt;
+			uint32_t offset;
+		} sdt;
+		struct {
+			struct instr_branch branch;
+			char *jump;
+		} branch;
 	} instr;
 };
 

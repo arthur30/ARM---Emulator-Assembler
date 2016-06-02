@@ -115,42 +115,43 @@ uint32_t instr_sdt(struct instruction *instr)
 	uint8_t amount;
 
 	cond = (uint32_t)(instr->cond) << 28;
-	rn = instr->instr.sdt.rn << 16;
-	rd = instr->instr.sdt.rd << 12;
+	rn = instr->instr.sdt.sdt.rn << 16;
+	rd = instr->instr.sdt.sdt.rd << 12;
 	rm = 0;
 	l = 0;
 	p = 0;
 	u = 0;
 	i = 0;
-	offset = instr->instr.sdt.offset.offset.imm;
+	offset = instr->instr.sdt.sdt.offset.offset.imm;
 	constant = false;
 	shift_type = 0;
 	amount = 0;
 
-	if (instr->instr.sdt.up)
+	if (instr->instr.sdt.sdt.up)
 		u = (uint32_t)1 << 23;
 
-	if (instr->instr.sdt.load)
+	if (instr->instr.sdt.sdt.load)
 		l = (uint32_t)1 << 20;
 
-	if (instr->instr.sdt.preindexing)
+	if (instr->instr.sdt.sdt.preindexing)
 		p = (uint32_t)1 << 24;
 
-	if (instr->instr.sdt.offset.immediate) {
+	if (instr->instr.sdt.sdt.offset.immediate) {
 		i = (uint32_t)1 << 25;
-		rm = instr->instr.sdt.offset.offset.reg.rm;
-		shift_type = instr->instr.sdt.offset.offset.reg.shift_type;
-		constant = instr->instr.sdt.offset.offset.reg.constant;
+		rm = instr->instr.sdt.sdt.offset.offset.reg.rm;
+		shift_type = instr->instr.sdt.sdt.offset.offset.reg.shift_type;
+		constant = instr->instr.sdt.sdt.offset.offset.reg.constant;
 
 		if (!constant) {
-			amount = instr->instr.sdt.offset.offset.reg.amount.
-									integer;
+			amount = instr->instr.sdt.sdt.offset.offset.
+							reg.amount.integer;
 			offset = ((uint32_t)amount << 7) |
 				((uint32_t)shift_type << 5) |
 				((uint32_t)constant << 4) |
 				rm;
 		} else {
-			amount = instr->instr.sdt.offset.offset.reg.amount.rs;
+			amount = instr->instr.sdt.sdt.offset.offset.
+							reg.amount.rs;
 			offset = ((uint32_t)amount << 8) |
 				((uint32_t)shift_type << 5) |
 				((uint32_t)constant << 4) |
@@ -167,7 +168,7 @@ uint32_t instr_branch(struct instruction *instr)
 	uint32_t offset;
 
 	cond = instr->cond << 28;
-	offset = (instr->instr.branch.offset >> 2) & ((1 << 24) - 1);
+	offset = (instr->instr.branch.branch.offset >> 2) & ((1 << 24) - 1);
 
 	return cond + (10 << 24) + offset;
 }

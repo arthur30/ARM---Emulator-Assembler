@@ -229,31 +229,31 @@ static int init_sdt(struct instruction *tokens)
 	uint8_t imm;
 	uint8_t shift;
 
-	tokens->instr.sdt.load = !tokens->opcode;
-	tokens->instr.sdt.up = true;
+	tokens->instr.sdt.sdt.load = !tokens->opcode;
+	tokens->instr.sdt.sdt.up = true;
 
 	if (!nexttok() || !tok_is_reg())
 		return -1;
 
 	rd = tok_get_reg();
 
-	tokens->instr.sdt.rd = rd;
-	tokens->instr.sdt.preindexing = true;
-	tokens->instr.sdt.offset.immediate = false;
-	tokens->sdt_offset = 0;
+	tokens->instr.sdt.sdt.rd = rd;
+	tokens->instr.sdt.sdt.preindexing = true;
+	tokens->instr.sdt.sdt.offset.immediate = false;
+	tokens->instr.sdt.offset = 0;
 
 	if (!nexttok())
 		return -1;
 
 	if (tok_is_number()) {
-		if (!tokens->instr.sdt.load) {
+		if (!tokens->instr.sdt.sdt.load) {
 			fprintf(stderr, ASS_ERR_STR_IMM);
 			return -1;
 		}
 
 		if (generate_op2(tok->num, &imm, &shift)) {
-			tokens->sdt_offset = tok->num;
-			tokens->instr.sdt.offset.immediate = false;
+			tokens->instr.sdt.offset = tok->num;
+			tokens->instr.sdt.sdt.offset.immediate = false;
 		} else {
 			tokens->type = INSTR_TYPE_DATA_PROC;
 			tokens->opcode = 13;
@@ -277,40 +277,41 @@ static int init_sdt(struct instruction *tokens)
 	if (!nexttok() || !tok_is_reg())
 		return -1;
 
-	tokens->instr.sdt.rn = tok_get_reg();
+	tokens->instr.sdt.sdt.rn = tok_get_reg();
 
 	if (!nexttok())
 		return -1;
 
 	if (tok_is_number()) {
-		tokens->instr.sdt.up = tok->num > 0;
-		tokens->instr.sdt.offset.offset.imm = (uint32_t)labs(tok->num);
+		tokens->instr.sdt.sdt.up = tok->num > 0;
+		tokens->instr.sdt.sdt.offset.offset.imm
+						= (uint32_t)labs(tok->num);
 
 		if (!nexttok() || !tok_is_bracket_close())
 			return -1;
 	} else if (tok_is_reg()) {
-		tokens->instr.sdt.offset.immediate = true;
-		tokens->instr.sdt.offset.offset.reg.rm = tok_get_reg();
+		tokens->instr.sdt.sdt.offset.immediate = true;
+		tokens->instr.sdt.sdt.offset.offset.reg.rm = tok_get_reg();
 
 		if (!nexttok())
 			return -1;
 
 		if (tok_is_string()) {
-			tokens->instr.sdt.offset.offset.reg.shift_type =
+			tokens->instr.sdt.sdt.offset.offset.reg.shift_type =
 					instr_code(tok->str, 6);
 
 			if (!nexttok())
 				return -1;
 
 			if (tok_is_number()) {
-				tokens->instr.sdt.offset.offset.reg.constant =
-						false;
-				tokens->instr.sdt.offset.offset.reg.
+				tokens->instr.sdt.sdt.offset.offset.
+							reg.constant = false;
+				tokens->instr.sdt.sdt.offset.offset.reg.
 					amount.integer = tok->num;
 			} else if (tok_is_reg()) {
-				tokens->instr.sdt.offset.offset.reg.constant =
-						true;
-				tokens->instr.sdt.offset.offset.reg.
+				tokens->instr.sdt.sdt.offset.offset.
+							reg.constant = true;
+				tokens->instr.sdt.sdt.offset.offset.reg.
 					amount.rs = tok_get_reg();
 			} else {
 				return -1;
@@ -335,14 +336,14 @@ static int init_sdt(struct instruction *tokens)
 	if (tok_is_newline())
 		return 0;
 
-	tokens->instr.sdt.preindexing = false;
+	tokens->instr.sdt.sdt.preindexing = false;
 
 	if (tok_is_number()) {
-		tokens->instr.sdt.up = tok->num > 0;
-		tokens->instr.sdt.offset.offset.imm = (uint32_t)tok->num;
+		tokens->instr.sdt.sdt.up = tok->num > 0;
+		tokens->instr.sdt.sdt.offset.offset.imm = (uint32_t)tok->num;
 	} else if (tok_is_reg()) {
-		tokens->instr.sdt.offset.immediate = true;
-		tokens->instr.sdt.offset.offset.reg.rm = tok_get_reg();
+		tokens->instr.sdt.sdt.offset.immediate = true;
+		tokens->instr.sdt.sdt.offset.offset.reg.rm = tok_get_reg();
 	}
 
 	if (!nexttok() || !tok_is_newline())
@@ -356,7 +357,7 @@ static int init_branch(struct instruction *tokens)
 	if (!nexttok() || tok->type != TOKEN_TYPE_STRING)
 		return -1;
 
-	tokens->jump = tok->str;
+	tokens->instr.branch.jump = tok->str;
 
 	if (!nexttok() || tok->type != TOKEN_TYPE_NEWLINE)
 		return -1;

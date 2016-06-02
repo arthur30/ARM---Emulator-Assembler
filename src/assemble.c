@@ -136,9 +136,9 @@ static int lookout_symbol(char *key)
 
 static void sdt_pc_instr(struct instruction *instr, uint32_t instr_num)
 {
-	instr->instr.sdt.rn = 15;
-	instr->instr.sdt.up = instr->sdt_offset > 0;
-	instr->instr.sdt.offset.offset.imm = 4 * (sym_table.instr_num++) -
+	instr->instr.sdt.sdt.rn = 15;
+	instr->instr.sdt.sdt.up = instr->instr.sdt.offset > 0;
+	instr->instr.sdt.sdt.offset.offset.imm = 4 * (sym_table.instr_num++) -
 						(4 * instr_num + 8);
 }
 
@@ -214,8 +214,8 @@ static int second_pass(struct token_list *toks)
 				break;
 
 			case INSTR_TYPE_TRANSFER:
-				if (instr->sdt_offset) {
-					add_constant(instr->sdt_offset);
+				if (instr->instr.sdt.offset) {
+					add_constant(instr->instr.sdt.offset);
 					sdt_pc_instr(instr, instr_num);
 				}
 
@@ -223,17 +223,19 @@ static int second_pass(struct token_list *toks)
 				break;
 
 			case INSTR_TYPE_BRANCH:
-				jump_to = lookout_symbol(instr->jump);
+				jump_to = lookout_symbol(
+						instr->instr.branch.jump);
 
 				if (jump_to == -1) {
-					fprintf(stderr, ASS_ERR_JUMP_TARGET,
-							instr->jump);
+					fprintf(stderr,
+						ASS_ERR_JUMP_TARGET,
+						instr->instr.branch.jump);
 					exit(EXIT_FAILURE);
 				}
 
 				current = 4*(instr_num);
 				offset = jump_to - (current + 8);
-				instr->instr.branch.offset = offset;
+				instr->instr.branch.branch.offset = offset;
 
 				instr_binary = instr_branch(instr);
 				break;
