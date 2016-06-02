@@ -115,7 +115,7 @@ static int decode_data_proc(uint32_t ic, struct pi_state *pstate)
 
 	data_proc->opcode = GETBITS(ic
 	, DATA_PROC_OPCODE_FIRST_BIT
-	, NUMBER_OF_BITS_TO_EXTRACT_FOR_REGISTERS);
+	, REG_ADDR_BIT_COUNT);
 	data_proc->setcond = GETFLAG(ic, INSTR_BIT_SETCOND);
 	data_proc->rn = GETREG(ic, DATA_PROC_RN_FIRST_BIT);
 	data_proc->rd = GETREG(ic, DATA_PROC_RD_FIRST_BIT);
