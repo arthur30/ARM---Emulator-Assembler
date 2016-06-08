@@ -26,8 +26,9 @@ static void initialize_screen(game_state_t *state, colour_t colour)
 	*}
 	*/
 	rect_fill(state,
-	       (rect_t){{0, 0}, {state->screen.width, state->screen.height} },
-	       colour);
+		(rect_t){(vector_t){0, 0},
+		       (vector_t){state->screen.width, state->screen.height} },
+								colour);
 }
 
 void game_init(game_state_t *state)
