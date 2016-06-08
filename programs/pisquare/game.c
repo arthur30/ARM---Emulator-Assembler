@@ -4,36 +4,38 @@ static box_t test, test2;
 
 static void initialize_screen(game_state_t *state, colour_t colour)
 {
-	/*int offset;
-	*int r, g, b, a;
-	*int x, y;
+	int offset;
+	int r, g, b, a;
+	int x, y;
 
-	*for (y = 0; y < screen.height; y++) {
-	*	for (x = 0; x < screen.width; x++) {
-	*		offset = (x * (screen.bpp >> 3)) + (y * screen.pitch);
+	for (y = 0; y < state->screen.height; y++) {
+		for (x = 0; x < state->screen.width; x++) {
+			offset = (x * (state->screen.bpp >> 3))
+			       + (y * state->screen.pitch);
 
-	*		r = (int)(current_colour.r * 0xFF) & 0xFF;
-	*		g = (int)(current_colour.g * 0xFF) & 0xFF;
-	*		b = (int)(current_colour.b * 0xFF) & 0xFF;
-	*		a = (int)(current_colour.b * 0xFF) & 0xFF;
+			r = (int)(colour.r * 0xFF) & 0xFF;
+			g = (int)(colour.g * 0xFF) & 0xFF;
+			b = (int)(colour.b * 0xFF) & 0xFF;
+			a = (int)(colour.b * 0xFF) & 0xFF;
 
-	*		screen.fb[offset++] = r;
-	*		screen.fb[offset++] = g;
-	*		screen.fb[offset++] = b;
-	*		screen.fb[offset++] = a;
-	*	}
-	*}
+			state->screen.fb[offset++] = r;
+			state->screen.fb[offset++] = g;
+			state->screen.fb[offset++] = b;
+			state->screen.fb[offset++] = a;
+		}
+	}
+
+	/*rect_fill(state,
+	*       (rect_t){{0, 0}, {state->screen.width, state->screen.height} },
+	*       colour);
 	*/
-	rect_fill(state,
-	       (rect_t){{0, 0}, {state->screen.width, state->screen.height} },
-	       colour);
 }
 
 void game_init(game_state_t *state)
 {
 	initialize_screen(state, (colour_t){1, 1, 1, 0});
 
-	colour_t col = (colour_t){0, 0, 0, 255};
+	colour_t col = (colour_t){220, 120, 80, 255};
 
 	test = (box_t){{20, 20}, {10, 10}, {2, 2}, {0, 0}, col};
 
