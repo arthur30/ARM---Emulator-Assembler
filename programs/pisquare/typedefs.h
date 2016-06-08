@@ -7,6 +7,11 @@ typedef struct {
 } vector_t;
 
 typedef struct {
+	float x;
+	float y;
+} vector_float_t;
+
+typedef struct {
 	vector_t origin;
 	vector_t size;
 } rect_t;

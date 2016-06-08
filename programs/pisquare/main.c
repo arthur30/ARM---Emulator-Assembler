@@ -106,15 +106,28 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 
 	game_init(&state);
 
+	uint32_t diff, new;
+
+	long double secondsElapsed;
+
+	rpi_sys_timer_t *timer = RPI_GetSystemTimer();
+	uint32_t prev = timer->counter_lo;
+
 	while (1) {
-		/*time difference
-		*modify buffer ('wipe') / pre-render
-		*update
-		*write full frame
-		*dma transfer
-		*/
-		game_update(&state, 0);
+		/* time delta */
+		new = timer->counter_lo;
+		diff = new - prev;
+		prev = new;
+		secondsElapsed = (long double)diff/1000000;
+
+		state.delta = secondsElapsed;
+		/* modify buffer ('wipe') / pre-render */
+		/* update */
+		game_update(&state);
+		/* draw */
 		/* game_draw(&state);*/
-		RPI_WaitMicroSeconds(8000);
+
+		/*write full frame*/
+		/*dma transfer*/
 	}
 }

@@ -4,10 +4,10 @@
 #include <stdlib.h>
 
 typedef struct {
-	vector_t pos;
+	vector_float_t pos;
 	vector_t size;
-	vector_t vel;
-	vector_t acc;
+	vector_float_t vel;
+	vector_float_t acc;
 } entity_t;
 
 entity_t *entity_new(void);
