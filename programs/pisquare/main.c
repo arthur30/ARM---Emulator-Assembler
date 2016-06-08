@@ -11,6 +11,7 @@
 #include "rpi-mailbox-interface.h"
 #include "rpi-systimer.h"
 
+#include "gamestate.h"
 #include "typedefs.h"
 #include "sprite.h"
 #include "box.h"
@@ -19,7 +20,6 @@
 #define SCREEN_HEIGHT   512
 #define SCREEN_DEPTH    32      /* 16 or 32-bit */
 
-static colour_t white = {1, 1, 1, 0};
 static screen_t screen;
 
 static void initialize_screen(colour_t current_colour)
@@ -127,7 +127,9 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 	if (mp)
 		screen.fb = (unsigned char *)mp->data.buffer_32[0];
 
-	initialize_screen(white);
+	initialize_screen({1,1,1,0});
+	
+	game_state_t state = {.screen = screen};
 
 	colour_t col = {0, 0, 0, 255};
 	box_t test = {{20, 20}, {10, 10}, {2, 2}, {0, 0}, col};
@@ -137,7 +139,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 	while (1) {
 
 		RPI_WaitMicroSeconds(8000);
-		box_draw_wipe(&test, &screen);
+		box_draw_wipe(&state, &test);
 		if ((test.size.x + test.pos.x) == SCREEN_WIDTH) {
 			test.vel.x = -abs(test.vel.x);
 			test.vel.y = -abs(test.vel.y);
@@ -145,10 +147,10 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 			test.vel.x = abs(test.vel.x);
 			test.vel.y = abs(test.vel.y);
 		}
-		box_move(&test);
-		box_draw(&test, &screen);
+		box_move(state, &test);
+		box_draw(&state, &test);
 
-		box_draw_wipe(&test2, &screen);
+		box_draw_wipe(&state, &test2);
 		if ((test2.size.x + test2.pos.x) == SCREEN_WIDTH) {
 			test2.vel.x = -abs(test2.vel.x);
 			test2.vel.y = abs(test2.vel.y);
@@ -156,7 +158,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 			test2.vel.x = abs(test2.vel.x);
 			test2.vel.y = -abs(test2.vel.y);
 		}
-		box_move(&test2);
-		box_draw(&test2, &screen);
+		box_move(&state, &test2);
+		box_draw(&state, &test2);
 	}
 }

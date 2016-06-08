@@ -1,3 +1,5 @@
+#ifndef BOX
+#define BOX
 #include "typedefs.h"
 #include "entity.h"
 
@@ -7,6 +9,8 @@ typedef struct {
 } box_t;
 
 box_t *box_new(void);
-void box_draw_wipe(box_t *box, screen_t *);
-void box_draw(box_t *, screen_t *);
-void box_move(box_t *);
+void box_draw_wipe(game_state_t*, box_t*);
+void box_draw(game_state_t*, box_t*);
+void box_move(game_state_t*, box_t*);
+
+#endif
