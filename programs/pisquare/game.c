@@ -1,5 +1,7 @@
 #include "game.h"
 
+#define BOX_MAX 5
+
 static void initialize_screen(game_state_t *state, colour_t colour)
 {
 	draw_rect(state,
@@ -11,16 +13,19 @@ static void initialize_screen(game_state_t *state, colour_t colour)
 void game_init(game_state_t *state)
 {
 	/* screen color */
-	initialize_screen(state, (colour_t){200, 50, 200, 0});
+	initialize_screen(state, (colour_t){255, 255, 255, 255});
 
 	/* boxes */
-	box_t *boxes = calloc(20, sizeof(box_t));
+	box_t **boxes = calloc(BOX_MAX, sizeof(box_t *));
 
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < BOX_MAX; i++) {
 		boxes[i] = box_new();
-		boxes[i].entity->pos = (vector_t){24 * i, 24 * i};
-		boxes[i].entity->vel = (vector_t){10-i, i-10};
-		boxes[i].colour = (colour_t){12*i, 4*i, 8*i, 255};
+
+		boxes[i]->entity->size = (vector_t){10, 10};
+		boxes[i]->entity->pos = (vector_t){i * 10, i * 10};
+		boxes[i]->entity->vel = (vector_t){2 - i, i - 2};
+		boxes[i]->colour = (colour_t){i*50, i*30, i*20, 255};
+		draw_box(state, boxes[i]);
 	}
 	state->boxes = boxes;
 }
@@ -33,11 +38,12 @@ void game_init(game_state_t *state)
 void game_update(game_state_t *state, float delta)
 {
 	(void)delta;
+	(void)state;
 	/* boxes */
-	for (int i = 0; i < 20; i++) {
-		box_t box = state->boxes[i];
+	for (int i = 0; i < BOX_MAX; i++) {
+		box_t *box = state->boxes[i];
 
-		entity_t *entity = box.entity;
+		entity_t *entity = box->entity;
 
 		if ((entity->size.x + entity->pos.x) >= state->screen.width) {
 			entity->vel.x = -abs(entity->vel.x);
@@ -46,8 +52,9 @@ void game_update(game_state_t *state, float delta)
 			entity->vel.x = abs(entity->vel.x);
 			entity->vel.y = abs(entity->vel.y);
 		}
-		move_box(state, &box);
-		draw_box(state, &box);
+		wipe_box(state, box);
+		move_box(state, box);
+		draw_box(state, box);
 	}
 }
 

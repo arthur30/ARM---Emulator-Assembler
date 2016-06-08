@@ -10,6 +10,7 @@ void draw_rect(game_state_t*, rect_t, colour_t);
 void draw_sprite(game_state_t*, sprite_t*);
 
 /* Box */
+void wipe_box(game_state_t*, box_t *box);
 void draw_box(game_state_t*, box_t *box);
 
 #endif

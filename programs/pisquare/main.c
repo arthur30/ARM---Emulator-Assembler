@@ -114,7 +114,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 		*dma transfer
 		*/
 		game_update(&state, 0);
-		game_draw(&state);
+		/* game_draw(&state);*/
 		RPI_WaitMicroSeconds(8000);
 	}
 }

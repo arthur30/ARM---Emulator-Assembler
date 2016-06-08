@@ -17,6 +17,12 @@ void draw_rect(game_state_t *state, rect_t rect, colour_t col)
 	}
 }
 
+void wipe_box(game_state_t *state, box_t *box)
+{
+	draw_rect(state, entity_rect(box->entity),
+					(colour_t){255, 255, 255, 255});
+}
+
 void draw_box(game_state_t *state, box_t *box)
 {
 	draw_rect(state, entity_rect(box->entity), box->colour);
