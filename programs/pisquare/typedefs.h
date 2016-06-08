@@ -12,10 +12,10 @@ typedef struct {
 } rect_t;
 
 typedef struct {
-    float r;
-    float g;
-    float b;
-    float a;
+	float r;
+	float g;
+	float b;
+	float a;
 } colour_t;
 
 typedef struct {
@@ -23,7 +23,8 @@ typedef struct {
 	int width;
 	int bpp;
 	int pitch;
-	volatile unsigned char* fb;
+
+	volatile unsigned char *fb;
 } screen_t;
 
 #endif
