@@ -8,6 +8,7 @@
 #include "sprite.h"
 #include "box.h"
 #include "draw.h"
+#include "move.h"
 
 void game_init(game_state_t *state);
 void game_update(game_state_t *state, float delta);

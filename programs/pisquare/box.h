@@ -1,18 +1,13 @@
 #ifndef BOX
 #define BOX
-#include "gamestate.h"
-#include "typedefs.h"
+
 #include "entity.h"
-#include "draw.h"
 
 typedef struct {
-	ENTITY_MEMBERS;
+	entity_t *entity;
 	colour_t colour;
 } box_t;
 
-box_t *box_new(void);
-void box_draw_wipe(game_state_t*, box_t*);
-void box_draw(game_state_t*, box_t*);
-void box_move(game_state_t*, box_t*);
+box_t box_new(void);
 
 #endif
