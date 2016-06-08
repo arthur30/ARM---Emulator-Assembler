@@ -1,7 +1,9 @@
 #ifndef BOX
 #define BOX
+#include "gamestate.h"
 #include "typedefs.h"
 #include "entity.h"
+#include "draw.h"
 
 typedef struct {
 	ENTITY_MEMBERS;

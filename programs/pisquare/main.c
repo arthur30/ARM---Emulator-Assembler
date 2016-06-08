@@ -127,8 +127,8 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 	if (mp)
 		screen.fb = (unsigned char *)mp->data.buffer_32[0];
 
-	initialize_screen({1,1,1,0});
-	
+	initialize_screen((colour_t){1, 1, 1, 0});
+
 	game_state_t state = {.screen = screen};
 
 	colour_t col = {0, 0, 0, 255};
@@ -147,7 +147,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 			test.vel.x = abs(test.vel.x);
 			test.vel.y = abs(test.vel.y);
 		}
-		box_move(state, &test);
+		box_move(&state, &test);
 		box_draw(&state, &test);
 
 		box_draw_wipe(&state, &test2);
