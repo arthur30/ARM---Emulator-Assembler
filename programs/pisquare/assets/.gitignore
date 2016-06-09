@@ -1,2 +1,5 @@
+*.a
 *.h
+*.o
 *.bin
+makeheaders

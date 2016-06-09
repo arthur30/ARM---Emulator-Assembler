@@ -12,7 +12,7 @@
 #include "move.h"
 #include "draw.h"
 
-#include "assets/splash.h"
+#include "assets/assets.h"
 
 static void add_box(game_state_t *state)
 {

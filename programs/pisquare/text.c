@@ -1,48 +1,8 @@
 #include "text.h"
+
 #include <string.h>
 
-#include "assets/font/A.h"
-#include "assets/font/B.h"
-#include "assets/font/C.h"
-#include "assets/font/D.h"
-#include "assets/font/E.h"
-#include "assets/font/F.h"
-#include "assets/font/G.h"
-#include "assets/font/H.h"
-#include "assets/font/I.h"
-#include "assets/font/J.h"
-#include "assets/font/K.h"
-#include "assets/font/L.h"
-#include "assets/font/M.h"
-#include "assets/font/N.h"
-#include "assets/font/O.h"
-#include "assets/font/P.h"
-#include "assets/font/Q.h"
-#include "assets/font/R.h"
-#include "assets/font/S.h"
-#include "assets/font/T.h"
-#include "assets/font/U.h"
-#include "assets/font/V.h"
-#include "assets/font/W.h"
-#include "assets/font/X.h"
-#include "assets/font/Y.h"
-#include "assets/font/Z.h"
-#include "assets/font/0.h"
-#include "assets/font/1.h"
-#include "assets/font/2.h"
-#include "assets/font/3.h"
-#include "assets/font/4.h"
-#include "assets/font/5.h"
-#include "assets/font/6.h"
-#include "assets/font/7.h"
-#include "assets/font/8.h"
-#include "assets/font/9.h"
-#include "assets/font/DOT.h"
-#include "assets/font/QUES.h"
-#include "assets/font/COMMA.h"
-#include "assets/font/COLON.h"
-#include "assets/font/SPACE.h"
-#include "assets/font/EX.h"
+#include "assets/assets.h"
 
 void print_text_color(game_state_t *state, const char *string, vector2_t pos,
 		      color_t col)
@@ -73,90 +33,90 @@ unsigned char *get_letter(char letter)
 {
 	switch (letter) {
 	case 32:
-		return SPACE_bin;
+		return font_SPACE_bin;
 	case 33:
-		return EX_bin;
+		return font_EX_bin;
 	case 44:
-		return COMMA_bin;
+		return font_COMMA_bin;
 	case 46:
-		return DOT_bin;
+		return font_DOT_bin;
 	case 48:
-		return __0_bin;
+		return font_0_bin;
 	case 49:
-		return __1_bin;
+		return font_1_bin;
 	case 50:
-		return __2_bin;
+		return font_2_bin;
 	case 51:
-		return __3_bin;
+		return font_3_bin;
 	case 52:
-		return __4_bin;
+		return font_4_bin;
 	case 53:
-		return __5_bin;
+		return font_5_bin;
 	case 54:
-		return __6_bin;
+		return font_6_bin;
 	case 55:
-		return __7_bin;
+		return font_7_bin;
 	case 56:
-		return __8_bin;
+		return font_8_bin;
 	case 57:
-		return __9_bin;
+		return font_9_bin;
 	case 58:
-		return COLON_bin;
+		return font_COLON_bin;
 	case 63:
-		return QUES_bin;
+		return font_QUES_bin;
 	case 65:
-		return A_bin;
+		return font_A_bin;
 	case 66:
-		return B_bin;
+		return font_B_bin;
 	case 67:
-		return C_bin;
+		return font_C_bin;
 	case 68:
-		return D_bin;
+		return font_D_bin;
 	case 69:
-		return E_bin;
+		return font_E_bin;
 	case 70:
-		return F_bin;
+		return font_F_bin;
 	case 71:
-		return G_bin;
+		return font_G_bin;
 	case 72:
-		return H_bin;
+		return font_H_bin;
 	case 73:
-		return I_bin;
+		return font_I_bin;
 	case 74:
-		return J_bin;
+		return font_J_bin;
 	case 75:
-		return K_bin;
+		return font_K_bin;
 	case 76:
-		return L_bin;
+		return font_L_bin;
 	case 77:
-		return M_bin;
+		return font_M_bin;
 	case 78:
-		return N_bin;
+		return font_N_bin;
 	case 79:
-		return O_bin;
+		return font_O_bin;
 	case 80:
-		return P_bin;
+		return font_P_bin;
 	case 81:
-		return Q_bin;
+		return font_Q_bin;
 	case 82:
-		return R_bin;
+		return font_R_bin;
 	case 83:
-		return S_bin;
+		return font_S_bin;
 	case 84:
-		return T_bin;
+		return font_T_bin;
 	case 85:
-		return U_bin;
+		return font_U_bin;
 	case 86:
-		return V_bin;
+		return font_V_bin;
 	case 87:
-		return W_bin;
+		return font_W_bin;
 	case 88:
-		return X_bin;
+		return font_X_bin;
 	case 89:
-		return Y_bin;
+		return font_Y_bin;
 	case 90:
-		return Z_bin;
+		return font_Z_bin;
 	default:
-		return COMMA_bin;
+		return font_COMMA_bin;
 	}
 }

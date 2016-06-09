@@ -2,7 +2,7 @@
 
 #include "renderer.h"
 
-#include "assets/background.h"
+#include "assets/assets.h"
 
 void draw_background(game_state_t *state)
 {
