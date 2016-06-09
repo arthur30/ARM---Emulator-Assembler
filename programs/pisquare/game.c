@@ -51,8 +51,10 @@ void game_init(game_state_t *state)
 	/* player */
 	player_t *player = player_new();
 
-	state->player = player;
 	player->entity->pos = (vector_float_t){256, 256};
+	player->angular_vel = 180;
+
+	state->player = player;
 
 	/* timers */
 	state->timer_box = 0;
@@ -71,38 +73,20 @@ void game_update(game_state_t *state)
 		state->timer_box = 0;
 		add_box(state);
 	}
-
+	/* Move Boxes */
 	for (int i = 0; i < state->box_count; i++) {
 		box_t *box = state->boxes[i];
-		entity_t *entity = box->entity;
 
 		move_box(state, box);
-
-		if (entity->pos.x > state->area.x) {
-			entity->pos.x = -entity->size.x;
-			entity->pos.y = random_int(state->area.y
-							-entity->size.y)
-							+ entity->size.y/2;
-		} else if (entity->pos.x + entity->size.x  < 0) {
-			entity->pos.x = state->area.x;
-			entity->pos.y = random_int(state->area.y
-							-entity->size.y)
-							+ entity->size.y/2;
-		}
-		if (entity->pos.y > state->area.y) {
-			entity->pos.y = -entity->size.y;
-			entity->pos.x = random_int(state->area.x
-							-entity->size.x)
-							+ entity->size.x/2;
-		} else if (entity->pos.y + entity->size.y < 0) {
-			entity->pos.y = state->area.y;
-			entity->pos.x = random_int(state->area.x
-							-entity->size.x)
-							+ entity->size.x/2;
-		}
 	}
 	/* Player */
 	move_player(state, state->player);
+
+	/* Detect collisions */
+	for (int i = 0; i < state->box_count; i++) {
+		box_t *box = state->boxes[i];
+		(void)box;
+	}
 }
 
 void game_draw(game_state_t *state)

@@ -6,12 +6,13 @@
 
 #define PLAYER_LIVES 3
 #define PLAYER_DIRECTION 90
-#define PLAYER_SPEED 40
+#define PLAYER_SPEED 200
 
 typedef struct {
 	entity_t *entity;
-	int dir;
+	float dir;
 	float speed;
+	float angular_vel;
 	int lives;
 	colour_t colour;
 } player_t;

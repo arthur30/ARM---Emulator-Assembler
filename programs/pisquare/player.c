@@ -5,7 +5,7 @@ player_t *player_new(void)
 	player_t *new = malloc(sizeof(player_t));
 
 	new->entity = entity_new();
-	new->entity->size = (vector_t){30, 30};
+	new->entity->size = (vector_t){5, 5};
 	new->lives = PLAYER_LIVES;
 	new->dir = PLAYER_DIRECTION;
 	new->speed = PLAYER_SPEED;

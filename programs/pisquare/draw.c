@@ -35,9 +35,9 @@ void draw_player(game_state_t *state, player_t *player)
 
 	/* Draw Direction */
 	vector_t pos = (vector_t){player->entity->pos.x
-				+ player->entity->vel.x * 10 - 2,
-				  player->entity->pos.y
-				+ player->entity->vel.y * 10 - 2};
+			+ player->entity->vel.x * state->delta * 10 - 2,
+			  player->entity->pos.y
+			+ player->entity->vel.y * state->delta * 10 - 2};
 
 	draw_rect(state, (rect_t){pos, {4, 4} }, player->colour);
 }
