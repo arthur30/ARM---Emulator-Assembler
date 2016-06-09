@@ -1,8 +1,5 @@
 #include "game.h"
 
-
-#define BOX_MAX 20
-
 static void initialize_screen(game_state_t *state, colour_t colour)
 {
 	draw_rect(state,
@@ -11,45 +8,54 @@ static void initialize_screen(game_state_t *state, colour_t colour)
 								colour);
 }
 
+static void add_box(game_state_t *state)
+{
+	bool right = random_int(2);
+	int sign = 2 * right - 1;
+	float vel = sign * random_int(500);
+
+	box_t *box = box_new();
+
+	box->entity->size = (vector_t){10, 10};
+	int randy = random_int(state->screen.height - box->entity->size.x)
+						+ box->entity->size.x/2;
+
+	int posx = -box->entity->size.x + !right * (state->screen.width
+							+ box->entity->size.x);
+	box->entity->pos = (vector_float_t){posx, randy};
+	box->entity->vel = (vector_float_t){vel, 0};
+	box->colour = (colour_t){255, 255, 255, 255};
+
+	++state->box_count;
+	state->boxes = realloc(state->boxes,
+					state->box_count * sizeof(box_t *));
+	state->boxes[state->box_count] = box;
+}
+
 void game_init(game_state_t *state)
 {
-	int vel;
-	bool dir;
-
 	RPI_InitRandom();
 
 	/* screen color */
 	initialize_screen(state, (colour_t){255, 255, 255, 255});
 
 	/* boxes */
-	box_t **boxes = calloc(BOX_MAX, sizeof(box_t *));
-
-	for (int i = 0; i < BOX_MAX; i++) {
-		boxes[i] = box_new();
-
-		boxes[i]->entity->size = (vector_t){10, 10};
-		boxes[i]->entity->pos = (vector_float_t){i * 10, 0};
-
-		dir = random_int(2);
-		vel = 50+random_int(80);
-
-		boxes[i]->entity->vel = (vector_float_t){dir*vel, !dir*vel};
-
-		boxes[i]->colour = (colour_t){i*5, i*7, i*8, 255};
-		draw_box(state, boxes[i]);
-	}
-	state->boxes = boxes;
+	state->box_count = 0;
 }
-/*void game_prerender(game_state_t *state)
-*{
-*	(void)state;
-*}
-*/
 
 void game_update(game_state_t *state)
 {
-	/* boxes */
-	for (int i = 0; i < BOX_MAX; i++) {
+	/* Timers */
+	state->timer_box += state->delta;
+
+	/* Boxes */
+	/* Increase number of boxes over time */
+	if (state->timer_box > BOX_TIMER && state->box_count < BOX_COUNT_MAX) {
+		state->timer_box = 0;
+		add_box(state);
+	}
+
+	for (int i = 0; i < state->box_count; i++) {
 		box_t *box = state->boxes[i];
 
 		entity_t *entity = box->entity;
@@ -84,7 +90,7 @@ void game_update(game_state_t *state)
 void game_draw(game_state_t *state)
 {
 	/* boxes */
-	for (int i = 0; i < BOX_MAX; i++) {
+	for (int i = 0; i < state->box_count; i++) {
 		box_t *box = state->boxes[i];
 
 		draw_box(state, box);
@@ -94,7 +100,7 @@ void game_draw(game_state_t *state)
 void game_free(game_state_t *state)
 {
 	/* boxes */
-	for (int i = 0; i < BOX_MAX; i++)
+	for (int i = 0; i < state->box_count; i++)
 		box_free(state->boxes[i]);
 
 	free(state->boxes);

@@ -3,6 +3,7 @@
 
 #include "entity.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct {
 	entity_t *entity;
