@@ -7,30 +7,20 @@ static void initialize_screen(game_state_t *state, colour_t colour)
 		       (vector_t){state->screen.width, state->screen.height} },
 								colour);
 }
-#ifdef DEBUG
-static void fill_random(game_state_t *state)
-{
-	int rand_r = random_int(256);
-	int rand_g = random_int(256);
-	int rand_b = random_int(256);
-
-	initialize_screen(state, (colour_t){rand_r, rand_g, rand_b, 255});
-}
-#endif
 
 static void add_box(game_state_t *state)
 {
 	bool right = random_int(2);
 	int sign = 2 * right - 1;
-	float vel = sign * random_int(500);
+	float vel = sign * (random_int(700) + 100);
 
 	box_t *box = box_new();
 
 	box->entity->size = (vector_t){10, 10};
-	int randy = random_int(state->screen.height - box->entity->size.x)
+	int randy = random_int(state->area.y - box->entity->size.x)
 						+ box->entity->size.x/2;
 
-	int posx = -box->entity->size.x + !right * (state->screen.width
+	int posx = -box->entity->size.x + !right * (state->area.x
 							+ box->entity->size.x);
 	int rand_r = random_int(256);
 	int rand_g = random_int(256);
@@ -49,18 +39,31 @@ static void add_box(game_state_t *state)
 void game_init(game_state_t *state)
 {
 	RPI_InitRandom();
+	/* game area */
+	state->area = (vector_t){state->screen.width,
+				     state->screen.height - 32};
 
 	/* screen color */
 	initialize_screen(state, (colour_t){104, 200, 169, 255});
 
 	/* boxes */
 	state->box_count = 0;
+	/* player */
+	player_t *player = player_new();
+
+	state->player = player;
+	player->entity->pos = (vector_float_t){256, 256};
+
+	/* timers */
+	state->timer_box = 0;
+	state->timer_game = 0;
 }
 
 void game_update(game_state_t *state)
 {
 	/* Timers */
 	state->timer_box += state->delta;
+	state->timer_game += state->delta;
 
 	/* Boxes */
 	/* Increase number of boxes over time */
@@ -75,29 +78,31 @@ void game_update(game_state_t *state)
 
 		move_box(state, box);
 
-		if (entity->pos.x > state->screen.width) {
+		if (entity->pos.x > state->area.x) {
 			entity->pos.x = -entity->size.x;
-			entity->pos.y = random_int(state->screen.height
+			entity->pos.y = random_int(state->area.y
 							-entity->size.y)
 							+ entity->size.y/2;
 		} else if (entity->pos.x + entity->size.x  < 0) {
-			entity->pos.x = state->screen.width;
-			entity->pos.y = random_int(state->screen.height
+			entity->pos.x = state->area.x;
+			entity->pos.y = random_int(state->area.y
 							-entity->size.y)
 							+ entity->size.y/2;
 		}
-		if (entity->pos.y > state->screen.height) {
+		if (entity->pos.y > state->area.y) {
 			entity->pos.y = -entity->size.y;
-			entity->pos.x = random_int(state->screen.width
+			entity->pos.x = random_int(state->area.x
 							-entity->size.x)
 							+ entity->size.x/2;
 		} else if (entity->pos.y + entity->size.y < 0) {
-			entity->pos.y = state->screen.height;
-			entity->pos.x = random_int(state->screen.width
+			entity->pos.y = state->area.y;
+			entity->pos.x = random_int(state->area.x
 							-entity->size.x)
 							+ entity->size.x/2;
 		}
 	}
+	/* Player */
+	move_player(state, state->player);
 }
 
 void game_draw(game_state_t *state)
@@ -108,6 +113,8 @@ void game_draw(game_state_t *state)
 
 		draw_box(state, box);
 	}
+	/* player */
+	draw_player(state, state->player);
 }
 
 void game_free(game_state_t *state)
@@ -117,4 +124,5 @@ void game_free(game_state_t *state)
 		box_free(state->boxes[i]);
 
 	free(state->boxes);
+	free(state->player);
 }

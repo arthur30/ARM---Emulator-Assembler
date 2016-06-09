@@ -4,9 +4,9 @@ void draw_rect(game_state_t *state, rect_t rect, colour_t col)
 {
 	int offset;
 	int size_vertical =
-		min(rect.size.y, state->screen.height - rect.origin.y);
+		min(rect.size.y, state->area.y - rect.origin.y);
 	int size_horizontal =
-		min(rect.size.x, state->screen.width - rect.origin.x);
+		min(rect.size.x, state->area.x - rect.origin.x);
 	int offset_vertical = max(-rect.origin.y, 0);
 	int offset_horizontal = max(-rect.origin.x, 0);
 
@@ -26,6 +26,20 @@ void draw_rect(game_state_t *state, rect_t rect, colour_t col)
 void draw_box(game_state_t *state, box_t *box)
 {
 	draw_rect(state, entity_rect(box->entity), box->colour);
+}
+
+void draw_player(game_state_t *state, player_t *player)
+{
+	/* Draw Player */
+	draw_rect(state, entity_rect(player->entity), player->colour);
+
+	/* Draw Direction */
+	vector_t pos = (vector_t){player->entity->pos.x
+				+ player->entity->vel.x * 10 - 2,
+				  player->entity->pos.y
+				+ player->entity->vel.y * 10 - 2};
+
+	draw_rect(state, (rect_t){pos, {4, 4} }, player->colour);
 }
 
 void draw_sprite(game_state_t *state, sprite_t *sprt)

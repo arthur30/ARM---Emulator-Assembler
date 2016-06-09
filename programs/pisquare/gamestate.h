@@ -2,22 +2,25 @@
 #define GAMESTATE
 
 #include "typedefs.h"
+#include "player.h"
 #include "box.h"
-
-#define BOX_TIMER 1.0f
-#define BOX_COUNT_MAX 40
 
 typedef struct {
 	screen_t screen;
+	vector_t area;
 	void *buffer;
-	box_t **boxes;
 
 	long double delta;
+
+	player_t *player;
+
+	box_t **boxes;
 
 	int box_count;
 
 	/* Timers */
 	long double timer_box;
+	long double timer_game;
 } game_state_t;
 
 #endif
