@@ -12,6 +12,7 @@
 #include "rpi-systimer.h"
 
 #include "game.h"
+#include "text.h"
 
 #define SCREEN_WIDTH    512
 #define SCREEN_HEIGHT   512
@@ -127,6 +128,8 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 		/* draw */
 		game_draw(&state);
 		/*write full frame*/
+
+		print_text(&state, "ARM11", (vector_t){0, 485});
 
 		/* check game state transition conditions */
 		/* perform transition */
