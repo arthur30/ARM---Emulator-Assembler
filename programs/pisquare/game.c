@@ -54,7 +54,7 @@ void game_update(game_state_t *state)
 
 		entity_t *entity = box->entity;
 
-		wipe_box(state, box);
+		move_box(state, box);
 
 		if (entity->pos.x > state->screen.width) {
 			entity->pos.x = -entity->size.x;
@@ -78,12 +78,15 @@ void game_update(game_state_t *state)
 							-entity->size.x)
 							+ entity->size.x/2;
 		}
-		move_box(state, box);
-		draw_box(state, box);
 	}
 }
 
 void game_draw(game_state_t *state)
 {
-	(void)state;
+	/* boxes */
+	for (int i = 0; i < BOX_MAX; i++) {
+		box_t *box = state->boxes[i];
+
+		draw_box(state, box);
+	}
 }

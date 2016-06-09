@@ -3,9 +3,15 @@
 void draw_rect(game_state_t *state, rect_t rect, colour_t col)
 {
 	int offset;
+	int size_vertical =
+		min(rect.size.y, state->screen.height - rect.origin.y);
+	int size_horizontal =
+		min(rect.size.x, state->screen.width - rect.origin.x);
+	int offset_vertical = max(-rect.origin.y, 0);
+	int offset_horizontal = max(-rect.origin.x, 0);
 
-	for (int y = 0; y < rect.size.y; y++) {
-		for (int x = 0; x < rect.size.x; x++) {
+	for (int y = offset_vertical; y < size_vertical; y++) {
+		for (int x = offset_horizontal; x < size_horizontal; x++) {
 			offset = (x + rect.origin.x)
 			       * (state->screen.bpp >> 3)
 			       + ((y + rect.origin.y) * state->screen.pitch);
@@ -15,12 +21,6 @@ void draw_rect(game_state_t *state, rect_t rect, colour_t col)
 			state->screen.fb[offset++] = col.a;
 		}
 	}
-}
-
-void wipe_box(game_state_t *state, box_t *box)
-{
-	draw_rect(state, entity_rect(box->entity),
-					(colour_t){255, 255, 255, 255});
 }
 
 void draw_box(game_state_t *state, box_t *box)

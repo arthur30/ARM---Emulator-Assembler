@@ -125,7 +125,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 		/* update */
 		game_update(&state);
 		/* draw */
-		/* game_draw(&state);*/
+		game_draw(&state);
 
 		/*write full frame*/
 	}
