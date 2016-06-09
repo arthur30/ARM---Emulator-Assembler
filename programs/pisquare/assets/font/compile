@@ -8,6 +8,10 @@ xxd -i DOT.bin > DOT.h
 xxd -i QUES.bin > QUES.h 
 ~/Desktop/imager.py COMMA.png --out=COMMA.bin
 xxd -i COMMA.bin > COMMA.h 
+~/Desktop/imager.py SPACE.png --out=SPACE.bin
+xxd -i SPACE.bin > SPACE.h 
+~/Desktop/imager.py COLON.png --out=COLON.bin
+xxd -i COLON.bin > COLON.h 
 ~/Desktop/imager.py A.png --out=A.bin 
 xxd -i A.bin > A.h 
 ~/Desktop/imager.py B.png --out=B.bin  
