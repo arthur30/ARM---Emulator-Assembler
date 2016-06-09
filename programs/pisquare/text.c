@@ -40,6 +40,8 @@
 #include "assets/font/DOT.h"
 #include "assets/font/QUES.h"
 #include "assets/font/COMMA.h"
+#include "assets/font/COLON.h"
+#include "assets/font/SPACE.h"
 #include "assets/font/EX.h"
 
 void print_text_colour(game_state_t *state, const char *string, vector_t pos,
@@ -89,6 +91,8 @@ void print_text(game_state_t *state, const char *string, vector_t pos)
 unsigned char *get_letter(char letter)
 {
 	switch (letter) {
+	case 32:
+		return SPACE_bin;
 	case 33:
 		return EX_bin;
 	case 44:
@@ -116,6 +120,8 @@ unsigned char *get_letter(char letter)
 	case 57:
 		return __9_bin;
 	case 58:
+		return COLON_bin;
+	case 63:
 		return QUES_bin;
 	case 65:
 		return A_bin;
