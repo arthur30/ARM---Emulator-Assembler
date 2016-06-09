@@ -4,7 +4,7 @@
 #include "typedefs.h"
 #include "box.h"
 
-#define BOX_TIMER 0.5f
+#define BOX_TIMER 1.0f
 #define BOX_COUNT_MAX 40
 
 typedef struct {
@@ -14,10 +14,10 @@ typedef struct {
 
 	long double delta;
 
-	unsigned short box_count;
+	int box_count;
 
 	/* Timers */
-	float timer_box;
+	long double timer_box;
 } game_state_t;
 
 #endif

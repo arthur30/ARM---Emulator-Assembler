@@ -7,6 +7,16 @@ static void initialize_screen(game_state_t *state, colour_t colour)
 		       (vector_t){state->screen.width, state->screen.height} },
 								colour);
 }
+#ifdef DEBUG
+static void fill_random(game_state_t *state)
+{
+	int rand_r = random_int(256);
+	int rand_g = random_int(256);
+	int rand_b = random_int(256);
+
+	initialize_screen(state, (colour_t){rand_r, rand_g, rand_b, 255});
+}
+#endif
 
 static void add_box(game_state_t *state)
 {
@@ -22,14 +32,18 @@ static void add_box(game_state_t *state)
 
 	int posx = -box->entity->size.x + !right * (state->screen.width
 							+ box->entity->size.x);
+	int rand_r = random_int(256);
+	int rand_g = random_int(256);
+	int rand_b = random_int(256);
+
 	box->entity->pos = (vector_float_t){posx, randy};
 	box->entity->vel = (vector_float_t){vel, 0};
-	box->colour = (colour_t){255, 255, 255, 255};
+	box->colour = (colour_t){rand_r, rand_g, rand_b, 255};
 
 	++state->box_count;
 	state->boxes = realloc(state->boxes,
 					state->box_count * sizeof(box_t *));
-	state->boxes[state->box_count] = box;
+	state->boxes[state->box_count-1] = box;
 }
 
 void game_init(game_state_t *state)
@@ -37,7 +51,7 @@ void game_init(game_state_t *state)
 	RPI_InitRandom();
 
 	/* screen color */
-	initialize_screen(state, (colour_t){255, 255, 255, 255});
+	initialize_screen(state, (colour_t){104, 200, 169, 255});
 
 	/* boxes */
 	state->box_count = 0;
@@ -57,7 +71,6 @@ void game_update(game_state_t *state)
 
 	for (int i = 0; i < state->box_count; i++) {
 		box_t *box = state->boxes[i];
-
 		entity_t *entity = box->entity;
 
 		move_box(state, box);
