@@ -1,5 +1,9 @@
 #include "move.h"
 
+#include <math.h>
+
+#include "random.h"
+
 static double mod(double x, double y)
 {
 	if (x > 0)

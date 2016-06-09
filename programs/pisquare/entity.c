@@ -1,13 +1,15 @@
 #include "entity.h"
 
+#include <stdlib.h>
+
 entity_t *entity_new(void)
 {
 	entity_t *ent = malloc(sizeof(entity_t));
 
-	ent->pos = (vector_float_t){0, 0};
-	ent->size = (vector_t){10, 10};
-	ent->vel = (vector_float_t){0, 0};
-	ent->acc = (vector_float_t){0, 0};
+	ent->pos = (vector2_t){0, 0};
+	ent->size = (vector2_t){10, 10};
+	ent->vel = (vector2_t){0, 0};
+	ent->acc = (vector2_t){0, 0};
 
 	return ent;
 }

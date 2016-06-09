@@ -1,10 +1,12 @@
 #include "box.h"
 
+#include <stdlib.h>
+
 box_t *box_new(void)
 {
 	box_t *box = malloc(sizeof(box_t));
 
-	box->colour = (colour_t){100, 150, 135, 255};
+	box->color = (color_t){100, 150, 135, 255};
 	box->entity = entity_new();
 
 	return box;

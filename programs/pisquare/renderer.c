@@ -69,11 +69,16 @@ void graphics_blank(const graphics_t *device)
 	memset(device->mem, 0, get_buf_size(device));
 }
 
+static color_t overrun;
 static color_t *get_pixel(const graphics_t *device, size_t x, size_t y)
 {
 	size_t bpos;
 
 	bpos = y * device->pitch + x * (device->bpp >> 3);
+
+	if (bpos + 4 > get_buf_size(device))
+		return &overrun;
+
 	return (void *)(&device->mem[bpos]);
 }
 

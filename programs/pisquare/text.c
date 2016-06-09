@@ -44,48 +44,29 @@
 #include "assets/font/SPACE.h"
 #include "assets/font/EX.h"
 
-void print_text_colour(game_state_t *state, const char *string, vector_t pos,
-		colour_t col)
+void print_text_color(game_state_t *state, const char *string, vector2_t pos,
+		      color_t col)
 {
-	int len;
-	int offset;
-	int disp;
-	int j;
+	size_t len;
+	vector2_t p;
 	unsigned char *letter;
 
+	(void)col;
 	len = strlen(string);
-	disp = 0;
-	j = 8;
+	p = pos;
 
-	for (int i = 0; i < len; i++) {
+
+	for (size_t i = 0; i < len; i++) {
 		letter = get_letter(string[i]);
-		for (int y = 0; y < 20; y++) {
-			for (int x = 0; x < 20; x++) {
-				offset = (x + pos.x + disp)
-					* (state->screen.bpp >> 3)
-				+ ((y + pos.y) * state->screen.pitch);
-				if (letter[j+3] != 0x00) {
-					state->screen.fb[offset++] =
-					letter[(int)(col.b * (float)j++/255)];
-					state->screen.fb[offset++] =
-					letter[(int)(col.g * (float)j++/255)];
-					state->screen.fb[offset++] =
-					letter[(int)(col.r * (float)j++/255)];
-					state->screen.fb[offset++] =
-					letter[j++];
-				} else
-					j += 4;
-			}
-		}
-		disp += 20;
-		j = 8;
+		graphics_draw_image(state->device, &p, letter);
+		p.x += 20;
 	}
 
 }
 
-void print_text(game_state_t *state, const char *string, vector_t pos)
+void print_text(game_state_t *state, const char *string, vector2_t pos)
 {
-	print_text_colour(state, string, pos, (colour_t){255, 255, 255, 255});
+	print_text_color(state, string, pos, (color_t){255, 255, 255, 255});
 }
 
 unsigned char *get_letter(char letter)

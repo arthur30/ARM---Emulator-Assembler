@@ -1,41 +1,24 @@
 #include "game.h"
+
+#include <stdio.h>
+
+#include "rpi-random.h"
+
+#include "renderer.h"
+#include "random.h"
+#include "text.h"
+#include "box.h"
+#include "player.h"
+#include "move.h"
+#include "draw.h"
+
 #include "assets/background.h"
 #include "assets/splash.h"
 
 static void initialize_screen(game_state_t *state)
 {
-	int offset;
-	int r, g, b, a;
-	int i = 8;
-
-	for (int y = 0; y < 480; y++) {
-		for (int x = 0; x < 512; x++) {
-			offset = x * (state->screen.bpp >> 3)
-					+ (y * state->screen.pitch);
-
-			r = background_bin[i++];
-			g = background_bin[i++];
-			b = background_bin[i++];
-			a = background_bin[i++];
-
-			state->screen.fb[offset++] = b;
-			state->screen.fb[offset++] = g;
-			state->screen.fb[offset++] = r;
-			state->screen.fb[offset++] = a;
-		}
-	}
-
-	for (int y = 480; y < 512; y++) {
-		for (int x = 0; x < 512; x++) {
-			offset = x * (state->screen.bpp >> 3)
-					+ (y * state->screen.pitch);
-
-			state->screen.fb[offset++] = 0;
-			state->screen.fb[offset++] = 0;
-			state->screen.fb[offset++] = 0;
-			state->screen.fb[offset++] = 255;
-		}
-	}
+	graphics_blank(state->device);
+	graphics_draw_image(state->device, &(vector2_t){0, 0}, background_bin);
 }
 
 static void add_box(game_state_t *state)
@@ -46,7 +29,7 @@ static void add_box(game_state_t *state)
 
 	box_t *box = box_new();
 
-	box->entity->size = (vector_t){10, 10};
+	box->entity->size = (vector2_t){10, 10};
 	int randy = random_int(state->area.y - box->entity->size.x)
 						+ box->entity->size.x/2;
 
@@ -56,9 +39,9 @@ static void add_box(game_state_t *state)
 	int rand_g = random_int(256);
 	int rand_b = random_int(256);
 
-	box->entity->pos = (vector_float_t){posx, randy};
-	box->entity->vel = (vector_float_t){vel, 0};
-	box->colour = (colour_t){rand_r, rand_g, rand_b, 255};
+	box->entity->pos = (vector2_t){posx, randy};
+	box->entity->vel = (vector2_t){vel, 0};
+	box->color = (color_t){rand_r, rand_g, rand_b, 255};
 
 	++state->box_count;
 	state->boxes = realloc(state->boxes,
@@ -71,9 +54,9 @@ static void print_time(game_state_t *state)
 	char str[10];
 	int len = sprintf(str, "%.1f", (double)state->timer_game);
 
-	int x = state->screen.width - len * 20;
+	int x = state->device->width - len * 20;
 
-	print_text(state, str, (vector_t){x, 486});
+	print_text(state, str, (vector2_t){x, 486});
 }
 
 static void print_lives(game_state_t *state)
@@ -81,40 +64,21 @@ static void print_lives(game_state_t *state)
 	char str[10];
 
 	sprintf(str, "LIVES %d", state->player->lives);
-	print_text_colour(state, str, (vector_t){0, 486},
-						(colour_t){255, 0, 0, 255});
+	print_text_color(state, str, (vector2_t){0, 486},
+						(color_t){255, 0, 0, 255});
 }
 
 void game_splash(game_state_t *state)
 {
-	int offset;
-	int r, g, b, a;
-	int i = 8;
-
-	for (int y = 0; y < 512; y++) {
-		for (int x = 0; x < 512; x++) {
-			offset = x * (state->screen.bpp >> 3)
-					+ (y * state->screen.pitch);
-
-			r = splash_bin[i++];
-			g = splash_bin[i++];
-			b = splash_bin[i++];
-			a = splash_bin[i++];
-
-			state->screen.fb[offset++] = b;
-			state->screen.fb[offset++] = g;
-			state->screen.fb[offset++] = r;
-			state->screen.fb[offset++] = a;
-		}
-	}
+	graphics_draw_image(state->device, &(vector2_t){0, 0}, splash_bin);
 }
 
 void game_init(game_state_t *state)
 {
 	RPI_InitRandom();
 	/* game area */
-	state->area = (vector_t){state->screen.width,
-				     state->screen.height - 32};
+	state->area = (vector2_t){state->device->width,
+				  state->device->height - 32};
 
 	/* screen color */
 	initialize_screen(state);
@@ -125,7 +89,7 @@ void game_init(game_state_t *state)
 	/* player */
 	player_t *player = player_new();
 
-	player->entity->pos = (vector_float_t){256, 256};
+	player->entity->pos = (vector2_t){256, 256};
 	player->angular_vel = 180;
 
 	state->player = player;

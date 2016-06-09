@@ -1,7 +1,6 @@
-#ifndef SPRITE
-#define SPRITE
+#ifndef SPRITE_H
+#define SPRITE_H
 
-#include "typedefs.h"
 #include "entity.h"
 
 typedef struct {

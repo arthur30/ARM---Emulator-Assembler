@@ -1,14 +1,14 @@
-#ifndef GAMESTATE
-#define GAMESTATE
+#ifndef GAMESTATE_H
+#define GAMESTATE_H
 
-#include "typedefs.h"
+#include "renderer.h"
 #include "player.h"
 #include "box.h"
 
 typedef struct {
-	screen_t screen;
-	vector_t area;
-	void *buffer;
+	graphics_t *device;
+
+	vector2_t area;
 
 	long double delta;
 

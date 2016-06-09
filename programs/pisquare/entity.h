@@ -1,22 +1,21 @@
-#ifndef ENTITY
-#define ENTITY
+#ifndef ENTITY_H
+#define ENTITY_H
+
+#include <stdbool.h>
 
 #include "typedefs.h"
-#include "random.h"
-#include <math.h>
-#include <stdbool.h>
-#include <stdlib.h>
+#include "vector2.h"
 
 typedef struct {
-	vector_float_t pos;
-	vector_t size;
-	vector_float_t vel;
-	vector_float_t acc;
+	vector2_t pos;
+	vector2_t size;
+	vector2_t vel;
+	vector2_t acc;
 } entity_t;
 
 entity_t *entity_new(void);
 void entity_free(entity_t *ent);
-rect_t entity_rect(entity_t *);
-bool entity_test_collision(entity_t*, entity_t*);
+rect_t entity_rect(entity_t *ent);
+bool entity_test_collision(entity_t *a, entity_t *b);
 
 #endif

@@ -1,8 +1,8 @@
-#ifndef PLAYER
-#define PLAYER
+#ifndef PLAYER_H
+#define PLAYER_H
 
-#include "typedefs.h"
 #include "entity.h"
+#include "color.h"
 
 #define PLAYER_LIVES 3
 #define PLAYER_DIRECTION 90
@@ -14,7 +14,7 @@ typedef struct {
 	float speed;
 	float angular_vel;
 	int lives;
-	colour_t colour;
+	color_t color;
 } player_t;
 
 player_t *player_new(void);

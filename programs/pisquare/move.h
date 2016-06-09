@@ -1,16 +1,15 @@
-#ifndef MOVE
-#define MOVE
+#ifndef MOVE_H
+#define MOVE_H
 
-#include <math.h>
 #include "gamestate.h"
 #include "entity.h"
 #include "box.h"
 #include "sprite.h"
 #include "player.h"
 
-void move_entity(game_state_t*, entity_t*);
-void move_box(game_state_t*, box_t*);
-void move_player(game_state_t*, player_t*);
-void move_sprite(game_state_t*, sprite_t*);
+void move_entity(game_state_t *state, entity_t *ent);
+void move_box(game_state_t *state, box_t *box);
+void move_player(game_state_t *state, player_t *player);
+void move_sprite(game_state_t *state, sprite_t *player);
 
 #endif
