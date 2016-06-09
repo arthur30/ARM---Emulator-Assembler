@@ -2,6 +2,7 @@
 #define GAME
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include "math.h"
 #include "gamestate.h"
 #include "typedefs.h"
