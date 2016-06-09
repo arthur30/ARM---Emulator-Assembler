@@ -70,6 +70,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 				       SCREEN_DEPTH);
 
 	game_splash(&state);
+	graphics_flush(state.device);
 
 	RPI_WaitMicroSeconds(10000000);
 
