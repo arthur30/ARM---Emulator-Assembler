@@ -2,6 +2,13 @@
 
 #include "renderer.h"
 
+#include "assets/background.h"
+
+void draw_background(game_state_t *state)
+{
+	graphics_draw_image(state->device, &(vector2_t){0, 0}, background_bin);
+}
+
 void draw_rect(game_state_t *state, rect_t rect, color_t col)
 {
 

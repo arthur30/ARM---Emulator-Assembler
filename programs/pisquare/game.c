@@ -12,14 +12,7 @@
 #include "move.h"
 #include "draw.h"
 
-#include "assets/background.h"
 #include "assets/splash.h"
-
-static void initialize_screen(game_state_t *state)
-{
-	graphics_blank(state->device);
-	graphics_draw_image(state->device, &(vector2_t){0, 0}, background_bin);
-}
 
 static void add_box(game_state_t *state)
 {
@@ -80,9 +73,6 @@ void game_init(game_state_t *state)
 	state->area = (vector2_t){state->device->width,
 				  state->device->height - 32};
 
-	/* screen color */
-	initialize_screen(state);
-
 	/* boxes */
 	state->box_count = 0;
 
@@ -131,6 +121,12 @@ void game_update(game_state_t *state)
 
 void game_draw(game_state_t *state)
 {
+	/* blank screen */
+	graphics_blank(state->device);
+
+	/* screen color */
+	draw_background(state);
+
 	/* boxes */
 	for (int i = 0; i < state->box_count; i++) {
 		box_t *box = state->boxes[i];
