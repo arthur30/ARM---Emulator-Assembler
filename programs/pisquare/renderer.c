@@ -74,10 +74,10 @@ static color_t *get_pixel(const graphics_t *device, size_t x, size_t y)
 {
 	size_t bpos;
 
-	bpos = y * device->pitch + x * (device->bpp >> 3);
-
-	if (bpos + 4 > get_buf_size(device))
+	if (x > device->width || y > device->height)
 		return &overrun;
+
+	bpos = y * device->pitch + x * (device->bpp >> 3);
 
 	return (void *)(&device->mem[bpos]);
 }
