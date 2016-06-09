@@ -1,11 +1,41 @@
 #include "game.h"
+#include "assets/background.h"
+#include "assets/splash.h"
 
-static void initialize_screen(game_state_t *state, colour_t colour)
+static void initialize_screen(game_state_t *state)
 {
-	draw_rect(state,
-		(rect_t){(vector_t){0, 0},
-		       (vector_t){state->screen.width, state->screen.height} },
-								colour);
+	int offset;
+	int r, g, b, a;
+	int i = 8;
+
+	for (int y = 0; y < 480; y++) {
+		for (int x = 0; x < 512; x++) {
+			offset = x * (state->screen.bpp >> 3)
+					+ (y * state->screen.pitch);
+
+			r = background_bin[i++];
+			g = background_bin[i++];
+			b = background_bin[i++];
+			a = background_bin[i++];
+
+			state->screen.fb[offset++] = b;
+			state->screen.fb[offset++] = g;
+			state->screen.fb[offset++] = r;
+			state->screen.fb[offset++] = a;
+		}
+	}
+
+	for (int y = 480; y < 512; y++) {
+		for (int x = 0; x < 512; x++) {
+			offset = x * (state->screen.bpp >> 3)
+					+ (y * state->screen.pitch);
+
+			state->screen.fb[offset++] = 0;
+			state->screen.fb[offset++] = 0;
+			state->screen.fb[offset++] = 0;
+			state->screen.fb[offset++] = 255;
+		}
+	}
 }
 
 static void add_box(game_state_t *state)
@@ -55,6 +85,30 @@ static void print_lives(game_state_t *state)
 						(colour_t){255, 0, 0, 255});
 }
 
+void game_splash(game_state_t *state)
+{
+	int offset;
+	int r, g, b, a;
+	int i = 8;
+
+	for (int y = 0; y < 512; y++) {
+		for (int x = 0; x < 512; x++) {
+			offset = x * (state->screen.bpp >> 3)
+					+ (y * state->screen.pitch);
+
+			r = splash_bin[i++];
+			g = splash_bin[i++];
+			b = splash_bin[i++];
+			a = splash_bin[i++];
+
+			state->screen.fb[offset++] = b;
+			state->screen.fb[offset++] = g;
+			state->screen.fb[offset++] = r;
+			state->screen.fb[offset++] = a;
+		}
+	}
+}
+
 void game_init(game_state_t *state)
 {
 	RPI_InitRandom();
@@ -63,7 +117,7 @@ void game_init(game_state_t *state)
 				     state->screen.height - 32};
 
 	/* screen color */
-	initialize_screen(state, (colour_t){0, 0, 0, 255});
+	initialize_screen(state);
 
 	/* boxes */
 	state->box_count = 0;

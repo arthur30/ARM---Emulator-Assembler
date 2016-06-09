@@ -105,6 +105,10 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 
 	state = (game_state_t){.screen = screen};
 
+	game_splash(&state);
+
+	RPI_WaitMicroSeconds(10000000);
+
 	game_init(&state);
 
 	uint32_t diff, new;
@@ -113,6 +117,8 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 
 	rpi_sys_timer_t *timer = RPI_GetSystemTimer();
 	uint32_t prev = timer->counter_lo;
+
+	RPI_SetGpioInput(RPI_GPIO18);
 
 	while (1) {
 		/* time delta */

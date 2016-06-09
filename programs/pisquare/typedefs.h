@@ -32,4 +32,10 @@ typedef struct {
 	volatile unsigned char *fb;
 } screen_t;
 
+typedef struct {
+	int width;
+	int height;
+	unsigned char *image;
+} image_t;
+
 #endif
