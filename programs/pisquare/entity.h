@@ -11,6 +11,7 @@ typedef struct {
 } entity_t;
 
 entity_t *entity_new(void);
+void entity_free(entity_t *ent);
 rect_t entity_rect(entity_t *);
 
 #endif

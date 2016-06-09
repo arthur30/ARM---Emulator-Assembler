@@ -13,3 +13,8 @@ box_t *box_new(void)
 	return box;
 }
 
+void box_free(box_t *box)
+{
+	entity_free(box->entity);
+	free(box);
+}

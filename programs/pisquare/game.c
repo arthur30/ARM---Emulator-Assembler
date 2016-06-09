@@ -90,3 +90,12 @@ void game_draw(game_state_t *state)
 		draw_box(state, box);
 	}
 }
+
+void game_free(game_state_t *state)
+{
+	/* boxes */
+	for (int i = 0; i < BOX_MAX; i++)
+		box_free(state->boxes[i]);
+
+	free(state->boxes);
+}

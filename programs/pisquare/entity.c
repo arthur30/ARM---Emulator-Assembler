@@ -11,6 +11,10 @@ entity_t *entity_new(void)
 
 	return ent;
 }
+void entity_free(entity_t *ent)
+{
+	free(ent);
+}
 
 rect_t entity_rect(entity_t *ent)
 {

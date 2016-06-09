@@ -15,5 +15,6 @@
 void game_init(game_state_t *state);
 void game_update(game_state_t *state);
 void game_draw(game_state_t *state);
+void game_free(game_state_t *state);
 
 #endif

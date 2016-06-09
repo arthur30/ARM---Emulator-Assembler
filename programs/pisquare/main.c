@@ -121,12 +121,14 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 		secondsElapsed = (long double)diff/1000000;
 
 		state.delta = secondsElapsed;
-		/* modify buffer ('wipe') / pre-render */
+
 		/* update */
 		game_update(&state);
 		/* draw */
 		game_draw(&state);
-
 		/*write full frame*/
+
+		/* check game state transition conditions */
+		/* perform transition */
 	}
 }

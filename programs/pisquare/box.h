@@ -10,5 +10,6 @@ typedef struct {
 } box_t;
 
 box_t *box_new(void);
+void box_free(box_t *);
 
 #endif
