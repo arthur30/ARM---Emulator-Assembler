@@ -20,7 +20,6 @@ endif
 ASFLAGS  = $(RPI1)
 CFLAGS   = $(RPI1) $(CSTD) $(WARNINGS) $(ERRORS) $(DEFINES) $(INCLUDES) $(DEPSINFO) $(OPTIMIZE)
 LDFLAGS  = $(RPI1) -Wl,-T,libarmc/rpi.x -L libarmc
-LDLIBS   = -lc -larmc
 LDLIBS   = -lc -larmc -lm
 OBJCOPYFLAGS = -O binary
 CHECKPATCH_IGNORE = VOLATILE,NEW_TYPEDEFS
