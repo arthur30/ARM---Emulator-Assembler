@@ -1,5 +1,3 @@
-#include "main.h"
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,27 +11,21 @@
 
 #include "game.h"
 #include "text.h"
+#include "renderer.h"
 
 #define SCREEN_WIDTH    512
 #define SCREEN_HEIGHT   512
 #define SCREEN_DEPTH    32      /* 16 or 32-bit */
 
 static game_state_t state;
-static screen_t screen;
 
 void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 {
+	rpi_mailbox_property_t *mp;
+
 	(void)r0;
 	(void)r1;
 	(void)atags;
-
-	screen.height = SCREEN_HEIGHT;
-	screen.width = SCREEN_WIDTH;
-	screen.bpp = SCREEN_DEPTH;
-	screen.pitch = 0;
-	screen.fb = NULL;
-
-	rpi_mailbox_property_t *mp;
 
 	/* Write 1 to the LED init nibble in the Function Select GPIO
 	 * peripheral register to enable LED pin as an output
@@ -73,39 +65,12 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 	RPI_PropertyAddTag(TAG_GET_CLOCK_RATE, TAG_CLOCK_ARM);
 	RPI_PropertyProcess();
 
-	/* Initialise a framebuffer... */
-	RPI_PropertyInit();
-	RPI_PropertyAddTag(TAG_ALLOCATE_BUFFER);
-	RPI_PropertyAddTag(TAG_SET_PHYSICAL_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT);
-	RPI_PropertyAddTag(TAG_SET_VIRTUAL_SIZE, SCREEN_WIDTH,
-						SCREEN_HEIGHT * 2);
-	RPI_PropertyAddTag(TAG_SET_DEPTH, SCREEN_DEPTH);
-	RPI_PropertyAddTag(TAG_GET_PITCH);
-	RPI_PropertyAddTag(TAG_GET_PHYSICAL_SIZE);
-	RPI_PropertyAddTag(TAG_GET_DEPTH);
-	RPI_PropertyProcess();
-
-	mp = RPI_PropertyGet(TAG_GET_PHYSICAL_SIZE);
-	if (mp) {
-		screen.width = mp->data.buffer_32[0];
-		screen.height = mp->data.buffer_32[1];
-	}
-
-	mp = RPI_PropertyGet(TAG_GET_DEPTH);
-	if (mp)
-		screen.bpp = mp->data.buffer_32[0];
-
-	mp = RPI_PropertyGet(TAG_GET_PITCH);
-	if (mp)
-		screen.pitch = mp->data.buffer_32[0];
-
-	mp = RPI_PropertyGet(TAG_ALLOCATE_BUFFER);
-	if (mp)
-		screen.fb = (unsigned char *)mp->data.buffer_32[0];
-
-	state = (game_state_t){.screen = screen};
+	state.device = graphics_create(SCREEN_WIDTH,
+				       SCREEN_HEIGHT,
+				       SCREEN_DEPTH);
 
 	game_splash(&state);
+	graphics_flush(state.device);
 
 	RPI_WaitMicroSeconds(10000000);
 
@@ -134,6 +99,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 		/* draw */
 		game_draw(&state);
 		/*write full frame*/
+		graphics_flush(state.device);
 
 		/* check game state transition conditions */
 		/* perform transition */

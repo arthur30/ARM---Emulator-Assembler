@@ -1,36 +1,12 @@
-#ifndef TYPEDEFS
-#define TYPEDEFS
+#ifndef TYPEDEFS_H
+#define TYPEDEFS_H
+
+#include "vector2.h"
 
 typedef struct {
-	int x;
-	int y;
-} vector_t;
-
-typedef struct {
-	float x;
-	float y;
-} vector_float_t;
-
-typedef struct {
-	vector_t origin;
-	vector_t size;
+	vector2_t origin;
+	vector2_t size;
 } rect_t;
-
-typedef struct {
-	float r;
-	float g;
-	float b;
-	float a;
-} colour_t;
-
-typedef struct {
-	int height;
-	int width;
-	int bpp;
-	int pitch;
-
-	volatile unsigned char *fb;
-} screen_t;
 
 typedef struct {
 	int width;

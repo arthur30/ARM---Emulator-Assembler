@@ -1,7 +1,8 @@
-#ifndef RANDOM
-#define RANDOM
+#ifndef RANDOM_H
+#define RANDOM_H
 
-#include "libarmc/rpi-random.h"
+#include <stdint.h>
 
 uint32_t random_int(uint32_t upper);
+
 #endif

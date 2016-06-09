@@ -1,13 +1,14 @@
-#ifndef BOX
-#define BOX
+#ifndef BOX_H
+#define BOX_H
+
+#include <stdbool.h>
 
 #include "entity.h"
-#include <stdlib.h>
-#include <stdbool.h>
+#include "color.h"
 
 typedef struct {
 	entity_t *entity;
-	colour_t colour;
+	color_t color;
 } box_t;
 
 box_t *box_new(void);
