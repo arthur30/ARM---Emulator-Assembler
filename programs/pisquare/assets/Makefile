@@ -34,6 +34,7 @@ $(ARCHIVE): $(patsubst %.png,%.o,$(IMGS))
 	xxd -i $^ $@
 
 %.h: %.c $(MAKEHEADERS)
+	$(RM) $@
 	./$(MAKEHEADERS) $<:$@
 
 $(MAKEHEADERS): makeheaders.c

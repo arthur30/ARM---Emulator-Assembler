@@ -32,7 +32,7 @@ BINARIES = kernel.img
 
 all: checksrc assets $(BINARIES)
 
-kernel.elf: $(patsubst %.c,%.o,$(wildcard *.c)) libarmc assets libarmc/rpi.x
+kernel.elf: $(patsubst %.c,%.o,$(wildcard *.c)) libarmc/libarmc.a assets/assets.a libarmc/rpi.x
 	$(CC) $(LDFLAGS) $(LOADLIBES) -o $@ $(filter %.o,$^) $(LDLIBS)
 
 assets:
