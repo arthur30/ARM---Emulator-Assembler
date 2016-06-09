@@ -109,7 +109,8 @@ void game_update(game_state_t *state)
 	/* Increase number of boxes over time */
 	if (state->timer_box > BOX_TIMER && state->box_count < BOX_COUNT_MAX) {
 		state->timer_box = 0;
-		add_box(state);
+		(void)add_box;
+		/* add_box(state); */
 	}
 	/* Move Boxes */
 	for (int i = 0; i < state->box_count; i++) {
