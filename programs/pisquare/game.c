@@ -36,6 +36,25 @@ static void add_box(game_state_t *state)
 	state->boxes[state->box_count-1] = box;
 }
 
+static void print_time(game_state_t *state)
+{
+	char str[10];
+	int len = sprintf(str, "%.1f", (double)state->timer_game);
+
+	int x = state->screen.width - len * 20;
+
+	print_text(state, str, (vector_t){x, 486});
+}
+
+static void print_lives(game_state_t *state)
+{
+	char str[10];
+
+	sprintf(str, "LIVES %d", state->player->lives);
+	print_text_colour(state, str, (vector_t){0, 486},
+						(colour_t){255, 0, 0, 255});
+}
+
 void game_init(game_state_t *state)
 {
 	RPI_InitRandom();
@@ -44,10 +63,11 @@ void game_init(game_state_t *state)
 				     state->screen.height - 32};
 
 	/* screen color */
-	initialize_screen(state, (colour_t){104, 200, 169, 255});
+	initialize_screen(state, (colour_t){0, 0, 0, 255});
 
 	/* boxes */
 	state->box_count = 0;
+
 	/* player */
 	player_t *player = player_new();
 
@@ -87,6 +107,7 @@ void game_update(game_state_t *state)
 		box_t *box = state->boxes[i];
 		(void)box;
 	}
+
 }
 
 void game_draw(game_state_t *state)
@@ -99,6 +120,10 @@ void game_draw(game_state_t *state)
 	}
 	/* player */
 	draw_player(state, state->player);
+
+	/* UI */
+	print_time(state);
+	print_lives(state);
 }
 
 void game_free(game_state_t *state)

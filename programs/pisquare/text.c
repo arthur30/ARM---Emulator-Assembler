@@ -1,5 +1,4 @@
 #include "text.h"
-
 #include <string.h>
 
 #include "assets/font/A.h"
@@ -43,7 +42,8 @@
 #include "assets/font/COMMA.h"
 #include "assets/font/EX.h"
 
-void print_text(game_state_t *state, const char *string, vector_t pos)
+void print_text_colour(game_state_t *state, const char *string, vector_t pos,
+		colour_t col)
 {
 	int len;
 	int offset;
@@ -62,15 +62,28 @@ void print_text(game_state_t *state, const char *string, vector_t pos)
 				offset = (x + pos.x + disp)
 					* (state->screen.bpp >> 3)
 				+ ((y + pos.y) * state->screen.pitch);
-				state->screen.fb[offset++] = letter[j++];
-				state->screen.fb[offset++] = letter[j++];
-				state->screen.fb[offset++] = letter[j++];
-				state->screen.fb[offset++] = letter[j++];
+				if (letter[j+3] != 0x00) {
+					state->screen.fb[offset++] =
+					letter[(int)(col.b * (float)j++/255)];
+					state->screen.fb[offset++] =
+					letter[(int)(col.g * (float)j++/255)];
+					state->screen.fb[offset++] =
+					letter[(int)(col.r * (float)j++/255)];
+					state->screen.fb[offset++] =
+					letter[j++];
+				} else
+					j += 4;
 			}
 		}
 		disp += 20;
 		j = 8;
 	}
+
+}
+
+void print_text(game_state_t *state, const char *string, vector_t pos)
+{
+	print_text_colour(state, string, pos, (colour_t){255, 255, 255, 255});
 }
 
 unsigned char *get_letter(char letter)
