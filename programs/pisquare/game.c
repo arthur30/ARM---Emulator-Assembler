@@ -121,10 +121,7 @@ void game_update(game_state_t *state)
 
 void game_draw(game_state_t *state)
 {
-	/* blank screen */
-	graphics_blank(state->device);
-
-	/* screen color */
+	/* background */
 	draw_background(state);
 
 	/* boxes */
