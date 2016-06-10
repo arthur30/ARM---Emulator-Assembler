@@ -19,8 +19,8 @@ OPTIMIZE = -O2 -D_FORTIFY_SOURCE=2 -pipe -fomit-frame-pointer
 endif
 ASFLAGS  = $(RPI1)
 CFLAGS   = $(RPI1) $(CSTD) $(WARNINGS) $(ERRORS) $(DEFINES) $(INCLUDES) $(DEPSINFO) $(OPTIMIZE)
-LDFLAGS  = $(RPI1) -Wl,-T,libarmc/rpi.x -L libarmc
-LDLIBS   = -lc -larmc
+LDFLAGS  = $(RPI1) -Wl,-T,libarmc/rpi.x -L libarmc -L assets
+LDLIBS   = -lc -larmc -lassets -lm
 OBJCOPYFLAGS = -O binary
 CHECKPATCH_IGNORE = VOLATILE,NEW_TYPEDEFS
 
@@ -28,15 +28,25 @@ BINARIES = kernel.img
 
 .SUFFIXES: .c .o
 
-.PHONY: all libarmc clean release
+.PHONY: all assets libarmc clean release
 
-all: checksrc $(BINARIES)
+all: checksrc assets $(BINARIES)
 
-kernel.elf: $(patsubst %.c,%.o,$(wildcard *.c)) libarmc libarmc/rpi.x
+kernel.elf: $(patsubst %.c,%.o,$(wildcard *.c)) libarmc/libarmc.a assets/assets.a libarmc/rpi.x
 	$(CC) $(LDFLAGS) $(LOADLIBES) -o $@ $(filter %.o,$^) $(LDLIBS)
+
+assets:
+	$(MAKE) -C assets
 
 libarmc:
 	$(MAKE) -C libarmc
+
+assets/assets.h: assets
+assets/assets.a: assets
+
+game.c: assets/assets.h
+draw.c: assets/assets.h
+text.c: assets/assets.h
 
 libarmc/libarmc.a: libarmc
 
@@ -46,6 +56,7 @@ libarmc/libarmc.a: libarmc
 clean:
 	$(RM) $(BINARIES) $(wildcard *.elf) $(wildcard *.o) $(wildcard *.d)
 	$(MAKE) -C libarmc clean
+	$(MAKE) -C assets clean
 
 release:
 	make "BUILD=release"
