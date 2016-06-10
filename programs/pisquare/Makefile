@@ -42,6 +42,7 @@ libarmc:
 	$(MAKE) -C libarmc
 
 assets/assets.h: assets
+assets/assets.a: assets
 
 game.c: assets/assets.h
 draw.c: assets/assets.h
