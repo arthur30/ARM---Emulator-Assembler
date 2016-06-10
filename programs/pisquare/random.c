@@ -2,7 +2,7 @@
 
 #include "rpi-random.h"
 
-uint32_t random_int(uint32_t upper)
+int random_int(int upper)
 {
 	return (RPI_GetRandom() % upper);
 }

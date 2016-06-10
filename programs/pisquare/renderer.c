@@ -103,7 +103,6 @@ static void draw_line(const graphics_t *device,
 		if (device->bpp == 32)
 			pixel->a = c.color.a;
 	}
-
 }
 
 static void fill_bottom_flat_triangle(const graphics_t *device,

@@ -10,17 +10,20 @@ typedef struct {
 
 	vector2_t area;
 
-	long double delta;
+	float delta;
 
 	player_t *player;
 
-	box_t **boxes;
+	box_t *boxes;
 
-	int box_count;
+	int boxes_count;
+	int frames_count;
+	int fps;
 
 	/* Timers */
-	long double timer_box;
-	long double timer_game;
+	float timer_frame;
+	float timer_box;
+	float timer_game;
 } game_state_t;
 
 #endif

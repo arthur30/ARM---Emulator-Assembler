@@ -11,7 +11,7 @@
 void draw_background(game_state_t *state);
 
 /* Generic Drawing Functions */
-void draw_rect(game_state_t *state, rect_t rect, color_t col);
+void draw_rect(game_state_t *state, rect_t *rect, color_t col);
 void draw_sprite(game_state_t *state, sprite_t *sprite);
 
 /* Box */
