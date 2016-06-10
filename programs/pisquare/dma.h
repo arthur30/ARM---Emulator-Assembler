@@ -10,7 +10,7 @@
 
 #define DMA_ENABLE_OFFSET 0xFF0
 
-#define DMA_ENABLE_ALL 0xFFFF
+#define DMA_ENABLE_ALL ((1 << DMA_CHANNELS) - 1)
 
 #define DMA_CS_ACTIVE 0x1
 #define DMA_CS_RESET  0x80000000

@@ -6,7 +6,7 @@
 #include "rpi-mailbox-interface.h"
 
 static dma_conblk_t *dma_blocks_mem;
-static dma_conblk_t *dma_blocks;
+static volatile dma_conblk_t *dma_blocks;
 
 static volatile uint32_t *dma_enable = (void *)(DMA_BASE + DMA_ENABLE_OFFSET);
 
@@ -39,8 +39,8 @@ int dma_init(void)
 	dma_blocks_mem = malloc(sizeof(dma_conblk_t) * (DMA_CHANNELS + 1));
 	if (!dma_blocks_mem)
 		return -1;
-	ptr = ((uintptr_t)dma_blocks_mem+sizeof(dma_register_t)-1) &
-		~sizeof(dma_register_t);
+	ptr = ((uintptr_t)dma_blocks_mem+sizeof(dma_conblk_t)-1) &
+		~(sizeof(dma_conblk_t) - 1);
 	dma_blocks = (void *)ptr;
 
 	return 0;
@@ -64,14 +64,16 @@ static int dma(void *dst, const void *src, size_t len, uint32_t ti)
 	for (i = 0; i < DMA_CHANNELS; i++) {
 		if (!dma_check_usable(i) && dma_check_active(i))
 			continue;
-		memset(&dma_blocks[i], 0, sizeof(dma_conblk_t));
 		dma_blocks[i].ti = ti;
-		dma_blocks[i].dest_ad = (uintptr_t)dst;
 		dma_blocks[i].source_ad = (uintptr_t)src;
+		dma_blocks[i].dest_ad = (uintptr_t)dst;
 		dma_blocks[i].txfr_len = len;
+		dma_blocks[i].stride = 0;
+		dma_blocks[i].nextconbk = 0;
 		dma_reg = get_channel(i);
 		dma_reg->conblk_ad = (uintptr_t)(void *)&dma_blocks[i];
-		dma_reg->cs = DMA_CS_ACTIVE;
+		dma_reg->cs |= DMA_CS_ACTIVE;
+
 		return i;
 	}
 
