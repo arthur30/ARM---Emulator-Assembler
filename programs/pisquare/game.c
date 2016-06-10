@@ -161,6 +161,7 @@ void game_draw(game_state_t *state)
 	/* boxes */
 	for (int i = 0; i < state->box_count; i++)
 		draw_box(state, &state->boxes[i]);
+
 	/* player */
 	draw_player(state, state->player);
 

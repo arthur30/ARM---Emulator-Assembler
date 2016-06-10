@@ -11,7 +11,6 @@ void draw_background(game_state_t *state)
 
 void draw_rect(game_state_t *state, rect_t rect, color_t col)
 {
-
 	graphics_draw_rectangle(state->device, &col, &rect.origin, &rect.size);
 }
 

@@ -20,7 +20,7 @@ void entity_free(entity_t *ent)
 
 rect_t entity_rect(entity_t *ent)
 {
-	return (rect_t){{ent->pos.x, ent->pos.y}, ent->size};
+	return (rect_t){ent->pos, ent->size};
 }
 
 bool entity_test_collision(entity_t *e1, entity_t *e2)
