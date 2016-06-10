@@ -6,9 +6,12 @@
 \begin{document}
 
 \title{ARM Final Report}
-\author{Abhinav Mishra, Arthur-Mihai Niculae,
-	 Szilveszter Szekely, Tom Bellingham}
-\date{June 10, 2016}
+\author{
+  Abhinav Mishra,
+  Arthur-Mihai Niculae,
+  Szilveszter Szekely,
+  Tom Bellingham
+}
 
 \maketitle
 
@@ -17,24 +20,27 @@
 \section{Emulator}
 
 \section{Assembler}
+
 \subsection{Design}
+
 The assembler has been implemented according to the two pass design provided in
 the specification file. However we read the input file only once and iterate
 over the stored instructions twice.
 
 The assembler has four major components:
 \begin{itemize}[noitemsep,topsep=0pt]
-	\item \textbf{Tokenizer}:
-		to tokenize the instruction.
-	\item \textbf{Parser}:
-		to parse the tokenized instruction.
-	\item \textbf{Dictionary}:
-		to look for the mnemonics and their respective values.
-	\item \textbf{Instruction Generator}:
-		to generate the final binary encoding.
+  \item \textbf{Tokenizer}:
+    to tokenize the instruction.
+  \item \textbf{Parser}:
+    to parse the tokenized instruction.
+  \item \textbf{Dictionary}:
+    to look for the mnemonics and their respective values.
+  \item \textbf{Instruction Generator}:
+    to generate the final binary encoding.
 \end{itemize}
 
 \subsection{Implementation}
+
 Every line in the instruction is fed into the tokenizer which returns a list
 of tokens. These tokens are then passed to the parser which recognizes the
 mnemonic and parses the whole instruction into a usable format. While the
@@ -44,16 +50,17 @@ generator which connects all the components of the parsed tokens and generates
 a final binary encoding of the instruction.
 
 In this implementation of the assembler, majority of the data structures are
-being reused from the emulator. 
+being reused from the emulator.
 
 \subsection{Extensions}
-The assembler has been extended to implement some more instructions comments. 
+
+The assembler has been extended to implement some more instructions comments.
 All the instructions are now of the type:
 \textbf{opcode\{cond\} \{operands\}}
 \begin{itemize}[noitemsep,topsep=0pt]
-	\item \textbf{opcode}: Basic Instruction
-	\item \textbf{cond}: Ex: eq, hi, al, cc, etc.
-	\item \textbf{operands}: Ex: registers, immediate values.
+  \item \textbf{opcode}: Basic Instruction
+  \item \textbf{cond}: Ex: eq, hi, al, cc, etc.
+  \item \textbf{operands}: Ex: registers, immediate values.
 \end{itemize}
 Example: andeq r0, r0, r0, mulhi r1, r2, r3.
 
@@ -61,15 +68,19 @@ It also supports comments along with the instructions which can be used to
 explain the code.
 
 \section{Extension}
+
 \subsection{Acknowledgement}
-The group takes this opportunity to gratefully acknowledge the people whose 
+
+The group takes this opportunity to gratefully acknowledge the people whose
 libraries and tutorials have been used to help make this extension.
 
 \begin{itemize}[noitemsep,topsep=0pt]
-	\item \textbf{Cambridge University Tutorials} for Baking Pi – 
-	Operating Systems Development.
-	\item \textbf{Valvers.com} for Bare Metal Programming in C.
-	\item \textbf{Brian Sidebotham} for Raspberry Pi Baremetal Libraries.
+  \item \textbf{Cambridge University Tutorials} for Baking Pi –
+    Operating Systems Development.
+  \item \textbf{Valvers.com} for Bare Metal Programming in C.
+  \item \textbf{Brian Sidebotham} for Raspberry Pi Baremetal Libraries.
+  \item \textbf{PiFox Team} for imager.py utility
+  \item \textbf{D. Richard Hipp} for makeheaders utilility
 \end{itemize}
 
 
@@ -82,6 +93,7 @@ libraries and tutorials have been used to help make this extension.
 \section{Group Reflection}
 
 \section{Personal Reflection}
+
 \subsection{Abhinav Mishra}
 
 \subsection{Arthur-Mihai Niculae}
