@@ -1,4 +1,4 @@
-ORIGCC   = $(CC)
+ORIGCC   := $(CC)
 AS       = arm-none-eabi-as
 CPP      = arm-none-eabi-cpp
 CC       = arm-none-eabi-gcc
@@ -38,7 +38,7 @@ $(ARCHIVE): $(patsubst %.png,%.o,$(IMGS))
 	./$(MAKEHEADERS) $<:$@
 
 $(MAKEHEADERS): makeheaders.c
-	$(ORIGCC) -o $@ ^
+	$(ORIGCC) -o $@ $^
 
 clean:
-	$(RM) $(HEADER) $(ARCHIVE) $(patsubst %.png,%.h,$(IMGS)) $(patsubst %.png,%.c,$(IMGS)) $(patsubst %.png,%.o,$(IMGS))
+	$(RM) $(HEADER) $(ARCHIVE) $(MAKEHEADERS) $(patsubst %.png,%.h,$(IMGS)) $(patsubst %.png,%.c,$(IMGS)) $(patsubst %.png,%.o,$(IMGS))
