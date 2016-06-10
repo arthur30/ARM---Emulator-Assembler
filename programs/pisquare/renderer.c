@@ -311,9 +311,9 @@ void graphics_draw_image(const graphics_t *device, const vector2_t *pos,
 		for (x = 0; x < width; x++) {
 			p = get_pixel(device, pos->x + x, pos->y + y);
 			imgpos = 8 + (y * width * 4) + (x * 4);
-			p->r = image[imgpos++];
-			p->g = image[imgpos++];
 			p->b = image[imgpos++];
+			p->g = image[imgpos++];
+			p->r = image[imgpos++];
 			if (device->bpp == 32)
 				p->a = image[imgpos++];
 		}

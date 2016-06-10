@@ -45,7 +45,7 @@ def main():
             assert 0 <= b < 256
             assert 0 <= a < 256
 
-            f.write(struct.pack('<BBBB', r, g, b, a))
+            f.write(struct.pack('<BBBB', b, g, r, a))
             if args.add_depth:
                 f.write(struct.pack('<f', 0x38f00000))
 
