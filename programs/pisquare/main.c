@@ -14,6 +14,7 @@
 #include "renderer.h"
 #include "dma.h"
 #include "draw.h"
+#include "player.h"
 
 #define SCREEN_WIDTH    512
 #define SCREEN_HEIGHT   512
@@ -73,10 +74,57 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 	state.device = graphics_create(SCREEN_WIDTH,
 				       SCREEN_HEIGHT,
 				       SCREEN_DEPTH);
+	state.player_count = 0;
 
 	draw_splash(&state);
 
-	RPI_WaitMicroSeconds(5000000);
+	RPI_WaitMicroSeconds(800000);
+
+	RPI_SetGpioInput(PLAYER_1_RIGHT);
+	RPI_GetGpio()->GPPUD = 2;
+	RPI_SetGpioInput(PLAYER_1_LEFT);
+	RPI_GetGpio()->GPPUD = 2;
+
+	while (RPI_GetGpioValue(PLAYER_1_RIGHT) != 0) {
+		draw_background(&state);
+		print_text(&state, "MENU",
+				(vector2_t){221, 161});
+		print_text(&state, "L : SELECT    R : START",
+				(vector2_t){36, 484});
+
+		print_text(&state, "1 PLAYER", (vector2_t){181, 201});
+		print_text(&state, "2 PLAYER", (vector2_t){181, 231});
+		print_text(&state, "3 PLAYER", (vector2_t){181, 261});
+		print_text(&state, "4 PLAYER", (vector2_t){181, 291});
+
+		if (RPI_GetGpioValue(PLAYER_1_LEFT) == 0)
+			state.player_count = (state.player_count + 1) % 4;
+
+		switch (state.player_count + 1) {
+		case 1:
+			print_text_color(&state, "1 PLAYER",
+					(vector2_t){181, 201},
+					(color_t){0, 255, 0, 255});
+			break;
+		case 2:
+			print_text_color(&state, "2 PLAYER",
+					(vector2_t){181, 231},
+					(color_t){0, 255, 0, 255});
+			break;
+		case 3:
+			print_text_color(&state, "3 PLAYER",
+					(vector2_t){181, 261},
+					(color_t){0, 255, 0, 255});
+			break;
+		case 4:
+			print_text_color(&state, "4 PLAYER",
+					(vector2_t){181, 291},
+					(color_t){0, 255, 0, 255});
+			break;
+		}
+
+		graphics_flush(state.device);
+	}
 
 	game_init(&state);
 

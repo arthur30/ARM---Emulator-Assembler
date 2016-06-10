@@ -9,6 +9,9 @@
 #define PLAYER_DIRECTION 90
 #define PLAYER_SPEED 50
 
+#define PLAYER_1_RIGHT 2
+#define PLAYER_1_LEFT 3
+
 typedef struct {
 	entity_t *entity;
 	float dir;

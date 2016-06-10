@@ -17,6 +17,7 @@ typedef struct {
 	box_t *boxes;
 
 	int boxes_count;
+	int player_count;
 	int frames_count;
 	int fps;
 
