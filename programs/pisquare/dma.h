@@ -19,15 +19,15 @@
 #define DMA_TI_SRC_INC  (1 << 8)
 
 typedef struct dma_register {
-	volatile uint32_t cs;
-	volatile uint32_t conblk_ad;
-	volatile uint32_t ti;
-	volatile uint32_t source_ad;
-	volatile uint32_t dest_ad;
-	volatile uint32_t txfr_len;
-	volatile uint32_t stride;
-	volatile uint32_t nextconbk;
-	volatile uint32_t debug;
+	uint32_t cs;
+	uint32_t conblk_ad;
+	uint32_t ti;
+	uint32_t source_ad;
+	uint32_t dest_ad;
+	uint32_t txfr_len;
+	uint32_t stride;
+	uint32_t nextconbk;
+	uint32_t debug;
 } dma_register_t;
 
 typedef struct dma_conblk {
