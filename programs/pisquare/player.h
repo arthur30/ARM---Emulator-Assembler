@@ -3,6 +3,7 @@
 
 #include "entity.h"
 #include "color.h"
+#include "libarmc/rpi-gpio.h"
 
 #define PLAYER_LIVES 3
 #define PLAYER_DIRECTION 90
@@ -15,6 +16,8 @@ typedef struct {
 	float angular_vel;
 	int lives;
 	color_t color;
+	rpi_gpio_pin_t left_pin;
+	rpi_gpio_pin_t right_pin;
 } player_t;
 
 player_t *player_new(void);

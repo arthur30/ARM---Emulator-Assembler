@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "rpi-random.h"
+#include "libarmc/rpi-gpio.h"
 
 #include "renderer.h"
 #include "random.h"
@@ -81,6 +82,13 @@ void game_init(game_state_t *state)
 
 	player->entity->pos = (vector2_t){256, 256};
 	player->angular_vel = 180;
+	player->right_pin = RPI_GPIO2;
+	player->left_pin = RPI_GPIO3;
+
+	RPI_SetGpioInput(player->right_pin);
+	RPI_SetGpioInput(player->left_pin);
+
+	RPI_GetGpio()->GPPUD = 2;
 
 	state->player = player;
 
@@ -94,6 +102,12 @@ void game_update(game_state_t *state)
 	/* Timers */
 	state->timer_box += state->delta;
 	state->timer_game += state->delta;
+
+	if (RPI_GetGpioValue(state->player->right_pin) > 0)
+		state->player->angular_vel = -270;
+
+	if (RPI_GetGpioValue(state->player->left_pin) > 0)
+		state->player->angular_vel = 270;
 
 	/* Boxes */
 	/* Increase number of boxes over time */
@@ -122,7 +136,7 @@ void game_update(game_state_t *state)
 void game_draw(game_state_t *state)
 {
 	/* background */
-	draw_background(state);
+	/* draw_background(state); */
 
 	/* boxes */
 	for (int i = 0; i < state->box_count; i++) {
