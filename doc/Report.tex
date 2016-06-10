@@ -90,27 +90,56 @@ metal mini-game experience.
 \subsection{Design Decisions}
 
 Our objective has been to learn about and exploit as many facets of the
-raspberry pi's functionality as possible; pursuing an interactive experience
+Raspberry Pi's functionality as possible; pursuing an interactive experience
 enabled us to do this effectively by compartmentalising research and
 implementation tasks between group members. We initially hoped to make use of
 graphics, sound, and controller input.
 
 Due to time constraints and implementation challenges, we continually altered
-and evolved our ideas to accommodate a range of pi functionality whilst still
+and evolved our ideas to accommodate a range of Pi functionality whilst still
 building an interactive experience.
-
-\subsection{Implementation Challenges}
-
-Initially we had hoped to use joysticks for input, which were replaced with
-1-bit buttons, and we had hoped to render many fast moving objects, which were
-substituted with fewer, slower objects.
-
-lack of documentation (graphics, i/o components) graphics, io, dma, software
-rendering...
 
 \subsection{Testing Methodology}
 
-HELP US SZILVESZTER!!!!!!!!!!!111!!!!11
+Testing our program has been a challenging experience. The main method has been
+compiling our program, putting it on the Pi and running it. This has proven
+adequate in most cases, where we only had to debug our application logic, so we
+could see what appears on the screen. However in some specific cases it did turn
+out be not enough.
+
+For some parts the strategy has been to compile it for \texttt{x86\_64}. This
+consisted of stubbing out the parts that natively interface with the board and
+then compiling the code for our machines while changing compiler flags. Now
+using a native executable we could step through the code with \texttt{gdb}.
+
+But this was no help when trying to test the board's peripheral functionalities.
+We tested that using trial and error only with some very simple output, for
+example painting the screen a given color and then spinning to prevent further
+statements from being executed.
+
+\subsection{Implementation Challenges}
+
+Initially we had a lot plans on what we want to do. As the project progressed on
+these came more and more in line on what we could do realistically. We had to
+scrap some features while also gaining some new ones instead that we could
+implement.
+
+Lack of documentation regarding specific parts had a negative effect.  For
+example our first idea was to use multi axis joysticks for input but we had to
+abandon the idea because there was no documentation available on how the pins
+are supposed to be used.
+
+Implementing some features such as DMA and GPIO has been challenging because of
+the previously mentioned testing deficiencies. When developing for our machines
+we had access to tools such as \texttt{gdb} and \texttt{valgrind} that greatly
+facilitate finding errors in our code. As these were not available on bare metal
+we had to resort to trial and error debugging.
+
+However in cases where it was possible compiling for our machines has been
+a great help. We had a bug in our software rasterizer (still outstanding at the
+time this report is written), where the colors in the triangle are not
+interpolated correctly. We have verified that on our machines the colors render
+properly and therefore that we should focus on what is done differently on Pi.
 
 \section{Group Reflection}
 
