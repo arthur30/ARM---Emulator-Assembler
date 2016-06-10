@@ -126,13 +126,24 @@ void game_update(game_state_t *state)
 		state->timer_frame = 0;
 	}
 
+	if ((int)state->player->entity->pos.x <= 0 ||
+		(int)state->player->entity->pos.y <= 0 ||
+		(int)(state->player->entity->pos.x
+		       + state->player->entity->size.x) >= 511 ||
+		(int)(state->player->entity->pos.y
+		       + state->player->entity->size.x) >= 481)
+		state->player->speed = 0;
+
 	/* IO */
-	if (RPI_GetGpioValue(state->player->right_pin) == 0)
+	if (RPI_GetGpioValue(state->player->right_pin) == 0) {
+		state->player->speed = 50;
 		state->player->angular_vel = 270;
-	else if (RPI_GetGpioValue(state->player->left_pin) == 0)
+	} else if (RPI_GetGpioValue(state->player->left_pin) == 0) {
+		state->player->speed = 50;
 		state->player->angular_vel = -270;
-	else
+	} else
 		state->player->angular_vel = 0;
+
 
 	/* Boxes */
 	/* Increase number of boxes over time */
