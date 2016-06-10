@@ -11,8 +11,6 @@
 #include "move.h"
 #include "draw.h"
 
-#include "assets/assets.h"
-
 static void add_box(game_state_t *state)
 {
 	int right = random_int(2);
@@ -81,12 +79,6 @@ static void print_fps(game_state_t *state)
 	sprintf(str, "%d", state->fps);
 	print_text_color(state, str, (vector2_t){250, 486},
 						(color_t){0, 255, 0, 255});
-}
-
-void game_splash(game_state_t *state)
-{
-	graphics_draw_image(state->device, &(vector2_t){0, 0},
-			    splash_bin, NULL);
 }
 
 void game_init(game_state_t *state)

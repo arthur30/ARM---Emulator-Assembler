@@ -13,6 +13,7 @@
 #include "text.h"
 #include "renderer.h"
 #include "dma.h"
+#include "draw.h"
 
 #define SCREEN_WIDTH    512
 #define SCREEN_HEIGHT   512
@@ -73,8 +74,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 				       SCREEN_HEIGHT,
 				       SCREEN_DEPTH);
 
-	game_splash(&state);
-	graphics_flush(state.device);
+	draw_splash(&state);
 
 	RPI_WaitMicroSeconds(5000000);
 

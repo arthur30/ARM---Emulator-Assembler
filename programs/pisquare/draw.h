@@ -7,6 +7,9 @@
 #include "sprite.h"
 #include "minmax.h"
 
+/* Splash */
+void draw_splash(game_state_t *state);
+
 /* Background */
 void draw_background(game_state_t *state);
 

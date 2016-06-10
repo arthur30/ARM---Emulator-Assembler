@@ -4,6 +4,31 @@
 
 #include "assets/assets.h"
 
+void draw_splash(game_state_t *state)
+{
+	graphics_draw_image(state->device, &(vector2_t){0, 0},
+			    splash_bin, NULL);
+
+	cvertex_t tr[3] = {
+		[0] = {
+			.pos = { .x = 0, .y = 0 },
+			.color = { .r = 255, .g = 0, .b = 0, .a = 255 }
+		},
+		[1] = {
+			.pos = { .x = 0, .y = 200 },
+			.color = { .r = 0, .g = 255, .b = 0, .a = 255 }
+		},
+		[2] = {
+			.pos = { .x = 200, .y = 0 },
+			.color = { .r = 0, .g = 0, .b = 255, .a = 255 }
+		},
+	};
+
+	graphics_draw(state->device, tr, 3);
+
+	graphics_flush(state->device);
+}
+
 void draw_background(game_state_t *state)
 {
 	graphics_draw_image(state->device, &(vector2_t){0, 0},
