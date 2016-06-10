@@ -17,6 +17,11 @@
 \maketitle
 
 \section{Introduction}
+This C project occupied the most amount of our time in the past few weeks.
+Following is the final project report. We start by discussing the implementation
+of the assembler followed by an indepth explanation of our extension with a few
+screenshots. After that we move on to our group reflection and finally we have 
+our personal reflections on the project and the team.
 
 \section{Assembler}
 
@@ -51,15 +56,17 @@ a final binary encoding of the instruction.
 In this implementation of the assembler, majority of the data structures are
 being reused from the emulator.
 
+\newpage
+
 \subsection{Extensions}
 
 The assembler has been extended to implement some more instructions comments.
 All the instructions are now of the type:
-\textbf{opcode\{cond\} \{operands\}}
+\texttt{opcode\{cond\} \{operands\}}
 \begin{itemize}[noitemsep,topsep=0pt]
-  \item \textbf{opcode}: Basic Instruction
-  \item \textbf{cond}: Ex: eq, hi, al, cc, etc.
-  \item \textbf{operands}: Ex: registers, immediate values.
+  \item \texttt{opcode}: Basic Instruction
+  \item \texttt{cond}: Ex: eq, hi, al, cc, etc.
+  \item \texttt{operands}: Ex: registers, immediate values.
 \end{itemize}
 Example: andeq r0, r0, r0, mulhi r1, r2, r3.
 
@@ -70,6 +77,12 @@ explain the code.
 
 \subsection{Description}
 
+\begin{wrapfigure}{r}{5cm}
+	\caption{Current Gameplay}\label{wrap-fig:1}
+	\includegraphics[width=5cm]{menu}
+	\includegraphics[width=5cm]{screen}
+\end{wrapfigure} 
+
 Our extension features graphical output driven by our own software renderer, in
 combination with controller input, to provide a competitive multiplayer bare
 metal mini-game experience.
@@ -78,12 +91,6 @@ It is a simple multiplayer survival arcade game where you have to avoid the
 obstacles and stay alive for as long as possible.
 
 \subsection{Design Decisions}
-
-\begin{wrapfigure}{r}{5cm}
-  \caption{Current Gameplay}\label{wrap-fig:1}
-  \includegraphics[width=5cm]{menu}
-  \includegraphics[width=5cm]{screen}
-\end{wrapfigure}
 
 Our objective has been to learn about and exploit as many facets of the
 Raspberry Pi's functionality as possible; pursuing an interactive experience
