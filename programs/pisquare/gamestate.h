@@ -14,7 +14,7 @@ typedef struct {
 
 	player_t *player;
 
-	box_t **boxes;
+	box_t *boxes;
 
 	int box_count;
 
