@@ -17,11 +17,11 @@ static void add_box(game_state_t *state)
 {
 	int right = random_int(2);
 	int sign = 2 * right - 1;
-	float vel = sign * (random_int(400) + 100);
+	float vel = sign * (random_int(100) + 50);
 
 	box_t *box = box_new();
 
-	box->entity->size = (vector2_t){10, 10};
+	box->entity->size = (vector2_t){15, 15};
 	int randy = random_int(state->area.y - box->entity->size.y)
 						+ box->entity->size.y/2;
 	/*int randx = random_int(state->area.x - box->entity->size.x)
@@ -31,13 +31,11 @@ static void add_box(game_state_t *state)
 							+ box->entity->size.x);
 	(void)vel;
 
-	int rand_r = random_int(256);
-	int rand_g = random_int(256);
-	int rand_b = random_int(256);
+	int grey = random_int(128) + 127;
 
 	box->entity->pos = (vector2_t){posx, randy};
-	box->entity->vel = (vector2_t){vel, 5};
-	box->color = (color_t){rand_r, rand_g, rand_b, 255};
+	box->entity->vel = (vector2_t){vel, 0};
+	box->color = (color_t){grey, grey, grey, 255};
 
 	++state->boxes_count;
 	state->boxes = realloc(state->boxes,
@@ -81,7 +79,8 @@ static void print_fps(game_state_t *state)
 	char str[2];
 
 	sprintf(str, "%d", state->fps);
-	print_text(state, str, (vector2_t){250, 486});
+	print_text_color(state, str, (vector2_t){250, 486},
+						(color_t){0, 255, 0, 255});
 }
 
 void game_splash(game_state_t *state)
@@ -105,6 +104,7 @@ void game_init(game_state_t *state)
 
 	player->entity->pos = (vector2_t){256, 256};
 	player->angular_vel = 0;
+	player->color = (color_t){0, 255, 0, 255};
 	player->right_pin = RPI_GPIO2;
 	player->left_pin = RPI_GPIO3;
 
@@ -126,12 +126,14 @@ void game_update(game_state_t *state)
 	state->timer_box += state->delta;
 	state->timer_game += state->delta;
 	state->timer_frame += state->delta;
+
 	/* Diagnostics */
 	if (state->timer_frame >= 1.f) {
 		state->fps = state->frames_count;
 		state->frames_count = 0;
 		state->timer_frame = 0;
 	}
+
 	/* IO */
 	if (RPI_GetGpioValue(state->player->right_pin) == 0)
 		state->player->angular_vel = 270;
