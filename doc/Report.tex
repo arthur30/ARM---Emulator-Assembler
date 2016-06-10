@@ -2,6 +2,7 @@
 
 \usepackage{fullpage}
 \usepackage{enumitem}
+\usepackage{graphicx,wrapfig}
 
 \begin{document}
 
@@ -88,7 +89,16 @@ Our extension features graphical output driven by our own software renderer, in
 combination with controller input, to provide a competitive multiplayer bare
 metal mini-game experience.
 
+It is a simple multiplayer survival arcade game where you have to avoid the
+obstacles and stay alive for as long as possible.
+
 \subsection{Design Decisions}
+
+\begin{wrapfigure}{r}{5cm}
+	\caption{Current Gameplay}\label{wrap-fig:1}
+	\includegraphics[width=5cm]{menu}
+	\includegraphics[width=5cm]{screen}
+\end{wrapfigure} 
 
 Our objective has been to learn about and exploit as many facets of the
 Raspberry Pi's functionality as possible; pursuing an interactive experience
@@ -117,6 +127,11 @@ But this was no help when trying to test the board's peripheral functionalities.
 We tested that using trial and error only with some very simple output, for
 example painting the screen a given color and then spinning to prevent further
 statements from being executed.
+
+After implementing our own print function, testing became easier for us.
+We used it to output certain variables and string onto the screen and check
+their values. This method helped us rectify the GPIO Input, the frame rate and the
+timer in our project.
 
 \subsection{Implementation Challenges}
 
@@ -166,7 +181,7 @@ have the time to learn C first and then work on the project.
 
 This group project has been challenging us since day one. We tried to complete
 assembler and emulator in parallel to quickly move to the extension, So I had
-to handle the assembler single handedly and I am proud of the fact that I was 
+to handle the assembler single handedly and I am proud of the fact that I was
 able to complete integral parts of the project and implement some nice designs.
 
 Overall I would say that this has been a really challenging and rewarding
