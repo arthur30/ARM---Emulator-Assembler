@@ -15,6 +15,9 @@
 #define DMA_CS_ACTIVE 0x1
 #define DMA_CS_RESET  0x80000000
 
+#define DMA_TI_DEST_INC (1 << 4)
+#define DMA_TI_SRC_INC  (1 << 8)
+
 typedef struct dma_register {
 	volatile uint32_t cs;
 	volatile uint32_t conblk_ad;
@@ -39,9 +42,11 @@ typedef struct dma_conblk {
 } dma_conblk_t;
 
 int dma_init(void);
-int dma(void *dst, const void *sr, size_t lenc);
 int dma_check_usable(int ch);
 int dma_check_active(int ch);
+int dma_copy(void *dst, const void *sr, size_t lenc);
+int dma_fill(void *dst, const void *sr, size_t lenc);
+int dma_zero(void *dst, size_t lenc);
 int dma_wait(int ch);
 
 #endif
