@@ -9,7 +9,6 @@ entity_t *entity_new(void)
 	ent->pos = (vector2_t){0, 0};
 	ent->size = (vector2_t){10, 10};
 	ent->vel = (vector2_t){0, 0};
-	ent->acc = (vector2_t){0, 0};
 
 	return ent;
 }

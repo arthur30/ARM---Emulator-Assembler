@@ -9,7 +9,6 @@ typedef struct {
 	vector2_t pos;
 	vector2_t size;
 	vector2_t vel;
-	vector2_t acc;
 } entity_t;
 
 entity_t *entity_new(void);
