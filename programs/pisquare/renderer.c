@@ -7,6 +7,7 @@
 
 #include "vector2.h"
 #include "color.h"
+#include "dma.h"
 
 static size_t get_buf_size(const graphics_t *device)
 {
@@ -66,7 +67,7 @@ fail:
 
 void graphics_blank(const graphics_t *device)
 {
-	memset(device->mem, 0, get_buf_size(device));
+	dma_zero(device->mem, get_buf_size(device));
 }
 
 static color_t overrun;
@@ -278,6 +279,18 @@ void graphics_draw_rectangle(const graphics_t *device, const color_t *color,
 	graphics_draw(device, rect, 6);
 }
 
+static void graphics_draw_image_fast(const graphics_t *device,
+				     const unsigned char *image, size_t imglen)
+{
+	size_t copysize;
+
+	copysize = get_buf_size(device);
+	if (imglen < copysize)
+		copysize = imglen;
+
+	dma_copy(device->mem, image + 8, copysize);
+}
+
 void graphics_draw_image(const graphics_t *device, const vector2_t *pos,
 			 const unsigned char *image)
 {
@@ -288,6 +301,11 @@ void graphics_draw_image(const graphics_t *device, const vector2_t *pos,
 
 	memcpy(&height, image, 4);
 	memcpy(&width, image + 4, 4);
+
+	if (width == device->width) {
+		graphics_draw_image_fast(device, image, height * width * 4);
+		return;
+	}
 
 	for (y = 0; y < height; y++) {
 		for (x = 0; x < width; x++) {
@@ -304,6 +322,5 @@ void graphics_draw_image(const graphics_t *device, const vector2_t *pos,
 
 void graphics_flush(const graphics_t *device)
 {
-	if (device->fb)
-		memcpy(device->fb, device->mem, get_buf_size(device));
+	dma_copy(device->fb, device->mem, get_buf_size(device));
 }

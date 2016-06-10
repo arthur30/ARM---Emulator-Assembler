@@ -12,6 +12,7 @@
 #include "game.h"
 #include "text.h"
 #include "renderer.h"
+#include "dma.h"
 
 #define SCREEN_WIDTH    512
 #define SCREEN_HEIGHT   512
@@ -64,6 +65,9 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 	RPI_PropertyInit();
 	RPI_PropertyAddTag(TAG_GET_CLOCK_RATE, TAG_CLOCK_ARM);
 	RPI_PropertyProcess();
+
+	/* Initialize DMA */
+	dma_init();
 
 	state.device = graphics_create(SCREEN_WIDTH,
 				       SCREEN_HEIGHT,
