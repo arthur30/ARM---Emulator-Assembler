@@ -247,35 +247,22 @@ void graphics_draw(const graphics_t *device,
 	}
 }
 
-static cvertex_t rect[6];
 void graphics_draw_rectangle(const graphics_t *device, const color_t *color,
 			     const vector2_t *pos, const vector2_t *hw)
 {
-	rect[0].pos.x = pos->x;
-	rect[0].pos.y = pos->y;
-	rect[0].color = *color;
+	size_t dx, dy;
+	color_t *p;
 
-	rect[1].pos.x = pos->x;
-	rect[1].pos.y = pos->y + hw->y;
-	rect[1].color = *color;
-
-	rect[2].pos.x = pos->x + hw->x;
-	rect[2].pos.y = pos->y;
-	rect[2].color = *color;
-
-	rect[3].pos.x = pos->x + hw->x;
-	rect[3].pos.y = pos->y;
-	rect[3].color = *color;
-
-	rect[4].pos.x = pos->x;
-	rect[4].pos.y = pos->y + hw->y;
-	rect[4].color = *color;
-
-	rect[5].pos.x = pos->x + hw->x;
-	rect[5].pos.y = pos->y + hw->y;
-	rect[5].color = *color;
-
-	graphics_draw(device, rect, 6);
+	for (dx = 0; dx < hw->x; dx++) {
+		for (dy = 0; dy < hw->y; dy++) {
+			p = get_pixel(device, pos->x + dx, pos->y + dy);
+			p->b = color->b;
+			p->g = color->g;
+			p->r = color->r;
+			if (device->bpp == 32)
+				p->a = color->a;
+		}
+	}
 }
 
 static void graphics_draw_image_fast(const graphics_t *device,
