@@ -39,11 +39,11 @@ static void add_box(game_state_t *state)
 	box->entity->vel = (vector2_t){vel, 5};
 	box->color = (color_t){rand_r, rand_g, rand_b, 255};
 
-	++state->box_count;
+	++state->boxes_count;
 	state->boxes = realloc(state->boxes,
-					state->box_count * sizeof(box_t));
+					state->boxes_count * sizeof(box_t));
 
-	state->boxes[state->box_count-1] = *box;
+	state->boxes[state->boxes_count-1] = *box;
 }
 
 static void print_time(game_state_t *state)
@@ -76,6 +76,14 @@ static void print_io(game_state_t *state)
 	print_text(state, str, (vector2_t){200, 486});
 }
 
+static void print_fps(game_state_t *state)
+{
+	char str[2];
+
+	sprintf(str, "%d", state->fps);
+	print_text(state, str, (vector2_t){250, 486});
+}
+
 void game_splash(game_state_t *state)
 {
 	graphics_draw_image(state->device, &(vector2_t){0, 0}, splash_bin);
@@ -89,7 +97,7 @@ void game_init(game_state_t *state)
 				  state->device->height - 32};
 
 	/* boxes */
-	state->box_count = 0;
+	state->boxes_count = 0;
 
 	/* player */
 	player_t *player = player_new();
@@ -116,7 +124,13 @@ void game_update(game_state_t *state)
 	/* Timers */
 	state->timer_box += state->delta;
 	state->timer_game += state->delta;
-
+	state->timer_frame += state->delta;
+	/* Diagnostics */
+	if (state->timer_frame >= 1.f) {
+		state->fps = state->frames_count;
+		state->frames_count = 0;
+		state->timer_frame = 0;
+	}
 	/* IO */
 	if (RPI_GetGpioValue(state->player->right_pin) == 0)
 		state->player->angular_vel = 270;
@@ -127,19 +141,20 @@ void game_update(game_state_t *state)
 
 	/* Boxes */
 	/* Increase number of boxes over time */
-	if (state->timer_box > BOX_TIMER && state->box_count < BOX_COUNT_MAX) {
+	if (state->timer_box > BOX_TIMER
+				&& state->boxes_count < BOX_COUNT_MAX) {
 		state->timer_box = 0;
 		add_box(state);
 	}
 	/* Move Boxes */
-	for (int i = 0; i < state->box_count; i++)
+	for (int i = 0; i < state->boxes_count; i++)
 		move_box(state, &state->boxes[i]);
 
 	/* Player */
 	move_player(state, state->player);
 
 	/* Detect collisions */
-	for (int i = 0; i < state->box_count; i++) {
+	for (int i = 0; i < state->boxes_count; i++) {
 		box_t box = state->boxes[i];
 		(void)box;
 	}
@@ -152,7 +167,7 @@ void game_draw(game_state_t *state)
 	draw_background(state);
 
 	/* boxes */
-	for (int i = 0; i < state->box_count; i++)
+	for (int i = 0; i < state->boxes_count; i++)
 		draw_box(state, &state->boxes[i]);
 
 
@@ -163,12 +178,16 @@ void game_draw(game_state_t *state)
 	print_time(state);
 	print_lives(state);
 	print_io(state);
+	print_fps(state);
+
+	/* Diagnostics */
+	state->frames_count += 1;
 }
 
 void game_free(game_state_t *state)
 {
 	/* boxes */
-	for (int i = 0; i < state->box_count; i++)
+	for (int i = 0; i < state->boxes_count; i++)
 		box_free(&state->boxes[i]);
 
 	free(state->boxes);

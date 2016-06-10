@@ -16,9 +16,12 @@ typedef struct {
 
 	box_t *boxes;
 
-	int box_count;
+	int boxes_count;
+	int frames_count;
+	int fps;
 
 	/* Timers */
+	float timer_frame;
 	float timer_box;
 	float timer_game;
 } game_state_t;
