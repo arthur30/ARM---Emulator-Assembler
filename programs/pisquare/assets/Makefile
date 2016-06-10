@@ -1,5 +1,6 @@
 ORIGCC   := $(CC)
 AS       = arm-none-eabi-as
+AR       = arm-none-eabi-ar
 CPP      = arm-none-eabi-cpp
 CC       = arm-none-eabi-gcc
 OBJCOPY  = arm-none-eabi-objcopy
