@@ -6,7 +6,8 @@
 
 void draw_background(game_state_t *state)
 {
-	graphics_draw_image(state->device, &(vector2_t){0, 0}, background_bin);
+	graphics_draw_image(state->device, &(vector2_t){0, 0},
+			    background_bin, NULL);
 }
 
 void draw_rect(game_state_t *state, rect_t rect, color_t col)

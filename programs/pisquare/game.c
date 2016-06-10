@@ -58,12 +58,13 @@ static void print_lives(game_state_t *state)
 
 	sprintf(str, "LIVES %d", state->player->lives);
 	print_text_color(state, str, (vector2_t){0, 486},
-						(color_t){255, 0, 0, 255});
+			 (color_t){ .r = 255, .g = 0, .b = 0, .a = 255});
 }
 
 void game_splash(game_state_t *state)
 {
-	graphics_draw_image(state->device, &(vector2_t){0, 0}, splash_bin);
+	graphics_draw_image(state->device, &(vector2_t){0, 0},
+			    splash_bin, NULL);
 }
 
 void game_init(game_state_t *state)

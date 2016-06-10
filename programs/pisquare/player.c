@@ -11,7 +11,7 @@ player_t *player_new(void)
 	new->lives = PLAYER_LIVES;
 	new->dir = PLAYER_DIRECTION;
 	new->speed = PLAYER_SPEED;
-	new->color = (color_t){0, 0, 255, 255};
+	new->color = (color_t){.r = 0, .g = 0, .b = 255, .a = 255};
 
 	return new;
 }

@@ -6,7 +6,7 @@ box_t *box_new(void)
 {
 	box_t *box = malloc(sizeof(box_t));
 
-	box->color = (color_t){100, 150, 135, 255};
+	box->color = (color_t){.r = 100, .g = 150, .b = 135, .a = 255};
 	box->entity = entity_new();
 
 	return box;

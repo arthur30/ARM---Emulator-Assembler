@@ -11,14 +11,12 @@ void print_text_color(game_state_t *state, const char *string, vector2_t pos,
 	vector2_t p;
 	unsigned char *letter;
 
-	(void)col;
 	len = strlen(string);
 	p = pos;
 
-
 	for (size_t i = 0; i < len; i++) {
 		letter = get_letter(string[i]);
-		graphics_draw_image(state->device, &p, letter);
+		graphics_draw_image(state->device, &p, letter, &col);
 		p.x += 20;
 	}
 

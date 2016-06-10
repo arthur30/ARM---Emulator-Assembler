@@ -292,17 +292,18 @@ static void graphics_draw_image_fast(const graphics_t *device,
 }
 
 void graphics_draw_image(const graphics_t *device, const vector2_t *pos,
-			 const unsigned char *image)
+			 const unsigned char *image, const color_t *tint)
 {
 	size_t width, height;
 	size_t x, y;
 	size_t imgpos;
 	color_t *p;
+	const color_t *src;
 
 	memcpy(&height, image, 4);
 	memcpy(&width, image + 4, 4);
 
-	if (width == device->width) {
+	if ((int)pos->x == 0 && (int)pos->y == 0 && width == device->width) {
 		graphics_draw_image_fast(device, image, height * width * 4);
 		return;
 	}
@@ -310,12 +311,21 @@ void graphics_draw_image(const graphics_t *device, const vector2_t *pos,
 	for (y = 0; y < height; y++) {
 		for (x = 0; x < width; x++) {
 			p = get_pixel(device, pos->x + x, pos->y + y);
+
 			imgpos = 8 + (y * width * 4) + (x * 4);
-			p->b = image[imgpos++];
-			p->g = image[imgpos++];
-			p->r = image[imgpos++];
+			if (image[imgpos + 3] == 0)
+				continue;
+
+			if (!tint)
+				src = (void *)(&image[imgpos]);
+			else
+				src = tint;
+
+			p->b = src->b;
+			p->g = src->g;
+			p->r = src->r;
 			if (device->bpp == 32)
-				p->a = image[imgpos++];
+				p->a = src->a;
 		}
 	}
 }
