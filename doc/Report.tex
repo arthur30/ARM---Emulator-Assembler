@@ -1,6 +1,7 @@
 \documentclass[11pt]{article}
 
 \usepackage{fullpage}
+\usepackage{enumitem}
 
 \begin{document}
 
@@ -13,19 +14,68 @@
 
 \section{Introduction}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
-
 \section{Emulator}
+
 \section{Assembler}
+\subsection{Design}
+The assembler has been implemented according to the two pass design provided in
+the specification file. However we read the input file only once and iterate
+over the stored instructions twice.
+
+The assembler has four major components:
+\begin{itemize}[noitemsep,topsep=0pt]
+	\item \textbf{Tokenizer}:
+		to tokenize the instruction.
+	\item \textbf{Parser}:
+		to parse the tokenized instruction.
+	\item \textbf{Dictionary}:
+		to look for the mnemonics and their respective values.
+	\item \textbf{Instruction Generator}:
+		to generate the final binary encoding.
+\end{itemize}
+
+\subsection{Implementation}
+Every line in the instruction is fed into the tokenizer which returns a list
+of tokens. These tokens are then passed to the parser which recognizes the
+mnemonic and parses the whole instruction into a usable format. While the
+instruction is being parsed the dictionary is used extensively to classify the
+tokens. Once the instruction has been parsed, it is passed to the instruction
+generator which connects all the components of the parsed tokens and generates
+a final binary encoding of the instruction.
+
+In this implementation of the assembler, majority of the data structures are
+being reused from the emulator. 
+
+\subsection{Extensions}
+The assembler has been extended to implement some more instructions comments. 
+All the instructions are now of the type:
+\textbf{opcode\{cond\} \{operands\}}
+\begin{itemize}[noitemsep,topsep=0pt]
+	\item \textbf{opcode}: Basic Instruction
+	\item \textbf{cond}: Ex: eq, hi, al, cc, etc.
+	\item \textbf{operands}: Ex: registers, immediate values.
+\end{itemize}
+Example: andeq r0, r0, r0, mulhi r1, r2, r3.
+
+It also supports comments along with the instructions which can be used to
+explain the code.
+
 \section{Extension}
 \subsection{Idea}
+
 \subsection{Implementation}
+
 \subsection{Result}
+
 \section{Group Reflection}
+
 \section{Personal Reflection}
+\subsection{Abhinav Mishra}
+
+\subsection{Arthur-Mihai Niculae}
+
+\subsection{Szilveszter Szekely}
+
+\subsection{Tom Bellingham}
+
 \end{document}
