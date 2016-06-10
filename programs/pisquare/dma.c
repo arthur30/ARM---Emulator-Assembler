@@ -73,10 +73,7 @@ static int dma(void *dst, const void *src, size_t len, uint32_t ti)
 		dma_reg = get_channel(i);
 		dma_reg->conblk_ad = (uintptr_t)(void *)&dma_blocks[i];
 		dma_reg->cs |= DMA_CS_ACTIVE;
-
-		while (dma_reg->cs & DMA_CS_ACTIVE)
-			;
-
+		
 		return i;
 	}
 

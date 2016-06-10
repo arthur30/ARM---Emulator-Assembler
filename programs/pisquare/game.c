@@ -1,10 +1,8 @@
 #include "game.h"
 
 #include <stdio.h>
-
-#include "rpi-random.h"
 #include "libarmc/rpi-gpio.h"
-
+#include "rpi-random.h"
 #include "renderer.h"
 #include "random.h"
 #include "text.h"
@@ -17,44 +15,41 @@
 
 static void add_box(game_state_t *state)
 {
-	bool right = random_int(2);
+	int right = random_int(2);
 	int sign = 2 * right - 1;
-	float vel = sign * (random_int(700) + 100);
+	float vel = sign * (random_int(400) + 100);
 
 	box_t *box = box_new();
 
 	box->entity->size = (vector2_t){10, 10};
 	int randy = random_int(state->area.y - box->entity->size.y)
 						+ box->entity->size.y/2;
-	int randx = random_int(state->area.x - box->entity->size.x)
-						+ box->entity->size.x/2;
-
+	/*int randx = random_int(state->area.x - box->entity->size.x)
+	*						+ box->entity->size.x/2;
+	*/
 	int posx = -box->entity->size.x + !right * (state->area.x
 							+ box->entity->size.x);
-	(void)posx;
-	(void)randx;
-	(void)randy;
+	(void)vel;
 
-	/*int rand_r = random_int(256);
-	*int rand_g = random_int(256);
-	*int rand_b = random_int(256);
-	*/
+	int rand_r = random_int(256);
+	int rand_g = random_int(256);
+	int rand_b = random_int(256);
 
-	box->entity->pos = (vector2_t){256, 256};
-	box->entity->vel = (vector2_t){vel, 0};
-	/* box->color = (color_t){rand_r, rand_g, rand_b, 255}; */
-	box->color = (color_t){0, 255, 0, 255};
+	box->entity->pos = (vector2_t){posx, randy};
+	box->entity->vel = (vector2_t){vel, 5};
+	box->color = (color_t){rand_r, rand_g, rand_b, 255};
 
 	++state->box_count;
 	state->boxes = realloc(state->boxes,
 					state->box_count * sizeof(box_t));
+
 	state->boxes[state->box_count-1] = *box;
 }
 
 static void print_time(game_state_t *state)
 {
 	char str[10];
-	int len = sprintf(str, "%.1f", (double)state->timer_game);
+	int len = sprintf(str, "%.1f", state->timer_game);
 
 	int x = state->device->width - len * 20;
 
@@ -122,8 +117,7 @@ void game_update(game_state_t *state)
 	state->timer_box += state->delta;
 	state->timer_game += state->delta;
 
-	print_io(state);
-
+	/* IO */
 	if (RPI_GetGpioValue(state->player->right_pin) == 0)
 		state->player->angular_vel = 270;
 	else if (RPI_GetGpioValue(state->player->left_pin) == 0)
@@ -135,7 +129,6 @@ void game_update(game_state_t *state)
 	/* Increase number of boxes over time */
 	if (state->timer_box > BOX_TIMER && state->box_count < BOX_COUNT_MAX) {
 		state->timer_box = 0;
-		(void)add_box;
 		add_box(state);
 	}
 	/* Move Boxes */
@@ -156,11 +149,12 @@ void game_update(game_state_t *state)
 void game_draw(game_state_t *state)
 {
 	/* background */
-	/* draw_background(state); */
+	draw_background(state);
 
 	/* boxes */
 	for (int i = 0; i < state->box_count; i++)
 		draw_box(state, &state->boxes[i]);
+
 
 	/* player */
 	draw_player(state, state->player);
@@ -168,6 +162,7 @@ void game_draw(game_state_t *state)
 	/* UI */
 	print_time(state);
 	print_lives(state);
+	print_io(state);
 }
 
 void game_free(game_state_t *state)

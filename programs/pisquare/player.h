@@ -7,7 +7,7 @@
 
 #define PLAYER_LIVES 3
 #define PLAYER_DIRECTION 90
-#define PLAYER_SPEED 200
+#define PLAYER_SPEED 50
 
 typedef struct {
 	entity_t *entity;

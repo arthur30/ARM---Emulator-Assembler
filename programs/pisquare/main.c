@@ -76,13 +76,13 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 	game_splash(&state);
 	graphics_flush(state.device);
 
-	RPI_WaitMicroSeconds(100000);
+	RPI_WaitMicroSeconds(500000);
 
 	game_init(&state);
 
 	uint32_t diff, new;
 
-	long double secondsElapsed;
+	float secondsElapsed;
 
 	rpi_sys_timer_t *timer = RPI_GetSystemTimer();
 	uint32_t prev = timer->counter_lo;
@@ -94,7 +94,7 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 		new = timer->counter_lo;
 		diff = new - prev;
 		prev = new;
-		secondsElapsed = (long double)diff/1000000;
+		secondsElapsed = (float)diff/1000000;
 
 		state.delta = secondsElapsed;
 

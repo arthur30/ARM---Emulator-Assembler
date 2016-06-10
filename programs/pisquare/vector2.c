@@ -4,7 +4,7 @@
 
 static int floateq(float a, float b)
 {
-	return fabs(a - b) < 0.00001f;
+	return fabsf(a - b) < 0.00001f;
 }
 
 float vector2_abs(const vector2_t *v)
