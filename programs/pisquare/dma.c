@@ -3,10 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "rpi-mailbox-interface.h"
+
 static dma_conblk_t *dma_blocks_mem;
 static dma_conblk_t *dma_blocks;
 
 static volatile uint32_t *dma_enable = (void *)(DMA_BASE + DMA_ENABLE_OFFSET);
+
+static uint32_t dma_usable;
 
 static volatile dma_register_t *get_channel(int channel)
 {
@@ -16,6 +20,17 @@ static volatile dma_register_t *get_channel(int channel)
 int dma_init(void)
 {
 	uintptr_t ptr;
+	rpi_mailbox_property_t *mp;
+
+	*dma_enable = DMA_ENABLE_ALL;
+
+	RPI_PropertyInit();
+	RPI_PropertyAddTag(TAG_GET_DMA_CHANNELS);
+	RPI_PropertyProcess();
+
+	mp = RPI_PropertyGet(TAG_GET_PHYSICAL_SIZE);
+	if (mp)
+		dma_usable = mp->data.buffer_32[0];
 
 	dma_blocks_mem = malloc(sizeof(dma_conblk_t) * (DMA_CHANNELS + 1));
 	if (!dma_blocks_mem)
@@ -24,14 +39,17 @@ int dma_init(void)
 		~sizeof(dma_register_t);
 	dma_blocks = (void *)ptr;
 
-	*dma_enable = DMA_ENABLE_ALL;
-
 	return 0;
 }
 
 int dma_check_active(int ch)
 {
-	return get_channel(ch)->cs & DMA_CS_ACTIVE;
+	return (get_channel(ch)->cs & DMA_CS_ACTIVE);
+}
+
+int dma_check_usable(int ch)
+{
+	return dma_usable & (1 << ch);
 }
 
 int dma(void *dst, const void *src, size_t len)
@@ -40,7 +58,7 @@ int dma(void *dst, const void *src, size_t len)
 	volatile dma_register_t *dma_reg;
 
 	for (i = 0; i < DMA_CHANNELS; i++) {
-		if (dma_check_active(i))
+		if (!dma_check_usable(i) && dma_check_active(i))
 			continue;
 		memset(&dma_blocks[i], 0, sizeof(dma_conblk_t));
 		dma_blocks[i].ti = (1 << 4) | (1 << 8);

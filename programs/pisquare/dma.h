@@ -6,7 +6,7 @@
 
 #define DMA_BASE     0x20007000
 #define DMA_OFFSET   0x100
-#define DMA_CHANNELS 15
+#define DMA_CHANNELS 16
 
 #define DMA_ENABLE_OFFSET 0xFF0
 
@@ -40,6 +40,7 @@ typedef struct dma_conblk {
 
 int dma_init(void);
 int dma(void *dst, const void *sr, size_t lenc);
+int dma_check_usable(int ch);
 int dma_check_active(int ch);
 int dma_wait(int ch);
 
