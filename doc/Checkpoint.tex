@@ -1,30 +1,139 @@
 \documentclass[11pt]{article}
 
 \usepackage{fullpage}
+\usepackage{enumitem}
 
 \begin{document}
 
-\title{ARM Checkpoint... }
-\author{TODO}
+\title{ARM Checkpoint}
+\author{
+  Szilveszter Szekely,
+  Abhinav Mishra,
+  Arthur-Mihai Niculae,
+  Tom Bellingham
+}
 
 \maketitle
 
 \section{Group Organisation}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+Our idea was to split up the parts of the task among the different members of
+the group, first focusing on the emulator and the assembler and then the
+remaining GPIO LED flasher and extension parts.
+
+The emulator was assigned to Szilveszter Szekely and Arthur-Mihai Niculae.
+The assembler was assigned to Abhinav Mishra and Tom Bellingham.
+
+At this point we have yet to decide on the specifics of the work allocation of
+GPIO LED program and the extension.
+
+\section{Group Dynamics}
+
+Our group is host to a wide range of abilities and expertise, which has provided
+a unique opportunity to query and learn from those who have considerable skill
+in particular areas.
+
+For some of us, the C lectures have been our first exposure to the language,
+thus studying the language independently in order to contribute to the group
+more effectively later on has been a hindrance to working as a team in the early
+stages.
+
+Partitioning the group into halves, with each pair tackling one of the first two
+tasks, has so far been an effective strategy. However, given the discrepancy in
+knowledge and ability between group members, some members were able to
+contribute disproportionally to the end result.
+
+In these situations we have peer-reviewed each other's code to discuss and
+ensure that we understand the design and implementation decisions that were
+made.
+
+In future we need to ensure that we communicate more systematically and
+regularly about progress with specific tasks, and strategize not only about
+immediate objectives but also upcoming tasks and the long-term life of the
+project.
 
 \section{Implementation Strategies}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+We wanted a consistent style for our code and one that also filters out most of
+the possible errors that we can make. Therefore we decided to include the Linux
+kernel checkpatch.pl tool to check our for style consistency. We also turned on
+more warnings in our Makefile to spot more problems. We made any style error and
+warning along with compiler errors into errors that stop the build, so we can
+spot and correct them easily. \\ \\
+
+The \textbf{emulator} was split into four main parts.
+
+There are data structures for storing the state of the emulator and the
+decoded instructions. The state includes the current values of registers, the
+current values in memory, whether there is a fetched instructions and the
+fetched instruction, whether there is a decoded instruction and the decoded
+instruction itself.
+
+The remaining four parts are split based on the parts of the execution pipeline,
+therefore fetch, decode, execute.
+
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item \textbf{Fetch}: relatively simple, fetches 4 bytes from memory,
+      packs them
+    \item \textbf{Decode}: tests for specific bit patterns to identify
+      instruction type then unpacks it
+    \item \textbf{Execute}: check the flags on the decoded instruction and calls
+      their respective functions by indexing into an array
+    \item \textbf{PC}: incremented
+\end{itemize}
+
+If any of these operations fail or a halt instruction is encountered then
+execution is halted and the state of the emulator dumped.
+
+To simplify code paths, we use arrays of function pointers and index into them
+with relevant parts of the instruction, for example the opcode of the data
+processing instruction. To save space the instructions are stored in unions.
+
+The data structures of the emulator are to be reused in the assembler. \\
+
+For the \textbf{assembler} we are using the two pass strategy mentioned in the
+spec file. In the first pass we read the labels and in the second pass we write
+the binary encoded instruction.
+
+Talking about how the assembler generates this binary encoding. The assembler
+has been divided into 4 main parts:
+\begin{itemize}[noitemsep,topsep=0pt]
+	\item \textbf{Tokenizer}:
+		to tokenize the instruction.
+	\item \textbf{Parser}:
+		to parse the tokenized instruction.
+	\item \textbf{Dictionary}:
+		to look for the mnemonics and their respective values.
+	\item \textbf{Instruction Generator}:
+		to generate the final binary encoding.
+\end{itemize}
+
+We also reuse some of the data structures used in the emulator in order to
+avoid duplicates and redundant code.(Ex:
+\textbf{instr\_data\_proc},
+\textbf{instr\_mult},
+\textbf{instr\_transfer} \&
+\textbf{instr\_branch}
+)
+
+We would also like to mention that there is some work to be done on the
+assembler to pass all the test cases. Also we are thinking of reducing the
+number of components underlying the assembler and making the tokenizer more
+efficient and complete.
+
+\section{Implementation Challenges}
+
+As was mentioned in the previous part we used very strong rules about checking
+code style. Therefore some times we had to search for new methods to do a part
+that we were warned about being unsafe.
+
+Coming from 6 months of Java some of us had a tough time with memory management
+in C. Receiving SIGSEGV error every now and then was not very pleasant to the
+eyes and the mind. So we had to be very careful with how and when to allocate
+memory and when to free it.
+
+Also we found shift registers hard to implement in the assembler because of an
+inefficient tokenizer. So we had to rewrite it in order to implment the
+shifting of registers.
 
 \end{document}
