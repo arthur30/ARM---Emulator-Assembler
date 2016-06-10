@@ -47,6 +47,5 @@ int dma_check_active(int ch);
 int dma_copy(void *dst, const void *sr, size_t lenc);
 int dma_fill(void *dst, const void *sr, size_t lenc);
 int dma_zero(void *dst, size_t lenc);
-int dma_wait(int ch);
 
 #endif

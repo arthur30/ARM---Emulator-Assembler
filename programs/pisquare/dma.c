@@ -74,6 +74,9 @@ static int dma(void *dst, const void *src, size_t len, uint32_t ti)
 		dma_reg->conblk_ad = (uintptr_t)(void *)&dma_blocks[i];
 		dma_reg->cs |= DMA_CS_ACTIVE;
 
+		while (dma_reg->cs & DMA_CS_ACTIVE)
+			;
+
 		return i;
 	}
 
@@ -93,11 +96,4 @@ int dma_fill(void *dst, const void *src, size_t len)
 int dma_zero(void *dst, size_t len)
 {
 	return dma_fill(dst, &zero, len);
-}
-
-int dma_wait(int ch)
-{
-	while (dma_check_active(ch))
-		;
-	return 0;
 }
