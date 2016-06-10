@@ -24,14 +24,6 @@ void draw_player(game_state_t *state, player_t *player)
 {
 	/* Draw Player */
 	draw_rect(state, entity_rect(player->entity), player->color);
-
-	/* Draw Direction */
-	vector2_t pos = (vector2_t){player->entity->pos.x
-			+ player->entity->vel.x * state->delta * 10 - 2,
-			  player->entity->pos.y
-			+ player->entity->vel.y * state->delta * 10 - 2};
-
-	draw_rect(state, (rect_t){pos, {4, 4} }, player->color);
 }
 
 void draw_sprite(game_state_t *state, sprite_t *sprt)

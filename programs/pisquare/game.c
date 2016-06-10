@@ -62,6 +62,17 @@ static void print_lives(game_state_t *state)
 						(color_t){255, 0, 0, 255});
 }
 
+static void print_io(game_state_t *state)
+{
+	char str[2];
+
+	str[0] = RPI_GetGpioValue(state->player->right_pin) > 0 ? '1' : '0';
+	str[1] = RPI_GetGpioValue(state->player->left_pin) > 0 ? '1' : '0';
+	str[2] = 0;
+
+	print_text(state, str, (vector2_t){200, 486});
+}
+
 void game_splash(game_state_t *state)
 {
 	graphics_draw_image(state->device, &(vector2_t){0, 0}, splash_bin);
@@ -81,7 +92,7 @@ void game_init(game_state_t *state)
 	player_t *player = player_new();
 
 	player->entity->pos = (vector2_t){256, 256};
-	player->angular_vel = 180;
+	player->angular_vel = 0;
 	player->right_pin = RPI_GPIO2;
 	player->left_pin = RPI_GPIO3;
 
@@ -103,11 +114,14 @@ void game_update(game_state_t *state)
 	state->timer_box += state->delta;
 	state->timer_game += state->delta;
 
-	if (RPI_GetGpioValue(state->player->right_pin) > 0)
-		state->player->angular_vel = -270;
+	print_io(state);
 
-	if (RPI_GetGpioValue(state->player->left_pin) > 0)
+	if (RPI_GetGpioValue(state->player->right_pin) == 0)
 		state->player->angular_vel = 270;
+	else if (RPI_GetGpioValue(state->player->left_pin) == 0)
+		state->player->angular_vel = -270;
+	else
+		state->player->angular_vel = 0;
 
 	/* Boxes */
 	/* Increase number of boxes over time */
