@@ -78,7 +78,8 @@ void kernel_main(unsigned int r0, unsigned int r1, unsigned int atags)
 
 	draw_splash(&state);
 
-	RPI_WaitMicroSeconds(800000);
+	RPI_WaitMicroSeconds(10000000);
+
 
 	RPI_SetGpioInput(PLAYER_1_RIGHT);
 	RPI_GetGpio()->GPPUD = 2;
