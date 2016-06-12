@@ -63,7 +63,7 @@ static void print_lives(game_state_t *state)
 
 static void print_io(game_state_t *state)
 {
-	char str[2];
+	char str[3];
 
 	str[0] = RPI_GetGpioValue(state->player->right_pin) > 0 ? '1' : '0';
 	str[1] = RPI_GetGpioValue(state->player->left_pin) > 0 ? '1' : '0';
