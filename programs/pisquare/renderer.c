@@ -27,7 +27,7 @@ graphics_t *graphics_create(size_t width, size_t height, size_t depth)
 	RPI_PropertyInit();
 	RPI_PropertyAddTag(TAG_ALLOCATE_BUFFER);
 	RPI_PropertyAddTag(TAG_SET_PHYSICAL_SIZE, width, height);
-	RPI_PropertyAddTag(TAG_SET_VIRTUAL_SIZE, width, height);
+	RPI_PropertyAddTag(TAG_SET_VIRTUAL_SIZE, width, height * 2);
 	RPI_PropertyAddTag(TAG_SET_DEPTH, depth);
 	RPI_PropertyAddTag(TAG_GET_PITCH);
 	RPI_PropertyAddTag(TAG_GET_PHYSICAL_SIZE);
@@ -49,18 +49,14 @@ graphics_t *graphics_create(size_t width, size_t height, size_t depth)
 		device->pitch = mp->data.buffer_32[0];
 
 	mp = RPI_PropertyGet(TAG_ALLOCATE_BUFFER);
-	if (mp)
+	if (mp) {
 		device->fb = (uint8_t *)(uintptr_t)mp->data.buffer_32[0];
-
-	device->mem = malloc(get_buf_size(device));
-
-	if (!device->mem)
-		goto fail1;
+		device->mem = (uint8_t *)(uintptr_t)
+			(mp->data.buffer_32[0] + get_buf_size(device));
+	}
 
 	return device;
 
-fail1:
-	free(device);
 fail:
 	return NULL;
 }
@@ -316,7 +312,17 @@ void graphics_draw_image(const graphics_t *device, const vector2_t *pos,
 	}
 }
 
-void graphics_flush(const graphics_t *device)
+void graphics_flush(graphics_t *device)
 {
-	dma_copy(device->fb, device->mem, get_buf_size(device));
+	uint8_t *tmp;
+
+	RPI_PropertyInit();
+	if (device->fb < device->mem)
+		RPI_PropertyAddTag(TAG_SET_VIRTUAL_OFFSET, 0, device->height);
+	else
+		RPI_PropertyAddTag(TAG_SET_VIRTUAL_OFFSET, 0, 0);
+	RPI_PropertyProcess();
+	tmp = device->fb;
+	device->fb = device->mem;
+	device->mem = tmp;
 }
